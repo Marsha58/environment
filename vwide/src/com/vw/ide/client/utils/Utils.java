@@ -1,14 +1,14 @@
 package com.vw.ide.client.utils;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
+
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.widget.client.TextButton;
 
+import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 /**
  * Some aux. methods
  * @author Oleg
@@ -16,7 +16,7 @@ import com.google.gwt.widget.client.TextButton;
  */
 public class Utils {
 
-	public static class DialogBoxRegularClickHandler implements ClickHandler {
+	public static class DialogBoxRegularClickHandler implements SelectHandler {
 
 		private TextButton toDisable;
 		private DialogBox dialogBox;
@@ -26,7 +26,7 @@ public class Utils {
 			this.dialogBox = dialogBox;
 		}
 		
-		public void onClick(ClickEvent event) {
+		public void onSelect(SelectEvent event) {
 			if (toDisable != null) {
 				toDisable.setEnabled(true);
 			}
@@ -59,8 +59,8 @@ public class Utils {
 			return cbk;
 		}
 		
-		public void onClick(ClickEvent event) {
-			super.onClick(event);
+		public void onClick(SelectEvent event) {
+			super.onSelect(event);
 			cbk.selected(expectedSelection);
 		}
 	}
@@ -73,7 +73,7 @@ public class Utils {
 		final DialogBox dialogBox = new DialogBox();
 		dialogBox.setText(caption);
 		dialogBox.setAnimationEnabled(true);
-		final Button closeButton = new Button("Close");
+		final TextButton closeButton = new TextButton("Close");
 		// We can set the id of a widget by accessing its Element
 		closeButton.getElement().setId("closeButton");
 		VerticalPanel dialogVPanel = new VerticalPanel();
@@ -83,7 +83,7 @@ public class Utils {
 		dialogVPanel.add(closeButton);
 		dialogBox.setWidget(dialogVPanel);
 		// Add a handler to close the DialogBox
-		closeButton.addClickHandler(new DialogBoxRegularClickHandler(dialogBox, toDisable));
+		closeButton.addSelectHandler(new DialogBoxRegularClickHandler(dialogBox, toDisable));
 		dialogBox.center();
 		return dialogBox;
 	}
@@ -96,8 +96,8 @@ public class Utils {
 		final DialogBox dialogBox = new DialogBox();
 		dialogBox.setText(caption);
 		dialogBox.setAnimationEnabled(true);
-		final Button yesButton = new Button("Yes");
-		final Button noButton = new Button("No   ");
+		final TextButton yesButton = new TextButton("Yes");
+		final TextButton noButton = new TextButton("No   ");
 		// We can set the id of a widget by accessing its Element
 		yesButton.getElement().setId("yesButton");
 		noButton.getElement().setId("noButton");
@@ -109,8 +109,8 @@ public class Utils {
 		dialogVPanel.add(noButton);
 		dialogBox.setWidget(dialogVPanel);
 		// Add a handler to close the DialogBox
-		yesButton.addClickHandler(new DialogBoxYesNoClickHandler(dialogBox, toDisable, YesNoMsgBoxSelctionCallback.SELECTION.YES, yesNoCbk));
-		noButton.addClickHandler(new DialogBoxYesNoClickHandler(dialogBox, toDisable, YesNoMsgBoxSelctionCallback.SELECTION.NO, yesNoCbk));
+		yesButton.addSelectHandler(new DialogBoxYesNoClickHandler(dialogBox, toDisable, YesNoMsgBoxSelctionCallback.SELECTION.YES, yesNoCbk));
+		noButton.addSelectHandler(new DialogBoxYesNoClickHandler(dialogBox, toDisable, YesNoMsgBoxSelctionCallback.SELECTION.NO, yesNoCbk));
 		dialogBox.center();
 		return dialogBox;
 	}

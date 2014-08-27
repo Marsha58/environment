@@ -1,16 +1,17 @@
 package com.vw.ide.client.login;
 
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.widget.client.TextButton;
 import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -24,7 +25,7 @@ public class LoginView extends Composite implements HasText, PresenterViewerLink
 	
 	@UiField TextBox userNameField;
 	@UiField PasswordTextBox passwordField;
-	@UiField TextButton loginProceed;
+	@UiField Button loginProceed;
 
 	interface LoginViewUiBinder extends UiBinder<Widget, LoginView> {
 	}
@@ -57,7 +58,7 @@ public class LoginView extends Composite implements HasText, PresenterViewerLink
 	
 	@UiHandler("loginProceed")
 	void onLoginProceedClick(ClickEvent event) {
-		boolean proceed = true;
+/*		boolean proceed = true;
 		String userName = userNameField.getText();
 		String password = passwordField.getText();
 		if (userName == null || userName.length() == 0) {
@@ -76,5 +77,6 @@ public class LoginView extends Composite implements HasText, PresenterViewerLink
 				presenter.fireEvent(new LoginEvent(userName, password));
 			}
 		}
+*/		
 	}
 }

@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
->
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.vw.ide</groupId>
 	<artifactId>vwide</artifactId>
@@ -11,26 +10,27 @@
 	<properties>
 		<spring.version>3.0.5.RELEASE</spring.version>
 		<gwtVersion>2.6.0</gwtVersion>
+		<gwtBootstrap3.version>0.8</gwtBootstrap3.version>
 	</properties>
 
 	<dependencies>
 
 		<dependency>
-      			<groupId>com.google.gwt</groupId>
-      			<artifactId>gwt-servlet</artifactId>
-      			<version>${gwtVersion}</version>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-servlet</artifactId>
+			<version>${gwtVersion}</version>
 			<scope>provided</scope>
-    		</dependency>
-    		<dependency>
-      			<groupId>com.google.gwt</groupId>
-      			<artifactId>validation-api-1.0.0.GA</artifactId>
-      			<version>${gwtVersion}</version>
-    		</dependency>
-    		<dependency>
-      			<groupId>com.google.gwt</groupId>
-      			<artifactId>validation-api-1.0.0.GA-sources</artifactId>
-      			<version>${gwtVersion}</version>
-    		</dependency>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>validation-api-1.0.0.GA</artifactId>
+			<version>${gwtVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>validation-api-1.0.0.GA-sources</artifactId>
+			<version>${gwtVersion}</version>
+		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -74,6 +74,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>org.gwtbootstrap3</groupId>
+			<artifactId>gwtbootstrap3</artifactId>
+			<version>${gwtBootstrap3.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.gwtbootstrap3</groupId>
+			<artifactId>gwtbootstrap3-extras</artifactId>
+			<version>${gwtBootstrap3.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -88,9 +100,24 @@
 			<url>http://repository.springsource.com/maven/bundles/external </url>
 		</repository>
 		<repository>
-    			<id>spring-external</id>
-    			<name>Spring External Repository</name>
-    			<url>http://maven.springframework.org/external</url>
+			<id>spring-external</id>
+			<name>Spring External Repository</name>
+			<url>http://maven.springframework.org/external</url>
+		</repository>
+		<repository>
+			<id>sonatype</id>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>sencha-commercial-release</id>
+			<name>Sencha commercial releases</name>
+			<url>https://maven.sencha.com/repo/commercial-release/</url>
 		</repository>
 	</repositories>
 
@@ -110,19 +137,19 @@
 
 		<plugins>
 			<plugin>
-  				<groupId>org.codehaus.mojo</groupId>
-  				<artifactId>gwt-maven-plugin</artifactId>
-  				<version>2.6.0</version>
-  				<executions>
-    					<execution>
-      						<configuration>
-        						<extraParam>true</extraParam>
-      						</configuration>
-      						<goals>
-        						<goal>compile</goal>
-      						</goals>
-    					</execution>
-  				</executions>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>2.6.0</version>
+				<executions>
+					<execution>
+						<configuration>
+							<extraParam>true</extraParam>
+						</configuration>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
