@@ -6,16 +6,13 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
-import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialog;
+import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.handler.LoginHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
 import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.login.LoginGxtPresenter;
-import com.vw.ide.client.login.LoginPresenter;
-import com.vw.ide.client.login.LoginView;
 import com.vw.ide.client.login.LoginViewGxt;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.factory.ServicesBrokerFactory;
@@ -42,14 +39,12 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 	    if (token != null) {
 			Presenter presenter = null;
 			
-			if (token.equals("login")) {
-			    presenter = new LoginPresenter(eventBus, new LoginView());
-			} else if (token.equals("loginGxt")) {
-				    presenter = new LoginGxtPresenter(eventBus, new LoginViewGxt());
+			if (token.equals("loginGxt")) {
+			    presenter = new LoginGxtPresenter(eventBus, new LoginViewGxt());
 			} else 	if (token.equals("dev")) {
 			    presenter = new DevelopmentBoardPresenter(eventBus, new DevelopmentBoard());
 			    presenter.setLoggedAsUser(getLoggedAsUser());
-			}
+			} 
 			if (presenter != null) {
 				presenter.go(container);
 			}

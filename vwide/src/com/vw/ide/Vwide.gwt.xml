@@ -25,8 +25,6 @@
 	<!-- Other module inherits -->
 	<inherits name='edu.ycp.cs.dh.acegwt.AceGWT' />
 	<inherits name='com.sencha.gxt.ui.GXT' />
-	<inherits name='com.google.gwt.sample.mail.Mail' />
-
 
 	<!-- Include both base GXT themes and set the app to check for url params 
 		to activate blue -->
