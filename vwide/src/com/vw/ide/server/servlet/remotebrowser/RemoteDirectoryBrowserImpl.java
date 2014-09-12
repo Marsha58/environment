@@ -1,6 +1,9 @@
 package com.vw.ide.server.servlet.remotebrowser;
 
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,4 +148,39 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	    }
 	    dir.delete();
 	}
+	
+	
+	private String openFile(String fileName) throws IOException {
+	    BufferedReader br = new BufferedReader(new FileReader(fileName));
+	    try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } finally {
+	        br.close();
+	    }
+	}
+
+	@Override
+	public RequestDirOperationResult readFile(String user, String parent,
+			String fileName) {
+		RequestDirOperationResult res = new RequestDirOperationResult();
+		res.setOperation("read file");
+		res.setRetCode(0);
+		try {
+			res.setTextFile(openFile(fileName));
+		}
+		catch(Exception ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(-1);
+		}
+		return res;
+	}	
+	
 }

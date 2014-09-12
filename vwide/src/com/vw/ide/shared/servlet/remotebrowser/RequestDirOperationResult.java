@@ -13,6 +13,7 @@ public class RequestDirOperationResult implements Serializable {
 	private String result;
 	private String operation;
 	private Integer retCode;
+	private String sTextFile;
 	
 	public String getPath() {
 		return path;
@@ -45,4 +46,13 @@ public class RequestDirOperationResult implements Serializable {
 	public void setOperation(String operation) {
 		this.operation = operation;
 	}
+	
+	public String getTextFile() {
+		return sTextFile;
+	}
+	
+	public void setTextFile(String sTextFile) {
+		this.sTextFile = sTextFile;
+	}
+	
 }

@@ -29,7 +29,7 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	public RequestedDirScanResult getDirScan(String user, String dir);
 	
 	/**
-	 * Creates dirrectory
+	 * Creates directory
 	 * @param user
 	 * @param parent
 	 * @param dir
@@ -43,4 +43,13 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 * @param dir
 	 */
 	public RequestDirOperationResult removeDir(String user, String parent, String dir);
+	
+	/**
+	 * File reading
+	 * @param user
+	 * @param parent
+	 * @param fileName
+	 */
+	public RequestDirOperationResult readFile(String user, String parent, String fileName);
+	
 }

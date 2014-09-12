@@ -32,6 +32,7 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 		bind();
 		ServicesBrokerFactory.instantiateAllServices(eventBus);
 	}
+
 	
 	public void onValueChange(ValueChangeEvent<String> event) {
 	    String token = event.getValue();
@@ -40,7 +41,7 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 			Presenter presenter = null;
 			
 			if (token.equals("loginGxt")) {
-			    presenter = new LoginGxtPresenter(eventBus, new LoginViewGxt());
+				presenter = new LoginGxtPresenter(eventBus, new LoginViewGxt());
 			} else 	if (token.equals("dev")) {
 			    presenter = new DevelopmentBoardPresenter(eventBus, new DevelopmentBoard());
 			    presenter.setLoggedAsUser(getLoggedAsUser());

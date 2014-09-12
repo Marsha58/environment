@@ -38,6 +38,15 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 			this.service = service;
 		}
 	}
+	
+	public static class ServiceCallbackForReadingFile extends ServiceCallback<List<String>>  {
+
+		private RemoteBrowserService service;
+		
+		public ServiceCallbackForReadingFile(RemoteBrowserService service) {
+			this.service = service;
+		}
+	}	
 
 	public static class ServiceCallbackForCompleteContent extends ServiceCallback<RequestedDirScanResult> {
 
@@ -100,5 +109,9 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 	public ServiceCallbackForAnyOperation buildCallbackForAnyOperation() {
 		return new ServiceCallbackForAnyOperation(this);
 	}
+	
+	public ServiceCallbackForReadingFile buildCallbackForReadingFile() {
+		return new ServiceCallbackForReadingFile(this);
+	}	
 	
 }

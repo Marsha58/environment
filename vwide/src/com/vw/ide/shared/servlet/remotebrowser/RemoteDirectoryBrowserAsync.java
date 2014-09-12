@@ -36,5 +36,14 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param dir
 	 */
 	public void removeDir(String user, String parent, String dir, AsyncCallback<RequestDirOperationResult> callback);
+
+	
+	/**
+	 * Creates directory
+	 * @param user
+	 * @param parent
+	 * @param filaName
+	 */
+	public void readFile(String user, String parent, String fileName, AsyncCallback<RequestDirOperationResult> callback);
 	
 }

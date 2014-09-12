@@ -82,6 +82,7 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 		
 		public DirOperationCreateResult(RemoteDirectoryBrowserDialog dialog) {
 			this.dialog = dialog;
+			
 		}
 		
 		@Override
@@ -170,6 +171,8 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 
 	public RemoteDirectoryBrowserDialog() {
 		super.setWidget(uiBinder.createAndBindUi(this));
+		
+
 		bind();
 	}
 
@@ -186,6 +189,8 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 	@UiHandler("ok")
 	void onOkClick(ClickEvent event) {
 	}
+	
+
 
 	/**
 	 * Performs preparation steps
