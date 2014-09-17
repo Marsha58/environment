@@ -149,6 +149,8 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	    dir.delete();
 	}
 	
+
+	
 	
 	private String openFile(String fileName) throws IOException {
 	    BufferedReader br = new BufferedReader(new FileReader(fileName));
@@ -172,6 +174,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			String fileName) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setOperation("read file");
+		res.setPath(fileName);
 		res.setRetCode(0);
 		try {
 			res.setTextFile(openFile(fileName));

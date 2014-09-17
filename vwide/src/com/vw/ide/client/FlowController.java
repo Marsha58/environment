@@ -8,10 +8,13 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel;
 import com.vw.ide.client.event.handler.LoginHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
+import com.vw.ide.client.event.handler.SelectFileHandler;
 import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
+import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.login.LoginGxtPresenter;
 import com.vw.ide.client.login.LoginViewGxt;
 import com.vw.ide.client.presenters.Presenter;
@@ -37,14 +40,16 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 	public void onValueChange(ValueChangeEvent<String> event) {
 	    String token = event.getValue();
 	    
+	    
 	    if (token != null) {
 			Presenter presenter = null;
-			
+
 			if (token.equals("loginGxt")) {
 				presenter = new LoginGxtPresenter(eventBus, new LoginViewGxt());
 			} else 	if (token.equals("dev")) {
 			    presenter = new DevelopmentBoardPresenter(eventBus, new DevelopmentBoard());
 			    presenter.setLoggedAsUser(getLoggedAsUser());
+			    
 			} 
 			if (presenter != null) {
 				presenter.go(container);
@@ -78,6 +83,11 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 				doLogout(event);
 			}
 		});
+		eventBus.addHandler(SelectFileEvent.TYPE, new SelectFileHandler() {
+			public void onSelectFile(SelectFileEvent event) {
+				doSelectFile(event);
+			}
+		});
 	}
 	
 	private void doLogin(LoginEvent event) {
@@ -89,6 +99,12 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 		setLoggedAsUser(null);
 		History.newItem("login");
 	}
+	
+	private void doSelectFile(SelectFileEvent event) {
+		History.newItem("selectFile");
+	}
+
+	
 	
 	public void fireEvent(GwtEvent<?> event) {
 	}
