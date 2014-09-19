@@ -3,6 +3,8 @@ package com.vw.ide.client.service.factory;
 import com.google.gwt.core.shared.GWT;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
+import com.vw.ide.shared.servlet.security.RemoteSecurity;
+import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;
 
 /**
  * Factory of internal services (stubs)
@@ -17,4 +19,14 @@ public class ServicesStubFactory {
 	public static RemoteDirectoryBrowserAsync createRemoteDirectoryBrowserAsync() {
 		return GWT.create(RemoteDirectoryBrowser.class);
 	}	
+
+	/**
+	 * Instantiates y remote security service
+	 * @return
+	 */
+	public static RemoteSecurityAsync createRemoteSecurityAsync() {
+		return GWT.create(RemoteSecurity.class);
+	}	
+	
+	
 }
