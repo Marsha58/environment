@@ -92,7 +92,7 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 	
 	private void doLogin(LoginEvent event) {
 		setLoggedAsUser(event.getLoggedAsUser());
-		History.newItem("dev");
+//		History.newItem("dev");
 	}
 	
 	private void doLogout(LogoutEvent event) {
