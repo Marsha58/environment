@@ -1,0 +1,26 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:w="urn:import:com.google.gwt.widget.client">
+	<ui:style>
+	.important {
+		font-weight: bold;
+	}
+	.dialogBackground {
+			background-color: beige;
+	}	
+	</ui:style>
+	<g:FlowPanel styleName="{style.dialogBackground}" width="600px" height="400px" ui:field="dialogMainPanel">
+		<g:FlowPanel height="255px">
+			<g:HTML wordWrap="true"/>
+		</g:FlowPanel>
+		<g:LayoutPanel height="10%" width="100%">
+			<g:layer left="420px" right="100px" top="3px" height="30px">
+				<w:TextButton ui:field="cancel">Cancel</w:TextButton>
+			</g:layer>
+			<g:layer left="510px" right="10px" top="3px" height="30px">
+				<w:TextButton ui:field="ok">Ok</w:TextButton>
+			</g:layer>
+		</g:LayoutPanel>
+	</g:FlowPanel>
+</ui:UiBinder> 

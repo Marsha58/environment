@@ -1,0 +1,26 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client"
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button">
+
+  <ui:style>
+    .centerMargin {
+ 		margin: auto;
+    	width: 70%;
+    }    
+  </ui:style>
+
+	<g:FlowPanel height="255px">
+		<g:HTML wordWrap="true">
+				<h2 style="text-align:center;">Virtual worlds modeling language</h2>
+				<h4 style="text-align:center;">integrated development environment</h4>
+				<p class="centerMargin" style="color:#556677;font-size:12px;text-align:center;">version 0.1</p>
+				<p style="padding-bottom:5px;color:#556677;font-size:12px;text-align:center;">2014</p>
+				<p style="padding:10px;text-align:justify;">
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+				</p>
+		</g:HTML> 
+	</g:FlowPanel>
+
+</ui:UiBinder> 

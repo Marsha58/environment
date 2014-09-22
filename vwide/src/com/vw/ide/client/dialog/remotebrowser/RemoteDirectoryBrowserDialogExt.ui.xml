@@ -1,0 +1,117 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:w="urn:import:com.google.gwt.widget.client"
+	xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client" xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:f="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
+	xmlns:tree="urn:import:com.sencha.gxt.widget.core.client.tree">
+	<ui:style>
+	.important {
+		font-weight: bold;
+	}
+	</ui:style>
+	<ui:with field='res'
+		type='com.vw.ide.client.dialog.remotebrowser.bundle.Images' />
+
+  <ui:with type="com.sencha.gxt.core.client.util.Margins" field="outerMargins">
+    <ui:attributes top="10" right="10" bottom="10" left="10" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.core.client.util.Margins" field="northMargins">
+    <ui:attributes top="1" right="5" bottom="1" left="5" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.core.client.util.Margins" field="westMargins">
+    <ui:attributes top="0" right="5" bottom="0" left="5" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.core.client.util.Margins" field="centerMargins">
+    <ui:attributes top="0" right="0" bottom="0" left="0" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.core.client.util.Margins" field="eastMargins">
+    <ui:attributes top="0" right="5" bottom="0" left="5" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.core.client.util.Margins" field="southMargins">
+    <ui:attributes top="5" right="5" bottom="5" left="5" />
+  </ui:with>
+  
+  <ui:with type="com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData" field="northData">
+    <ui:attributes size="40" margins="{northMargins}" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData" field="westData">
+    <ui:attributes size="250" margins="{westMargins}" collapsible="false" split="true" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.widget.core.client.container.MarginData" field="centerData">
+    <ui:attributes margins="{centerMargins}" />
+  </ui:with>  
+  <ui:with type="com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData" field="southData">
+    <ui:attributes size="20" margins="{southMargins}" />
+  </ui:with>  
+
+  <ui:with type="com.sencha.gxt.widget.core.client.tips.ToolTipConfig" field="createDirToolTip">
+    <ui:attributes bodyText="Create Directory" trackMouse="false" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.widget.core.client.tips.ToolTipConfig" field="removeDirToolTip">
+    <ui:attributes bodyText="Remove Directory" trackMouse="false" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.widget.core.client.tips.ToolTipConfig" field="refreshDirToolTip">
+    <ui:attributes bodyText="Refresh Directory" trackMouse="false" />
+  </ui:with>
+  
+  <ui:with type="com.sencha.gxt.data.shared.TreeStore" field="store" />
+  <ui:with type="com.sencha.gxt.core.client.ValueProvider" field="valueProvider" />  
+  
+	<container:BorderLayoutContainer
+		ui:field="con" borders="false">
+		<container:north layoutData="{northData}">
+			<container:HBoxLayoutContainer 	hBoxLayoutAlign="MIDDLE">
+				<container:child>
+					<button:TextButton icon="{res.createdir}" ui:field="createDir" toolTipConfig="{createDirToolTip}"/>
+				</container:child>
+				<container:child>
+					<button:TextButton icon="{res.removedir}" ui:field="removeDir" toolTipConfig="{removeDirToolTip}"/>
+				</container:child>
+				<container:child>
+					<button:TextButton icon="{res.refreshdir}" ui:field="refreshDir" toolTipConfig="{refreshDirToolTip}"/>
+				</container:child>
+			</container:HBoxLayoutContainer>
+		</container:north>
+		<container:west layoutData="{westData}">
+			<gxt:ContentPanel resize="true">
+			        <tree:Tree ui:field="treeDirs" width="300" valueProvider="{valueProvider}" store="{store}">
+        			</tree:Tree>
+			</gxt:ContentPanel>
+		</container:west>
+		<container:center layoutData="{centerData}">
+			<gxt:ContentPanel resize="true">
+			</gxt:ContentPanel>
+		</container:center>
+		<container:south layoutData="{southData}">
+			<container:SimpleContainer>
+				<g:Label text = "selectedPathField" ui:field="selectedPathField"/>
+			</container:SimpleContainer>
+		</container:south>
+	</container:BorderLayoutContainer>
+	<!-- <g:FlowPanel styleName="{style.dialogBackground}" width="600px" height="400px" 
+		ui:field="dialogMainPanel"> 
+			<g:LayoutPanel height="12%" width="100%"> 
+				<g:layer left="10px" right="546px" top="3px" height="41px"> 
+				<g:PushButton ui:field="createDir"> 
+					<g:downFace image='{res.createdir}'>
+					</g:downFace> 
+					<g:upFace image='{res.createdir}'></g:upFace> 
+		</g:PushButton> </g:layer> <g:layer left="60px" right="496px" top="3px" height="41px"> 
+		<g:PushButton ui:field="removeDir"> <g:downFace image='{res.removedir}'></g:downFace> 
+		<g:upFace image='{res.removedir}'></g:upFace> </g:PushButton> </g:layer> 
+		<g:layer left="110px" right="446px" top="3px" height="41px"> <g:PushButton 
+		ui:field="refreshDir"> <g:downFace image='{res.refreshdir}'></g:downFace> 
+		<g:upFace image='{res.refreshdir}'></g:upFace> </g:PushButton> </g:layer> 
+		</g:LayoutPanel> <g:SplitLayoutPanel styleName="{style.panelFramed}" width="100%" 
+		height="78%"> <g:west size='300' unit='PX'> <g:Tree ui:field="dirsField"></g:Tree> 
+		</g:west> <g:center size='270' unit='PX'> <g:ListBox ui:field="filesField" 
+		width="100%"></g:ListBox> </g:center> </g:SplitLayoutPanel> <g:LayoutPanel 
+		height="10%" width="100%"> <g:layer left="10px" right="200px" top="3px" height="30px"> 
+		<g:Label ui:field="selectedPathField" horizontalAlignment="ALIGN_LEFT"></g:Label> 
+		</g:layer> <g:layer left="420px" right="100px" top="3px" height="30px"> <w:TextButton 
+		ui:field="cancel">Cancel</w:TextButton> </g:layer> <g:layer left="510px" 
+		right="10px" top="3px" height="30px"> <w:TextButton ui:field="ok">Ok</w:TextButton> 
+		</g:layer> </g:LayoutPanel> </g:FlowPanel> -->
+</ui:UiBinder> 

@@ -1,0 +1,122 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:w="urn:import:com.google.gwt.widget.client"
+	xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client" 
+	xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:f="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button">
+	<ui:style>
+	.important {
+		font-weight: bold;
+	}
+	
+	.panelFramed {
+		border-top: 1px solid #666;
+		border-right: 1px solid #666;
+		border-left: 1px solid #666;
+		border-bottom: 1px solid #666;
+		background-color: beige;
+	}
+	
+	.dialogBackground {
+		background-color: beige;
+	}
+	
+	.westPanel {
+		background-color: beige;
+	}
+	
+	.centerPanel {
+		background-color: beige;
+	}
+	</ui:style>
+
+	<ui:with type="com.sencha.gxt.core.client.util.Padding" field="padding5">
+		<ui:attributes top="5" right="5" bottom="5" left="5" />
+	</ui:with>
+
+	<container:VBoxLayoutContainer padding="{padding5}" vBoxLayoutAlign="STRETCH">
+		<container:child>
+			<form:FieldSet ui:field="fieldSetVWMLsettings"
+				headingText="VWML settings" collapsible="true">
+				<container:VerticalLayoutContainer>
+					<container:child>
+						<form:FieldLabel text="Project Name">
+							<form:widget>
+								<form:TextField allowBlank="false" />
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel text="Project path">
+							<form:widget>
+								<container:HBoxLayoutContainer  hBoxLayoutAlign="MIDDLE">						    
+									<container:child>
+										<form:TextField allowBlank="false" width="280px"/>
+									</container:child>
+									<container:child>
+										<button:TextButton ui:field="browseVwmlProjPath" text="Browse" />
+									</container:child>
+								</container:HBoxLayoutContainer>		
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel text="Main module">
+							<form:widget>
+								<form:TextField allowBlank="false" width="280px"/>
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel text="Author">
+							<form:widget>
+								<form:TextField allowBlank="false" />
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel text="Description">
+							<form:widget>
+								<f:TextArea allowBlank="true" width="325px" height="60px"/>
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+				</container:VerticalLayoutContainer>
+			</form:FieldSet>
+		</container:child>
+		<container:child>
+			<form:FieldSet ui:field="fieldSetJavasettings"
+				headingText="VWML settings" collapsible="true">
+				<container:VerticalLayoutContainer>
+					<container:child>
+						<form:FieldLabel text="Package">
+							<form:widget>
+								<form:TextField allowBlank="false" width="280px"/>
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel text="Source path">
+							<form:widget>
+								<container:HBoxLayoutContainer  hBoxLayoutAlign="MIDDLE">						    
+									<container:child>
+										<form:TextField allowBlank="false" width="280px"/>
+									</container:child>
+									<container:child>
+										<button:TextButton text="Browse" />
+									</container:child>
+								</container:HBoxLayoutContainer>		
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+				</container:VerticalLayoutContainer>
+			</form:FieldSet>
+
+		</container:child>
+	</container:VBoxLayoutContainer>
+
+
+</ui:UiBinder> 

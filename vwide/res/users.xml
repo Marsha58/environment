@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appl>
+	<users>
+  		<user name="admin" password="admin" >
+                      <roles>
+                             <role>superuser</role>
+                             <role>manager</role>
+                      </roles>
+                </user>
+  		<user name="olmel" password="perception" >
+                      <roles>
+                             <role>simple</role>
+                      </roles>
+                </user>
+	</users>
+	<roles_list>
+                <role>superuser</role>
+  		<role>manager</role>
+  		<role>simple</role>
+	</roles_list>
+
+</appl>

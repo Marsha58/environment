@@ -1,0 +1,118 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui' 
+	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client" 
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
+	xmlns:tree="urn:import:com.sencha.gxt.widget.core.client.tree">
+
+	<!-- GIFs needed for ie6 work arounds. Can't use <ui:image>, it makes PNGs -->
+	<ui:data field='mailboxesgroupIe6Data' src='../../images/mailboxesgroup_ie6.gif' />
+	<ui:data field='tasksgroupIe6Data' src='../../images/tasksgroup_ie6.gif' />
+	<ui:data field='contactsgroupIe6Data' src='../../images/contactsgroup_ie6.gif' />
+
+	<ui:style>
+  .shortcuts {
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+  }
+
+  @sprite .stackHeader {
+    gwt-image: 'gradient';
+    background-color: #b4b6bc;
+    cursor: pointer;
+
+    text-shadow: rgba(255, 255, 255, 1) 0 1px 1px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #000;
+    padding: .7em .5em 0 .6em;
+    border-top: 1px solid #888;
+  }
+
+  @if user.agent ie6 {
+    @url mailboxesgroupIe6 mailboxesgroupIe6Data;
+    @url tasksgroupIe6 tasksgroupIe6Data;
+    @url contactsgroupIe6 contactsgroupIe6Data;
+
+    .mailboxesIcon {
+      background-image: mailboxesgroupIe6;
+      width: 31px;
+      height: 22px;
+      float: left;
+    }
+
+    .tasksIcon {
+      background-image: tasksgroupIe6;
+      width: 31px;
+      height: 22px;
+      float: left;
+    }
+
+    .contactsIcon {
+      background-image: contactsgroupIe6;
+      width: 31px;
+      height: 22px;
+      float: left;
+    }
+  } @else {
+    @sprite .mailboxesIcon {
+      gwt-image: 'mailboxesgroup';
+      float: left;
+    }
+  
+    @sprite .tasksIcon {
+      gwt-image: 'tasksgroup';
+      float: left;
+    }
+  
+    @sprite .contactsIcon {
+      gwt-image: 'contactsgroup';
+      float: left;
+    }
+    .sep {   
+    	margin-top: 20px;
+    }    
+  }
+  </ui:style>
+
+	<ui:image field='mailboxesgroup' src='../../images/mailboxesgroup.png' />
+	<ui:image field='contactsgroup' src='../../images/contactsgroup.png' />
+	<ui:image field='tasksgroup' src='../../images/tasksgroup.png' />
+	<ui:image field='gradient' src='../../images/gradient_bg_dark.png'
+		repeatStyle='Horizontal' />
+
+
+	<ui:with type="com.sencha.gxt.widget.core.client.TabItemConfig"
+		field="shortTextTabConfig">
+		<ui:attributes text="VWML" />
+	</ui:with>
+	<ui:with type="com.sencha.gxt.widget.core.client.TabItemConfig"
+		field="longTextTabConfig">
+		<ui:attributes text="Java" />
+	</ui:with>
+
+  <ui:with type="com.sencha.gxt.data.shared.TreeStore" field="store" />
+  <ui:with type="com.sencha.gxt.core.client.ValueProvider" field="valueProvider" /> 
+
+	<gxt:TabPanel width="450" addStyleNames="margin-10">
+		<gxt:child config="{shortTextTabConfig}">
+			<container:SimpleContainer>
+				<gxt:ContentPanel ui:field="panel" headingText="Basic Tree (UiBinder)" resize="true"
+					pixelSize="350, 400" addStyleNames="margin-10">
+			        <tree:Tree ui:field="projectsDirsField" width="300" valueProvider="{valueProvider}" store="{store}">
+        			</tree:Tree>
+				</gxt:ContentPanel>
+			</container:SimpleContainer>
+		</gxt:child>
+
+		<gxt:child config="{longTextTabConfig}">
+			<container:FlowLayoutContainer>
+				<g:Label text="txt1" addStyleNames="pad-text" />
+				<g:Label text="txt2" addStyleNames="pad-text {style.sep}" />
+			</container:FlowLayoutContainer>
+		</gxt:child>
+	</gxt:TabPanel>
+
+
+</ui:UiBinder>
