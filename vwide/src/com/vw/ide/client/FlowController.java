@@ -9,9 +9,11 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel;
+import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.LoginHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
 import com.vw.ide.client.event.handler.SelectFileHandler;
+import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
@@ -83,11 +85,6 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 				doLogout(event);
 			}
 		});
-		eventBus.addHandler(SelectFileEvent.TYPE, new SelectFileHandler() {
-			public void onSelectFile(SelectFileEvent event) {
-				doSelectFile(event);
-			}
-		});
 	}
 	
 	private void doLogin(LoginEvent event) {
@@ -100,10 +97,6 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 		History.newItem("login");
 	}
 	
-	private void doSelectFile(SelectFileEvent event) {
-		History.newItem("selectFile");
-	}
-
 	
 	
 	public void fireEvent(GwtEvent<?> event) {

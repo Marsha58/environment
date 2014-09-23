@@ -12,8 +12,8 @@ public class FileItemInfo implements Serializable {
 	private String name;
 	private String path;
 	private boolean isDir;
-	private byte[] checkSumOnOpen;
-	private byte[] checkSumOnClose;
+	private String checkSumOnOpen;
+	private String checkSumOnClose;
 	private boolean isEdited;
 	
 	
@@ -52,19 +52,19 @@ public class FileItemInfo implements Serializable {
 		this.isDir = isDir;
 	}
 	
-	public byte[] getCheckSumOnOpen() {
+	public String getCheckSumOnOpen() {
 		return checkSumOnOpen;
 	}
 	
-	public void setCheckSumOnOpen(byte[] checkSumOnOpen) {
+	public void setCheckSumOnOpen(String checkSumOnOpen) {
 		this.checkSumOnOpen = checkSumOnOpen;
 	}	
 
-	public byte[] getCheckSumOnClose() {
+	public String getCheckSumOnClose() {
 		return checkSumOnClose;
 	}
 	
-	public void setCheckSumOnClose(byte[] checkSumOnClose) {
+	public void setCheckSumOnClose(String checkSumOnClose) {
 		this.checkSumOnClose = checkSumOnClose;
 	}	
 

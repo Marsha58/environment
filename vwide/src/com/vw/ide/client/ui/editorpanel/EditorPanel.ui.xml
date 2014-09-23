@@ -54,7 +54,8 @@
 		type="com.sencha.gxt.core.client.resources.ThemeStyles.ThemeAppearance"
 		field="theme" />
 
-	<gxt:TabPanel addStyleNames="margin-10" ui:field="tabPanel">
+	<gxt:TabPanel addStyleNames="margin-10" ui:field="tabPanel" >
+<!-- 
 		<gxt:child config="{shortTextTabConfig}" >
 			<g:DockLayoutPanel ui:field="dockLayoutPanel1" height="700px">
 				<g:center>
@@ -81,7 +82,7 @@
 				</g:south>
 			</g:DockLayoutPanel>
 		</gxt:child>
-
+ -->
 
 	</gxt:TabPanel>
 

@@ -9,6 +9,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ResizeComposite;
@@ -25,7 +26,12 @@ import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.dialog.about.AboutDialog;
 import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialog;
+import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
+import com.vw.ide.client.event.handler.LoginHandler;
+import com.vw.ide.client.event.handler.LogoutHandler;
 import com.vw.ide.client.event.handler.SelectFileHandler;
+import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
+import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -259,30 +265,6 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 		projectPanel.requestForDirContent(null);
 	}	
 
-	private void bind() {
-
-		// Special-case stuff to make topPanel overhang a bit.
-		// Element topElem = outer.getWidgetContainerElement(topPanel);
-		// topElem.getStyle().setZIndex(2);
-		// topElem.getStyle().setOverflow(Overflow.VISIBLE);
-
-		// if (logoutField != null) {
-		// logoutField.setScheduledCommand(new LogoutCommand(this));
-		// }
-
-		// if (newVwmlProjField != null) {
-		// newVwmlProjField
-		// .setScheduledCommand(new NewVwmlProjectCommand(this));
-		// }
-
-		// if (helpAboutField != null) {
-		// helpAboutField.setScheduledCommand(new AboutCommand());
-		// }
-
-		// RootLayoutPanel root = RootLayoutPanel.get();
-		// root.add(outer);
-
-	}
 	
 	
 

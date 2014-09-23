@@ -48,6 +48,7 @@ import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.vw.ide.client.dialog.about.AboutDialogExt;
 import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt;
+import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -174,6 +175,7 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 		@Override
 		public void onSelection(SelectionEvent<AceEditorTheme> event) {
 //			editor1.setTheme(event.getSelectedItem());
+			presenter.fireEvent(new AceColorThemeChangedEvent(event));
 			
 		}
     });			

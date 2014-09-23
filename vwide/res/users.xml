@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appl>
 	<users>
-  		<user name="admin" password="admin" >
+  		<user name="admin" password="21232f297a57a5a743894a0e4a801fc3" >
                       <roles>
                              <role>superuser</role>
                              <role>manager</role>
                       </roles>
                 </user>
-  		<user name="olmel" password="perception" >
+  		<user name="olmel" password="4596647ea31bcace6c011c1b99b2388d" >
                       <roles>
                              <role>simple</role>
                       </roles>

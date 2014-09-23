@@ -3,6 +3,7 @@ package com.vw.ide.client.projects;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 public class FileManagerImpl implements FileManager {
@@ -11,6 +12,8 @@ public class FileManagerImpl implements FileManager {
 	
 	Map<Long, FileItemInfo> filesFileInfoContext =  new HashMap <Long, FileItemInfo>();
 	Map<Long, String> filesContext =  new HashMap <Long, String>();
+	Map<Long, Widget> associatedTabWidgets =  new HashMap <Long, Widget>();
+	
 	
 	private Long getNewFileId() {
 		return ++idsCounter;
@@ -124,6 +127,33 @@ public class FileManagerImpl implements FileManager {
 			}
 		}
 		return res;
+	}
+
+	@Override
+	public void setAssociatedTabWidget(Long fileId, Widget widget) {
+		associatedTabWidgets.put(fileId, widget);
+		
+	}
+
+	@Override
+	public Widget getAssociatedTabWidget(Long fileId) {
+		return associatedTabWidgets.get(fileId);
+	}	
+	
+
+	@Override
+	public Map<Long, Widget> getAssociatedTabWidgets() {
+		return associatedTabWidgets;
+	}	
+	
+	@Override
+	public Map<Long, FileItemInfo> getFilesFileInfoContext() {
+		return filesFileInfoContext;
+	}	
+	
+	@Override
+	public Map<Long, String> getFilesContext() {
+		return filesContext;
 	}	
 	
 

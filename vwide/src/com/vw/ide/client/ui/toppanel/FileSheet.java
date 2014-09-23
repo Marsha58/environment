@@ -3,6 +3,7 @@ package com.vw.ide.client.ui.toppanel;
 import java.util.Arrays;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,6 +28,7 @@ import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceAnnotationType;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditor;
+import edu.ycp.cs.dh.acegwt.client.ace.AceEditorCallback;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorMode;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 
@@ -82,10 +84,17 @@ public class FileSheet extends Composite {
 		return fileName;
 	}
 	
+	
+	public AceEditor getAceEditor() {
+		return aceEditor;
+	}
+	
 	public void constructEditor(String textFile) {
 		aceEditor = new AceEditor();
 		aceEditor.setWidth("100%");
 		aceEditor.setHeight("600px");
+		
+		
 
 		// Try out custom code completer
 		// AceEditor.addCompletionProvider(new MyCompletionProvider());
@@ -98,6 +107,14 @@ public class FileSheet extends Composite {
 
 		aceEditor.setText(textFile);
 
+		aceEditor.addOnChangeHandler(new AceEditorCallback() {
+			@Override
+			public void invokeAceCallback(JavaScriptObject obj) {
+				
+				System.out.println("invokeAceCallback: ");
+			}
+			
+		});
 		// add some annotations
 		// editor1.addAnnotation(0, 1, "What's up?", AceAnnotationType.WARNING);
 		// editor1.addAnnotation(2, 1, "This code is lame",

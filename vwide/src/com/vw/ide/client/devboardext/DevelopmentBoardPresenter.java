@@ -4,8 +4,14 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
+import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
+import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.SelectFileHandler;
+import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
+import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -46,6 +52,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		}
 
 		fileManager = new FileManagerImpl();
+		
 
 	}
 
@@ -59,9 +66,13 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 		if (event instanceof SelectFileEvent) {
 			SelectFileEvent evt = (SelectFileEvent) event;
-//			fileManager.addFile(evt.getFileItemInfo());
 			requestForReadingFile(evt.getFileItemInfo().getPath());
-		} else if (event instanceof LogoutEvent) {
+		} else if (event instanceof AceColorThemeChangedEvent) {
+			doAceColorThemeChange((AceColorThemeChangedEvent)event);
+		} else if (event instanceof EditorTabClosedEvent) {
+			doRemoveFile((EditorTabClosedEvent) event);
+		}
+			else if (event instanceof LogoutEvent) {
 			History.newItem("loginGxt");
 		}  
 	}
@@ -131,24 +142,28 @@ public class DevelopmentBoardPresenter extends Presenter {
 //				String name = extractJustFileName(result.getPath());
 				
 				if(((DevelopmentBoardPresenter)presenter).fileManager.checkIsFileOpened(result.getPath())) {
-//					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor.getTabPanel().scrollToTab(item, true);
+					Long fileId = ((DevelopmentBoardPresenter)presenter).fileManager.getFileIdByFilePath(result.getPath());
+					((DevelopmentBoardPresenter)presenter).scrollToTab(fileId, true);
 				} else {
 					
 					Long fileId = ((DevelopmentBoardPresenter)presenter).fileManager.addFile(new FileItemInfo(extractJustFileName(result.getPath()),result.getPath(),false));
 					
 //					Long fileId = ((DevelopmentBoardPresenter)presenter).fileManager.getFileIdByFilePath(result.getPath()); 
-					byte[] fileMD5 = calculateCheckSum(result.getTextFile());
+					String fileMD5 = calculateCheckSum(result.getTextFile());
 					
-					
-					((DevelopmentBoardPresenter)presenter).fileManager.getFileItemInfo(fileId).setCheckSumOnOpen(fileMD5);
+//					((DevelopmentBoardPresenter)presenter).fileManager.getFileItemInfo(fileId).setCheckSumOnOpen(fileMD5);
 					((DevelopmentBoardPresenter)presenter).fileManager.setFileContent(fileId, result.getTextFile());
 					
 					FileSheet newFileSheet = new FileSheet(presenter,fileId,extractJustFileName(result.getPath()));
 					newFileSheet.constructEditor(result.getTextFile());
+					((DevelopmentBoardPresenter)presenter).fileManager.setAssociatedTabWidget(fileId, newFileSheet);
 					
-					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor.getTabPanel().add(newFileSheet,extractJustFileName(result.getPath()));
+					TabItemConfig tabItemConfig = new TabItemConfig(extractJustFileName(result.getPath()));
+					tabItemConfig.setClosable(true);
+					
+					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor.getTabPanel().add(newFileSheet,tabItemConfig);
+					((DevelopmentBoardPresenter)presenter).scrollToTab(fileId, true);
 				}
-//				editor.tabPanel.add(newFileSheet,"test");
 			}
 		}
 	}
@@ -165,24 +180,50 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 	
 	
-	public static byte[] calculateCheckSum(String input) {
-		byte[] bytesOfMessage = null;
-		try {
-			bytesOfMessage = input.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		MessageDigest md = null;
-		try {
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		byte[] thedigest = md.digest(bytesOfMessage);		
-		return thedigest;
+	public static String calculateCheckSum(String md5) {
+		   try {
+		        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+		        byte[] array = md.digest(md5.getBytes());
+		        StringBuffer sb = new StringBuffer();
+		        for (int i = 0; i < array.length; ++i) {
+		          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+		       }
+		        return sb.toString();
+		    } catch (java.security.NoSuchAlgorithmException e) {
+		    }
+		    return null;
 	}
 
+	
+	private void doSelectFile(SelectFileEvent event) {
+		History.newItem("selectFile");
+	}	
+	
+	
+
+	public void scrollToTab(Long fileId, boolean animate) {
+		FileSheet curFileSheet = (FileSheet) fileManager.getAssociatedTabWidgets().get(fileId);
+		((DevelopmentBoard) view).editor.getTabPanel().setActiveWidget(curFileSheet);
+		((DevelopmentBoard) view).editor.getTabPanel().scrollToTab(curFileSheet, animate);
+	}
+
+	
+	private void doAceColorThemeChange(AceColorThemeChangedEvent event) {
+		for(Long lKey : fileManager.getAssociatedTabWidgets().keySet()) {
+			FileSheet curFileSheet = (FileSheet) fileManager.getAssociatedTabWidgets().get(lKey);
+			
+//			curFileSheet.getAceEditor().setTheme(getTopPanel().comboATh.getCurrentValue());
+			curFileSheet.getAceEditor().setTheme(event.getEvent().getSelectedItem());
+		}
+		
+	}
+	
+	private void doRemoveFile(EditorTabClosedEvent event) {
+		Long fileId = ((FileSheet) event.getEvent().getItem()).getFileId();
+		fileManager.getFilesFileInfoContext().remove(fileId);
+		fileManager.getFilesContext().remove(fileId);
+		FileSheet curFileSheet = (FileSheet) fileManager.getAssociatedTabWidgets().remove(fileId);
+	}		
+	
+	
 }

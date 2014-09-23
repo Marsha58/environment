@@ -126,8 +126,7 @@ public class LoginGxtPresenter extends Presenter {
 
 	protected void requestForLogin(String userName, String password) {
 		
-		byte[] bPasswordMD5 = calculateCheckSum(password.trim());
-		String sPasswordMD5 = bPasswordMD5.toString();		
+		String sPasswordMD5 = calculateCheckSum(password.trim());
 		
 		RemoteSecurityAsync service = RemoteSecurityService.instance()
 				.getServiceImpl();
@@ -135,28 +134,24 @@ public class LoginGxtPresenter extends Presenter {
 			ServiceCallbackForLogin cbk = RemoteSecurityService.instance()
 					.buildCallbackForLogin();
 			cbk.setProcessedResult(new LoginResult(this));
-			service.login(userName, password, cbk);
+			service.login(userName, sPasswordMD5, cbk);
 		}
 	}
 	
 	
-	public static byte[] calculateCheckSum(String input) {
-		byte[] bytesOfMessage = null;
-		try {
-			bytesOfMessage = input.trim().getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		MessageDigest md = null;
-		try {
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		byte[] thedigest = md.digest(bytesOfMessage);		
-		return thedigest;
-	}	
+	public String calculateCheckSum(String md5) {
+		   try {
+		        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+		        byte[] array = md.digest(md5.getBytes());
+		        StringBuffer sb = new StringBuffer();
+		        for (int i = 0; i < array.length; ++i) {
+		          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+		       }
+		        return sb.toString();
+		    } catch (java.security.NoSuchAlgorithmException e) {
+		    }
+		    return null;
+		}	
+	
+	
 }

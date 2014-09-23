@@ -1,5 +1,6 @@
 package com.vw.ide.client.ui.editorpanel;
 
+import org.gwtbootstrap3.client.ui.constants.TabPosition;
 import org.springframework.jdbc.datasource.SimpleConnectionHandle;
 
 import com.google.gwt.core.client.GWT;
@@ -16,6 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceAnnotationType;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditor;
@@ -25,8 +27,10 @@ import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 import com.sencha.gxt.widget.core.client.Status;
 import com.sencha.gxt.widget.core.client.Status.BoxStatusAppearance;
 import com.sencha.gxt.widget.core.client.Status.StatusAppearance;
+import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.vw.ide.client.event.handler.SelectFileHandler;
+import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.ui.toppanel.FileSheet;
@@ -44,20 +48,20 @@ public class EditorPanel extends Composite {
 	private Widget widget;
 	private AceEditor editor1;
 
-	@UiField
-	SimpleContainer file1;
-	@UiField
-	Status status;
+//	@UiField
+//	SimpleContainer file1;
+//	@UiField
+//	Status status;
 	@UiField
 	TabPanel tabPanel;
-	@UiField
-	DockLayoutPanel dockLayoutPanel1;
-	@UiField(provided = true)
-	Status charCount = new Status(
-			GWT.<StatusAppearance> create(BoxStatusAppearance.class));
-	@UiField(provided = true)
-	Status wordCount = new Status(
-			GWT.<StatusAppearance> create(BoxStatusAppearance.class));
+//	@UiField
+//	DockLayoutPanel dockLayoutPanel1;
+//	@UiField(provided = true)
+//	Status charCount = new Status(
+//			GWT.<StatusAppearance> create(BoxStatusAppearance.class));
+//	@UiField(provided = true)
+//	Status wordCount = new Status(
+//			GWT.<StatusAppearance> create(BoxStatusAppearance.class));
 
 	private static final String JAVA_TEXT = "public class Hello {\n"
 			+ "\tpublic static void main(String[] args) {\n"
@@ -69,6 +73,20 @@ public class EditorPanel extends Composite {
 		}
 		initWidget(widget);
 
+		
+		tabPanel.setTabScroll(true);
+		tabPanel.setAnimScroll(true);
+		tabPanel.setCloseContextMenu(true);
+		tabPanel.addBeforeCloseHandler(new BeforeCloseEvent.BeforeCloseHandler<Widget> () {
+
+			@Override
+			public void onBeforeClose(BeforeCloseEvent<Widget> event) {
+				System.out.println("BeforeCloseEvent: " + event.toString());
+				presenter.fireEvent(new EditorTabClosedEvent(event));
+			}
+			
+		});
+		
 		if (editor1 == null) {
 			constructEditor();
 		}
@@ -115,7 +133,7 @@ public class EditorPanel extends Composite {
 				AceAnnotationType.ERROR);
 		editor1.setAnnotations();
 
-		file1.add(editor1);
+//		file1.add(editor1);
 	}
 
 	private Widget constructUi() {
