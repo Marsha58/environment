@@ -3,6 +3,7 @@ package com.vw.ide.server.servlet.remotebrowser;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 
@@ -183,6 +185,52 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
 		}
+		return res;
+	}
+
+	private String makeMainProjectFileName(String projectName) {
+		StringBuffer sPackageFileName = new StringBuffer();
+		String[] arrProjectFileName = projectName.split(" ");
+		for (String curWord : arrProjectFileName) {
+			sPackageFileName.append(curWord);
+		}
+		sPackageFileName.append(".vwml");		
+		return sPackageFileName.toString().toLowerCase();
+	}
+	
+	
+	@Override
+	public RequestProjectCreationResult createProject(String userName, String projectName,
+			String params) {
+		RequestProjectCreationResult res = new RequestProjectCreationResult();
+		res.setOperation("project creating");
+//		res.setProjectPath(projectPath);
+		res.setProjectName(projectName);
+		res.setRetCode(0);
+		
+		String sUserBasePath = constructUserHomePath(userName);
+		String sFullProjectPath = sUserBasePath + "\\" + projectName; 
+		try {
+			
+			File dir = new File(sFullProjectPath);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			};
+			
+			File f = new File(sFullProjectPath + "\\" + makeMainProjectFileName(projectName) );
+			if (!f.exists()) {
+				f.createNewFile();
+				FileWriter writer = new FileWriter(f); 
+				writer.write(params);
+				writer.flush();
+				writer.close();
+			}
+		}
+		catch(Exception ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(-1);
+		}		
+		
 		return res;
 	}	
 	

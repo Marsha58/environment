@@ -21,11 +21,11 @@
   <ui:with type="com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData" field="eastData" />
   <ui:with type="com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData" field="southData" />
  
-  <container:SimpleContainer height="950px" >  <!--  -->
+  <container:SimpleContainer height="900px"  ui:field="mainContainer">  <!--  -->
     <container:child layoutData="{outerData}">
       <container:BorderLayoutContainer ui:field="con" borders="true">
         <container:north layoutData="{northData}">
-          <gxt:ContentPanel headingText="Virtual World Modeling Language IDE">
+          <gxt:ContentPanel headingText="Virtual World Modeling Language IDE" resize="true">
           		<uitp:TopPanel ui:field='topPanel'  />
           </gxt:ContentPanel>		
         </container:north>
@@ -34,8 +34,8 @@
           		<uipp:ProjectPanel ui:field='projectPanel' />
           </gxt:ContentPanel>
         </container:west>
-        <container:center layoutData="{centerData}">
-          <gxt:ContentPanel headingText="Here will be a tab window with opened files" resize="false">
+        <container:center layoutData="{centerData}" >
+          <gxt:ContentPanel headingText="Here will be a tab window with opened files" ui:field='editorContentPanel' resize="true">
           		<uiep:EditorPanel ui:field='editor' />
           </gxt:ContentPanel>
         </container:center>

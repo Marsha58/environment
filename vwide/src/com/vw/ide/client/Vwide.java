@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.Viewport;
+import com.sencha.gxt.widget.core.client.event.ResizeEndEvent;
 import com.vw.ide.client.service.factory.ServicesBrokerFactory;
 
 /**

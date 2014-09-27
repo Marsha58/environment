@@ -39,6 +39,7 @@ import com.vw.ide.client.utils.Utils.YesNoMsgBoxSelctionCallback;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 /**
@@ -161,8 +162,6 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		}
 	}
 
-
-
 	public static class DirOperationRemoveResult extends
 			ProcessedResult<RequestDirOperationResult> {
 
@@ -196,6 +195,8 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			}
 		}
 	}
+
+	
 
 	public static class ConfirmDirectoryRemoving implements
 			YesNoMsgBoxSelctionCallback {
@@ -566,16 +567,16 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		}
 		return output;
 	}
-	
+
 	public String extractJustFileName(String input) {
 		String output = "";
 		String[] arrPath = input.split("\\\\");
 		String sLastItemName = arrPath[arrPath.length - 1];
 		if (sLastItemName.indexOf(".") != -1) {
-			output = arrPath[arrPath.length -1];
-		} 
+			output = arrPath[arrPath.length - 1];
+		}
 		return output;
-	}	
+	}
 
 	protected void onCreateDirectory(String dir) {
 

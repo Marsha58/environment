@@ -11,6 +11,7 @@ import com.vw.ide.client.service.factory.ServicesStubFactory;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 /**
@@ -66,6 +67,15 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 		}
 	}
 	
+	public static class ServiceCallbackForProjectCreation extends ServiceCallback<RequestProjectCreationResult> {
+
+		private RemoteBrowserService service;
+		
+		public ServiceCallbackForProjectCreation(RemoteBrowserService service) {
+			this.service = service;
+		}
+	}	
+	
 	private RemoteBrowserService() {
 		
 	}
@@ -112,6 +122,10 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 	
 	public ServiceCallbackForReadingFile buildCallbackForReadingFile() {
 		return new ServiceCallbackForReadingFile(this);
-	}	
+	}
+	
+	public ServiceCallbackForProjectCreation buildCallbackForProjectCreation() {
+		return new ServiceCallbackForProjectCreation(this);
+	}		
 	
 }

@@ -9,6 +9,8 @@ import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
+import com.sencha.gxt.widget.core.client.container.MarginData;
+import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.vw.ide.client.presenters.Presenter;
 
 public class WindowsPanelView extends Composite {
@@ -24,6 +26,12 @@ public class WindowsPanelView extends Composite {
 	@UiField HTML bodyErrors;
 	@UiField HTML bodySearch;
 
+	@UiField(provided = true)
+	MarginData centerData = new MarginData();
+	@UiField(provided = true)
+	BorderLayoutData southData = new BorderLayoutData(80);
+	
+	
 	private Presenter presenter = null;
 	
 	

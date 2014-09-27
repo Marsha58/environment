@@ -5,6 +5,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -44,14 +47,34 @@ public class LoginViewGxt extends Composite implements HasText, PresenterViewerL
 	interface LoginViewGxtUiBinder extends UiBinder<Widget, LoginViewGxt> {
 	}
 
+	
+	KeyPressHandler keyPressHandler = new KeyPressHandler() {
+		@Override
+		public void onKeyPress(KeyPressEvent event) {
+			if((event.getCharCode() == KeyCodes.KEY_ENTER)){
+				onLoginProceedClicked(new SelectEvent());
+			}
+		}
+	};  
+	
+
+	public void addHandlers() {
+		userNameField.addKeyPressHandler(keyPressHandler);
+		passwordField.addKeyPressHandler(keyPressHandler);
+	}
+	
+	
+	
 	public LoginViewGxt() {
 		initWidget(uiBinder.createAndBindUi(this));
+		addHandlers();
 	}
 
 
 	
 	
 	public LoginViewGxt(String firstName) {
+		addHandlers();
 	}
 
 

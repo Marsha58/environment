@@ -12,25 +12,6 @@
 		font-weight: bold;
 	}
 	
-	.panelFramed {
-		border-top: 1px solid #666;
-		border-right: 1px solid #666;
-		border-left: 1px solid #666;
-		border-bottom: 1px solid #666;
-		background-color: beige;
-	}
-	
-	.dialogBackground {
-		background-color: beige;
-	}
-	
-	.westPanel {
-		background-color: beige;
-	}
-	
-	.centerPanel {
-		background-color: beige;
-	}
 	</ui:style>
 
 	<ui:with type="com.sencha.gxt.core.client.util.Padding" field="padding5">
@@ -45,7 +26,7 @@
 					<container:child>
 						<form:FieldLabel text="Project Name">
 							<form:widget>
-								<form:TextField allowBlank="false" />
+								<form:TextField ui:field="tfVWMLProjectName" allowBlank="false" />
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
@@ -54,7 +35,7 @@
 							<form:widget>
 								<container:HBoxLayoutContainer  hBoxLayoutAlign="MIDDLE">						    
 									<container:child>
-										<form:TextField allowBlank="false" width="280px"/>
+										<form:TextField ui:field="tfVWMLProjectPath" allowBlank="false" width="280px"/>
 									</container:child>
 									<container:child>
 										<button:TextButton ui:field="browseVwmlProjPath" text="Browse" />
@@ -66,21 +47,21 @@
 					<container:child>
 						<form:FieldLabel text="Main module">
 							<form:widget>
-								<form:TextField allowBlank="false" width="280px"/>
+								<form:TextField ui:field="tfVWMLMainModule" allowBlank="false" width="280px"/>
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
 					<container:child>
 						<form:FieldLabel text="Author">
 							<form:widget>
-								<form:TextField allowBlank="false" />
+								<form:TextField ui:field="tfVWMLAuthor" allowBlank="false" />
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
 					<container:child>
 						<form:FieldLabel text="Description">
 							<form:widget>
-								<f:TextArea allowBlank="true" width="325px" height="60px"/>
+								<f:TextArea ui:field="tfVWMLDescr" allowBlank="true" width="325px" height="60px"/>
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
@@ -89,12 +70,12 @@
 		</container:child>
 		<container:child>
 			<form:FieldSet ui:field="fieldSetJavasettings"
-				headingText="VWML settings" collapsible="true">
+				headingText="Java settings" collapsible="true">
 				<container:VerticalLayoutContainer>
 					<container:child>
-						<form:FieldLabel text="Package">
+						<form:FieldLabel text="Package" >
 							<form:widget>
-								<form:TextField allowBlank="false" width="280px"/>
+								<form:TextField ui:field="tfJavaPackageName" allowBlank="false" width="280px" enabled="false"/>
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
@@ -103,7 +84,7 @@
 							<form:widget>
 								<container:HBoxLayoutContainer  hBoxLayoutAlign="MIDDLE">						    
 									<container:child>
-										<form:TextField allowBlank="false" width="280px"/>
+										<form:TextField ui:field="tfJavaSourcePath" allowBlank="false" width="280px"/>
 									</container:child>
 									<container:child>
 										<button:TextButton text="Browse" />

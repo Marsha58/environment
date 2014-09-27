@@ -2,7 +2,10 @@ package com.vw.ide.client.ui.windowspanel;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.sencha.gxt.widget.core.client.container.MarginData;
+import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.projects.FileManager;
@@ -26,6 +29,8 @@ public class WindowsPanelPresenter extends Presenter {
 			view.associatePresenter(this);
 		}
 		
+		
+	
 
 	}
 	

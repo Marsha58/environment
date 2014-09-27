@@ -45,5 +45,12 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param filaName
 	 */
 	public void readFile(String user, String parent, String fileName, AsyncCallback<RequestDirOperationResult> callback);
+
+	/**
+	 * Project creating
+	 * @param projectName
+	 * @param params
+	 */
+	public void createProject(String userName,String projectName, String params, AsyncCallback<RequestProjectCreationResult> callback);
 	
 }

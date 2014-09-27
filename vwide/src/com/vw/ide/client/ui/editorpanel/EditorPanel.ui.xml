@@ -40,11 +40,6 @@
 		field="mainRow">
 		<ui:attributes width="1" height="1" margins="{margins1}" />
 	</ui:with>
-
-	<ui:with type="com.sencha.gxt.widget.core.client.TabItemConfig"
-		field="shortTextTabConfig">
-		<ui:attributes text="Main_file.vwml" />
-	</ui:with>
 	<ui:with
 		type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData"
 		field="toolbarRow">
@@ -54,36 +49,8 @@
 		type="com.sencha.gxt.core.client.resources.ThemeStyles.ThemeAppearance"
 		field="theme" />
 
-	<gxt:TabPanel addStyleNames="margin-10" ui:field="tabPanel" >
-<!-- 
-		<gxt:child config="{shortTextTabConfig}" >
-			<g:DockLayoutPanel ui:field="dockLayoutPanel1" height="700px">
-				<g:center>
-					<container:SimpleContainer ui:field="file1"
-						layoutData="{mainRow}" />
-				</g:center>
-				<g:south size='30'>
-					<container:VerticalLayoutContainer>
-						<container:SimpleContainer>
-							<container:child layoutData="{toolbarRow}">
-								<toolbar:ToolBar addStyleNames="{theme.style.borderTop}">
-									<gxt:Status ui:field="status" text="Not writing"
-										width="150" />
-									<toolbar:FillToolItem />
-									<gxt:Status ui:field="charCount" text="0 Chars"
-										width="100" />
-									<toolbar:LabelToolItem label=" " />
-									<gxt:Status ui:field="wordCount" text="0 Words"
-										width="100" />
-								</toolbar:ToolBar>
-							</container:child>
-						</container:SimpleContainer>
-					</container:VerticalLayoutContainer>
-				</g:south>
-			</g:DockLayoutPanel>
-		</gxt:child>
- -->
-
+	<gxt:TabPanel addStyleNames="margin-10" ui:field="tabPanel" 
+	              borders="false" resizeTabs="true" >
 	</gxt:TabPanel>
 
 </ui:UiBinder> 

@@ -24,7 +24,7 @@
 		type="com.sencha.gxt.core.client.resources.ThemeStyles.ThemeAppearance"
 		field="theme" />
 
-	<g:DockLayoutPanel ui:field="dockLayoutPanel" height="700px">
+	<g:DockLayoutPanel ui:field="dockLayoutPanel" >
 		<g:center>
 			<container:SimpleContainer ui:field="fileContainer"
 				layoutData="{mainRow}" />

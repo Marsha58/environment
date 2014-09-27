@@ -30,8 +30,8 @@ public interface ExampleImages extends ClientBundle {
   @Source("application_side_list.png")
   ImageResource side_list();
   
-  @Source("list.gif")
-  ImageResource list();
+  @Source("enabled//list.gif")
+  ImageResource list_en();
 
   @Source("application_form.png")
   ImageResource form();
@@ -102,4 +102,70 @@ public interface ExampleImages extends ClientBundle {
   
   @Source("folder.png")
   ImageResource folder();
+  
+  @Source("enabled//save_edit.gif")
+  ImageResource save_edit_en();
+  
+  @Source("disabled//save_edit.gif")
+  ImageResource save_edit_dis();  
+  
+  @Source("enabled//saveas_edit.gif")
+  ImageResource saveas_edit_en();
+
+  @Source("enabled//saveall_edit.gif")
+  ImageResource saveall_edit_en();
+
+  @Source("disabled//saveall_edit.gif")
+  ImageResource saveall_edit_dis();
+
+  @Source("close.gif")
+  ImageResource close();
+  
+  @Source("file_obj.gif")
+  ImageResource file_obj();
+  
+  @Source("prj_obj.gif")
+  ImageResource prj_obj();
+  
+  @Source("enabled//debug_persp.gif")
+  ImageResource debug_persp_en();    
+
+  @Source("enabled//skip_brkp.gif")
+  ImageResource skip_brkp_en();    
+
+  @Source("enabled//search.gif")
+  ImageResource search_en();
+  
+  @Source("enabled//terminate_obj.gif")
+  ImageResource terminate_obj_en();
+  
+  @Source("enabled//suspend_en.gif")
+  ImageResource suspend_en();
+
+  @Source("enabled//print_edit.gif")
+  ImageResource print_edit_en();
+
+  @Source("disabled//print_edit.gif")
+  ImageResource print_edit_dis();
+  
+  @Source("enabled//new_con.gif")
+  ImageResource new_con_en();
+
+  @Source("disabled//new_con.gif")
+  ImageResource new_con_dis();
+
+  @Source("enabled//new_wiz.gif")
+  ImageResource new_wiz_en();
+
+  @Source("disabled//new_wiz.gif")
+  ImageResource new_wiz_dis();
+  
+  @Source("enabled//vwml.gif")
+  ImageResource vwml();
+  
+  @Source("java-facet.gif")
+  ImageResource java_facet();
+
+  @Source("git\\elcl16\\continue.gif")
+  ImageResource continue_exec();    
 }

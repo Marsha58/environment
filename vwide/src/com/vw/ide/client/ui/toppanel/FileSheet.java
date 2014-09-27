@@ -6,6 +6,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.layout.client.Layout;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -18,6 +19,7 @@ import com.sencha.gxt.data.shared.StringLabelProvider;
 import com.sencha.gxt.widget.core.client.Status;
 import com.sencha.gxt.widget.core.client.Status.BoxStatusAppearance;
 import com.sencha.gxt.widget.core.client.Status.StatusAppearance;
+import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
@@ -67,10 +69,17 @@ public class FileSheet extends Composite {
 		this.fileId = fileId;
 		this.fileName = fileName;
 	}	
+
+	
+	public void setDockLayoutPanel(String sHeight) {
+		dockLayoutPanel.setHeight(sHeight);
+	}	
 	
 	public void setFileId(Long fileId) {
 		this.fileId = fileId;
 	}
+
+	
 	
 	public Long getFileId() {
 		return fileId;
@@ -92,7 +101,7 @@ public class FileSheet extends Composite {
 	public void constructEditor(String textFile) {
 		aceEditor = new AceEditor();
 		aceEditor.setWidth("100%");
-		aceEditor.setHeight("600px");
+		aceEditor.setHeight("100%");
 		
 		
 
@@ -115,13 +124,16 @@ public class FileSheet extends Composite {
 			}
 			
 		});
+		
+		
 		// add some annotations
 		// editor1.addAnnotation(0, 1, "What's up?", AceAnnotationType.WARNING);
 		// editor1.addAnnotation(2, 1, "This code is lame",
 		// AceAnnotationType.ERROR);
 		// editor1.setAnnotations();
 
-		fileContainer.add(aceEditor);
+		MarginData layoutData = new MarginData(1,1,1,1);
+		fileContainer.add(aceEditor,layoutData);
 	}
 
 }

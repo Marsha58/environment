@@ -9,31 +9,28 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ResizeComposite;
+import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.form.ComboBoxCell.TriggerAction;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.StringLabelProvider;
+import com.sencha.gxt.widget.core.client.Component;
+import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
+import com.sencha.gxt.widget.core.client.event.ResizeEndEvent;
+import com.sencha.gxt.widget.core.client.event.ResizeStartEvent;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.dialog.about.AboutDialog;
-import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialog;
-import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
-import com.vw.ide.client.event.handler.LoginHandler;
-import com.vw.ide.client.event.handler.LogoutHandler;
-import com.vw.ide.client.event.handler.SelectFileHandler;
-import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
-import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
-import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.ui.editorpanel.EditorPanel;
@@ -50,11 +47,14 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 
 	private static String s_newVwmlProjectCaption = "New VWML project";
 	private static String s_AboutCaption = "About";
-
+	
+	@UiField
+	SimpleContainer mainContainer = new SimpleContainer();
+	
 	@UiField(provided = true)
 	MarginData outerData = new MarginData(1);
 	@UiField(provided = true)
-	BorderLayoutData northData = new BorderLayoutData(52);
+	BorderLayoutData northData = new BorderLayoutData(81);
 	@UiField(provided = true)
 	BorderLayoutData westData = new BorderLayoutData(200);
 	@UiField(provided = true)
@@ -65,6 +65,8 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 	BorderLayoutData southData = new BorderLayoutData(120);
 	@UiField
 	BorderLayoutContainer con;
+	
+	@UiField ContentPanel editorContentPanel;
 
 	@UiField
 	TopPanel topPanel;
@@ -92,6 +94,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 					}
 
 				});
+		
 		colors.addAll(Arrays.asList(Theme.values()));
 
 		final SimpleContainer con = new SimpleContainer();
@@ -114,17 +117,17 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 				case BLUE:
 					Window.Location.assign(GWT.getHostPageBaseURL()
 							+ "Vwide.html" + Window.Location.getHash());
-					northData.setSize(52);
+					northData.setSize(74);
 					break;
 				case GRAY:
 					Window.Location.assign(GWT.getHostPageBaseURL()
 							+ "Vwide-gray.html" + Window.Location.getHash());
-					northData.setSize(53);
+					northData.setSize(76);
 					break;
 				case NEPTUNE:
 					Window.Location.assign(GWT.getHostPageBaseURL()
 							+ "Vwide-neptune.html" + Window.Location.getHash());
-					northData.setSize(67);
+					northData.setSize(89);
 					break;
 				default:
 					assert false : "Unsupported theme enum";
@@ -135,16 +138,17 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 
 		con.add(combo);
 
+		
 		if (Theme.BLUE.isActive()) {
-			northData.setSize(53);
+			northData.setSize(74);
 		} else if (Theme.GRAY.isActive()) {
-			northData.setSize(54);
+			northData.setSize(76);
 		} else {
-			northData.setSize(68);
-		}
+			northData.setSize(89);
+		}		
 		
 		initWidget(uiBinder.createAndBindUi(this));
-		
+
 		
 	}
 
@@ -155,6 +159,11 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 	public DevelopmentBoard(Integer size) {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
+	
+
+
+
+	
 
 	/**
 	 * Fired by menu-item 'Logout' in case if last was selected
@@ -183,6 +192,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 	 * @author Oleg
 	 * 
 	 */
+/*	
 	public static class NewVwmlProjectCommand implements ScheduledCommand {
 
 		private DevelopmentBoard view = null;
@@ -200,7 +210,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 			}
 		}
 	}
-
+*/
 	/**
 	 * Fired when 'Project -> New' menu item selected
 	 * 

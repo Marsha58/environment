@@ -19,6 +19,7 @@ import java.util.Arrays;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 //import com.google.gwt.sample.mail.client.AboutDialog;
@@ -37,6 +38,7 @@ import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.StringLabelProvider;
+import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
@@ -76,21 +78,25 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 	
 //	 @UiField MenuItem logoutField;
 	 @UiField MenuItem newVwmlProjField;
+	 @UiField TextButton bnNewVwmlProjField;
 	 @UiField MenuItem miHelpAboutField;
 //	 @UiField FlowPanel panelEditor;
 	 @UiField SimpleContainer comboAceEditorPlaceCont;
 	 @UiField SimpleContainer userNamePlaceCont;
 	 @UiField SimpleContainer comboPlaceCont;
-	 @UiField SimpleContainer outer;
+//	 @UiField SimpleContainer outer;
 	 @UiField Label userName;
 	 @UiField TextButton userLogout;
-	 
+
+
 		@UiField(provided = true)
-		MarginData centerData = new MarginData();
+		BorderLayoutData northDataTP = new BorderLayoutData(21);
+	 	@UiField(provided = true)
+	 	MarginData centerDataTP = new MarginData();		
 		@UiField(provided = true)
-		BorderLayoutData eastData = new BorderLayoutData(490);
+		BorderLayoutData eastDataTP = new BorderLayoutData(630);
 		@UiField
-		BorderLayoutContainer con;   	 
+		BorderLayoutContainer conTP;   	 
   
 		
 	  public enum Theme {
@@ -141,13 +147,15 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
   
   public TopPanel() {
     initWidget(binder.createAndBindUi(this));
+
+
     
-    
-    centerData.setMargins(new Margins(2, 2, 0, 1));
-    eastData.setMargins(new Margins(3, 2, 0, 0));
+//    centerData.setMargins(new Margins(2, 2, 0, 1));
+      eastDataTP.setMargins(new Margins(0, 0, 0, 0));
+//    southData.setMargins(new Margins(1, 1, 1, 1));
 //    centerData.setMargins(new Margins(0, 5, 0, 5));    
     
-    
+      
     
 	// ------Ace theme combo
     ListStore<AceEditorTheme> aceColors = new ListStore<AceEditorTheme>(new ModelKeyProvider<AceEditorTheme>() {
@@ -248,15 +256,7 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 		return this.presenter;
 	}
   
-
-	@UiHandler({"userLogout"})
-	  public void onButtonClick(SelectEvent event) {
-	    Info.display("Click", ((TextButton) event.getSource()).getText() + " clicked");
-//	    fireEvent(new LogoutEvent());
-	    History.newItem("loginGxt");
-    }
-	
-    
+   
     
     @UiHandler(value = {"miHelpAboutField","newVwmlProjField"})
 	public void onMenuSelection(SelectionEvent<Item> event) {
@@ -269,6 +269,28 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 	    }
 	}	
 
+
+	@UiHandler({"userLogout", "bnNewVwmlProjField"})
+	  public void onToolBarrButtonClick(SelectEvent event) {
+	    Info.display("Click", ((TextButton) event.getSource()).getText() + " clicked");
+//	    History.newItem("loginGxt");
+	    
+	    String sItemId = ((TextButton)event.getSource()).getItemId(); 
+	    
+	    switch (sItemId) {
+		case "idUserLogout": History.newItem("loginGxt");
+			break;
+		case "idNewVwmlProjField": executeProjectNew();
+			break;
+		default:
+			break;
+		}
+	    
+	    
+  }
+
+    
+    
     
     public void executeHelpAbout() {
 		AboutDialogExt d = new AboutDialogExt();
@@ -299,51 +321,18 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 		} else {
 			d.setLoggedAsUser("olmel");	
 		}
+		d.associatePresenter(getAssociatedPresenter());
 		d.setSize("480", "380");
 		d.showCenter(s_newVwmlProjectCaption, null);
 	}
     
     
 	private void bind() {
-		 if (newVwmlProjField != null) {
-//			 newVwmlProjField. setScheduledCommand(new NewVwmlProjectCommand(this));
-		 }
+
 	}  
   
 	
 	
-	
-	public static class NewVwmlProjectCommand implements ScheduledCommand {
-
-		private TopPanel view = null;
-
-		public NewVwmlProjectCommand(TopPanel view) {
-			this.view = view;
-		}
-
-		public void execute() {
-//			if (view.getAssociatedPresenter() != null) {
-//				NewVwmlProjectDialog d = new NewVwmlProjectDialog();
-//				d.setLoggedAsUser(view.getAssociatedPresenter()
-//						.getLoggedAsUser());
-//				d.show(s_newVwmlProjectCaption, null, 0, 0);
-//			}
-		}
-	}	
-	
   
-//  @UiHandler("aboutLink")
-//  void onAboutClicked(ClickEvent event) {
-//    // When the 'About' item is selected, show the AboutDialog.
-//    // Note that showing a dialog box does not block -- execution continues
-//    // normally, and the dialog fires an event when it is closed.
-//    AboutDialog dlg = new AboutDialog();
-//    dlg.show();
-//    dlg.center();
-//  }
 
-//  @UiHandler("signOutLink")
-//  void onSignOutClicked(ClickEvent event) {
-//    Window.alert("If this were implemented, you would be signed out now.");
-//  }
 }
