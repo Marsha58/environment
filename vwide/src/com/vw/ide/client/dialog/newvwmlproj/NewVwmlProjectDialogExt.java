@@ -167,16 +167,7 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 		return sPackageName.toString();
 	}
 
-	public static String format(final String format, final String... args) {
-		String[] split = format.split("%s");
-		final StringBuffer msg = new StringBuffer();
-		for (int pos = 0; pos < split.length - 1; pos += 1) {
-			msg.append(split[pos]);
-			msg.append(args[pos]);
-		}
-		msg.append(split[split.length - 1]);
-		return msg.toString();
-	}
+
 
 	// @UiHandler("ok")
 	// void onOkClick(ClickEvent event) {
@@ -201,23 +192,15 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 	protected void onButtonPressed(TextButton textButton) {
 		super.onButtonPressed(textButton);
 		if (textButton == getButton(PredefinedButton.OK)) {
-
-			String params = format("options {\n" + "language=_java_ {\n"
-					+ "package = \"%s\"\n" + "path = \"%s\"\n"
-					+ "author = \"%s\"\n" + "project_name = \"%s\"\n"
-					+ "description = \"%s\"\n" + "beyond {\n" + "}\n" + "}\n"
-					+ "conflicting {\n" + "}\n" + "}",
-					tfJavaPackageName.getText(), tfJavaSourcePath.getText(),
-					tfVWMLAuthor.getText(), tfVWMLProjectName.getText(),
-					tfVWMLDescr.getText());
-
-			System.out.println(params);
-			requestForProjectCreation(tfVWMLProjectName.getText(), params);
+			requestForProjectCreation(tfVWMLProjectName.getText(), tfJavaPackageName.getText(),
+					 tfJavaSourcePath.getText(),tfVWMLAuthor.getText(),	tfVWMLDescr.getText()
+					);
 			hide();
 		}
 	}
 
-	protected void requestForProjectCreation(String projectName, String params) {
+	protected void requestForProjectCreation(String projectName, String packageName,
+			String javaSrcPath, String author, String descr) {
 		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
 				.getServiceImpl();
 
@@ -225,8 +208,8 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 			ServiceCallbackForProjectCreation cbk = RemoteBrowserService
 					.instance().buildCallbackForProjectCreation();
 			cbk.setProcessedResult(new ProjectCreationResult());
-			service.createProject(this.getLoggedAsUser(), projectName, params,
-					cbk);
+			service.createProject(this.getLoggedAsUser(), projectName, packageName,
+					javaSrcPath, author, descr, cbk);
 		}
 	}
 

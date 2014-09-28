@@ -2,10 +2,13 @@ package com.vw.ide.shared.servlet.remotebrowser;
 
 import java.io.Serializable;
 
+import com.vw.ide.client.projects.FilesTypesEnum;
+
 /**
  * Simple class which is used to pass inforemation about file
+ * 
  * @author Oleg
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class FileItemInfo implements Serializable {
@@ -15,8 +18,7 @@ public class FileItemInfo implements Serializable {
 	private String checkSumOnOpen;
 	private String checkSumOnClose;
 	private boolean isEdited;
-	
-	
+
 	public FileItemInfo() {
 		super();
 	}
@@ -28,54 +30,65 @@ public class FileItemInfo implements Serializable {
 		this.isDir = isDir;
 	}
 
+	public static FilesTypesEnum getFyleType(String fileName) {
+		if (fileName.indexOf(".") != -1) {
+			String sSuffix = fileName.substring(fileName.indexOf(".") + 1);
+			switch (sSuffix) {
+			case "vwml": return FilesTypesEnum.VWML;
+			case "java": return FilesTypesEnum.JAVA;
+			case "xml": return FilesTypesEnum.XML;
+			default: return FilesTypesEnum.NOT_DEF;
+			}
+		} else return FilesTypesEnum.NOT_DEF;
+	}
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getPath() {
 		return path;
 	}
-	
+
 	public void setPath(String path) {
 		this.path = path;
 	}
-	
+
 	public boolean isDir() {
 		return isDir;
 	}
-	
+
 	public void setDir(boolean isDir) {
 		this.isDir = isDir;
 	}
-	
+
 	public String getCheckSumOnOpen() {
 		return checkSumOnOpen;
 	}
-	
+
 	public void setCheckSumOnOpen(String checkSumOnOpen) {
 		this.checkSumOnOpen = checkSumOnOpen;
-	}	
+	}
 
 	public String getCheckSumOnClose() {
 		return checkSumOnClose;
 	}
-	
+
 	public void setCheckSumOnClose(String checkSumOnClose) {
 		this.checkSumOnClose = checkSumOnClose;
-	}	
+	}
 
 	public boolean isEdited() {
 		return isEdited;
 	}
-	
+
 	public void setEdited(boolean isEdited) {
 		this.isEdited = isEdited;
 	}
-	
 
 	@Override
 	public String toString() {

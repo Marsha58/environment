@@ -166,9 +166,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 					FileSheet newFileSheet = new FileSheet(presenter, fileId,
 							extractJustFileName(result.getPath()));
-					newFileSheet.constructEditor(result.getTextFile());
-					((DevelopmentBoardPresenter) presenter).fileManager
-							.setAssociatedTabWidget(fileId, newFileSheet);
+					
+					
+					newFileSheet.constructEditor(result.getTextFile(),FileItemInfo.getFyleType(extractJustFileName(result.getPath())));
+					((DevelopmentBoardPresenter) presenter).fileManager.setAssociatedTabWidget(fileId, newFileSheet);
 
 					TabItemConfig tabItemConfig = new TabItemConfig(
 							extractJustFileName(result.getPath()));

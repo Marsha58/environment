@@ -10,6 +10,17 @@ import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+ 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.log4j.Logger;
 
@@ -198,10 +209,93 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		return sPackageFileName.toString().toLowerCase();
 	}
 	
+	private String makeProjectConfigFileName(String projectMainFileName) {
+		StringBuffer sProjectConfigFileName = new StringBuffer();
+		if (projectMainFileName.indexOf(".") != -1) {
+			sProjectConfigFileName.append(projectMainFileName.substring(0,projectMainFileName.indexOf(".")));
+			sProjectConfigFileName.append(".xml");		
+		}
+		return sProjectConfigFileName.toString().toLowerCase();
+	}	
+	
+	
+	private static String format(final String format, final String... args) {
+		String[] split = format.split("%s");
+		final StringBuffer msg = new StringBuffer();
+		for (int pos = 0; pos < split.length - 1; pos += 1) {
+			msg.append(split[pos]);
+			msg.append(args[pos]);
+		}
+		msg.append(split[split.length - 1]);
+		return msg.toString();
+	}	
+	
+	private String makeProjectFileHeaderPattern(String projectName, String packageName, String javaSrcPath,
+			String author, String descr) {
+		String pattern = format("options {\n" + "language=_java_ {\n"
+				+ "package = \"%s\"\n" + "path = \"%s\"\n"
+				+ "author = \"%s\"\n" + "project_name = \"%s\"\n"
+				+ "description = \"%s\"\n" + "beyond {\n" + "}\n" + "}\n"
+				+ "conflicting {\n" + "}\n" + "}",
+				packageName, javaSrcPath, author, projectName,	descr);		
+		return pattern;
+	}
+	
+	private void makeProjectConfigFile(String projectConfFileFullName, String projectName, String packageName, String javaSrcPath,
+			String author, String descr) {
+		
+		 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	     DocumentBuilder dBuilder;
+		
+	     try {
+	            dBuilder = dbFactory.newDocumentBuilder();
+	            Document doc = dBuilder.newDocument();
+	            Element rootElement = doc.createElementNS("http://www.win-interactive.com/" + packageName.toLowerCase(), "project");
+	            doc.appendChild(rootElement);
+
+	            Element nodePackage = doc.createElement("package");
+	    		nodePackage.appendChild(doc.createTextNode(packageName));
+	    		rootElement.appendChild(nodePackage);
+
+	    		Element nodeJavaSrcPath = doc.createElement("path");
+	    		nodeJavaSrcPath.appendChild(doc.createTextNode(javaSrcPath));
+	    		rootElement.appendChild(nodeJavaSrcPath);
+	    		 
+	    		Element nodeAuthor = doc.createElement("author");
+	    		nodeAuthor.appendChild(doc.createTextNode(author));
+	    		rootElement.appendChild(nodeAuthor);
+
+	    		Element nodeProjectName = doc.createElement("projectName");
+	    		nodeProjectName.appendChild(doc.createTextNode(projectName));
+	    		rootElement.appendChild(nodeProjectName);	    		 
+
+	    		Element nodeDescr = doc.createElement("descr");
+	    		nodeDescr.appendChild(doc.createTextNode(descr));
+	    		rootElement.appendChild(nodeDescr);	
+	    		 
+	            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	            Transformer transformer = transformerFactory.newTransformer();
+	            //for pretty print
+	            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+	            DOMSource source = new DOMSource(doc);
+	 
+	            //write to console or file
+//	            StreamResult console = new StreamResult(System.out);
+	            StreamResult file = new StreamResult(new File(projectConfFileFullName));
+	 
+	            //write data
+//	            transformer.transform(source, console);
+	            transformer.transform(source, file);
+	 
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	}	
 	
 	@Override
-	public RequestProjectCreationResult createProject(String userName, String projectName,
-			String params) {
+	public RequestProjectCreationResult createProject(String userName,
+			String projectName, String packageName, String javaSrcPath,
+			String author, String descr) {
 		RequestProjectCreationResult res = new RequestProjectCreationResult();
 		res.setOperation("project creating");
 //		res.setProjectPath(projectPath);
@@ -217,14 +311,32 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 				dir.mkdirs();
 			};
 			
-			File f = new File(sFullProjectPath + "\\" + makeMainProjectFileName(projectName) );
-			if (!f.exists()) {
-				f.createNewFile();
-				FileWriter writer = new FileWriter(f); 
-				writer.write(params);
+			String sProjectMainFileName = makeMainProjectFileName(projectName);
+			
+			File fMainVWML = new File(sFullProjectPath + "\\" + sProjectMainFileName );
+			if (!fMainVWML.exists()) {
+				fMainVWML.createNewFile();
+				FileWriter writer = new FileWriter(fMainVWML); 
+				writer.write(makeProjectFileHeaderPattern(projectName, packageName, javaSrcPath, author, descr));
 				writer.flush();
 				writer.close();
 			}
+
+			
+			String projectConfFileFullName = sFullProjectPath + "\\" + makeProjectConfigFileName(sProjectMainFileName);
+			
+			makeProjectConfigFile(projectConfFileFullName, projectName, packageName, javaSrcPath, author, descr);
+/*			
+			File fProjectConf = new File(sFullProjectPath + "\\" + makeProjectConfigFileName(sProjectMainFileName));
+			if (!fProjectConf.exists()) {
+				fProjectConf.createNewFile();
+				FileWriter writerPC = new FileWriter(fProjectConf); 
+				writerPC.write(makeProjectConfigFile(projectName, packageName, javaSrcPath, author, descr));
+				writerPC.flush();
+				writerPC.close();
+			}
+*/			
+			
 		}
 		catch(Exception ex) {
 			res.setResult(ex.getMessage());
@@ -232,6 +344,8 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		}		
 		
 		return res;
-	}	
+	}
+
+	
 	
 }

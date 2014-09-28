@@ -52,12 +52,9 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 */
 	public RequestDirOperationResult readFile(String user, String parent, String fileName);
 
-	/**
-	 * Project creating
-	 * @param projectName
-	 * @param params
-	 */
-	public RequestProjectCreationResult createProject(String userName, String projectName, String params);
+	RequestProjectCreationResult createProject(String userName,
+			String projectName, String packageName, String javaSrcPath,
+			String author, String descr);
 	
 	
 }

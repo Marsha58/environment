@@ -51,6 +51,7 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param projectName
 	 * @param params
 	 */
-	public void createProject(String userName,String projectName, String params, AsyncCallback<RequestProjectCreationResult> callback);
+	public void createProject(String userName,String projectName, String packageName,
+			String javaSrcPath, String author, String descr, AsyncCallback<RequestProjectCreationResult> callback);
 	
 }

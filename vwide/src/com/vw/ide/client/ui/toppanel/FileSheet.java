@@ -25,6 +25,7 @@ import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.presenters.Presenter;
+import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.client.ui.toppanel.TopPanel.ActiveTheme;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
 
@@ -98,7 +99,7 @@ public class FileSheet extends Composite {
 		return aceEditor;
 	}
 	
-	public void constructEditor(String textFile) {
+	public void constructEditor(String textFile, FilesTypesEnum fileType) {
 		aceEditor = new AceEditor();
 		aceEditor.setWidth("100%");
 		aceEditor.setHeight("100%");
@@ -112,9 +113,26 @@ public class FileSheet extends Composite {
 		aceEditor.startEditor(); // must be called before calling
 								// setTheme/setMode/etc.
 		aceEditor.setTheme(((DevelopmentBoardPresenter) presenter).getTopPanel().comboATh.getCurrentValue());
-		aceEditor.setMode(AceEditorMode.JAVA);
 
+		
 		aceEditor.setText(textFile);
+		
+		switch (fileType) {
+		case VWML:
+			aceEditor.setMode(AceEditorMode.LISP);	
+			break;
+		case JAVA:
+			aceEditor.setMode(AceEditorMode.JAVA);	
+			break;
+		case XML:
+			aceEditor.setMode(AceEditorMode.XML);	
+			break;
+		default:
+			aceEditor.setMode(AceEditorMode.TEXT);	
+			break;
+		}
+		
+
 
 		aceEditor.addOnChangeHandler(new AceEditorCallback() {
 			@Override

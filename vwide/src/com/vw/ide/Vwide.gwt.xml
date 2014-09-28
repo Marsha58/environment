@@ -22,6 +22,8 @@
 	<!-- For support for IE8 you need to inherit the Respond module into your 
 		*.gwt.xml. <inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
 
+ 	
+
 	<!-- Other module inherits -->
 	<inherits name='edu.ycp.cs.dh.acegwt.AceGWT' />
 	<inherits name='com.sencha.gxt.ui.GXT' />
