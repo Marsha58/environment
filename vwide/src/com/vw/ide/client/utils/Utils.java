@@ -5,7 +5,6 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
@@ -120,4 +119,30 @@ public class Utils {
 			dialogBox.hide();
 		}
 	}
+	
+	public static String extractJustPath(String input) {
+		String output = "";
+		String[] arrPath = input.split("\\\\");
+		String sLastItemName = arrPath[arrPath.length - 1];
+		if (sLastItemName.indexOf(".") == -1) {
+			return input;
+		} else {
+			for (int i = 0; i < arrPath.length - 2; i++) {
+				output += arrPath[i] + "\\";
+			}
+			output += arrPath[arrPath.length - 2];
+		}
+		return output;
+	}
+
+	public static String extractJustFileName(String input) {
+		String output = "";
+		String[] arrPath = input.split("\\\\");
+		String sLastItemName = arrPath[arrPath.length - 1];
+		if (sLastItemName.indexOf(".") != -1) {
+			output = arrPath[arrPath.length - 1];
+		}
+		return output;
+	}	
+	
 }

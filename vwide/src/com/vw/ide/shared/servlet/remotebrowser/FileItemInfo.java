@@ -30,18 +30,29 @@ public class FileItemInfo implements Serializable {
 		this.isDir = isDir;
 	}
 
-	public static FilesTypesEnum getFyleType(String fileName) {
+	public static FilesTypesEnum getFileType(String fileName) {
 		if (fileName.indexOf(".") != -1) {
 			String sSuffix = fileName.substring(fileName.indexOf(".") + 1);
 			switch (sSuffix) {
 			case "vwml": return FilesTypesEnum.VWML;
 			case "java": return FilesTypesEnum.JAVA;
 			case "xml": return FilesTypesEnum.XML;
+			case "c": return FilesTypesEnum.CPP;
+			case "cpp": return FilesTypesEnum.CPP;
+			case "json": return FilesTypesEnum.JSON;
+			case "html": return FilesTypesEnum.HTML;
+			case "css": return FilesTypesEnum.CSS;
+			case "js": return FilesTypesEnum.JS;
 			default: return FilesTypesEnum.NOT_DEF;
 			}
 		} else return FilesTypesEnum.NOT_DEF;
 	}
 
+	public FilesTypesEnum getFileType() {
+		return getFileType(this.name);
+	}
+	
+	
 	public String getName() {
 		return name;
 	}

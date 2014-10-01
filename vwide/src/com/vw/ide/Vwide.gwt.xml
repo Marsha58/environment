@@ -28,6 +28,8 @@
 	<inherits name='edu.ycp.cs.dh.acegwt.AceGWT' />
 	<inherits name='com.sencha.gxt.ui.GXT' />
 
+	<inherits name="com.seanchenxi.gwt.storage.Storage" />
+
 	<!-- Include both base GXT themes and set the app to check for url params 
 		to activate blue -->
 <!-- 	 -->
@@ -53,6 +55,12 @@
 			<when-property-is name="gxt.theme" value="gray" />
 		</any>
 	</set-property>
+
+<!-- 
+  However, if you want to use both RPC and XML to define persistable classes, 
+  Use the following line.
+-->
+	<set-configuration-property name="storage.type.finder" value="mix"/>
 
 
 	<!-- Specify the app entry point class. -->

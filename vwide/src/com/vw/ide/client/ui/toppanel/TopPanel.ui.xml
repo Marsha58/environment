@@ -13,7 +13,6 @@
 
 
 	<ui:style>
-
 	.panelCentered {
 		margin-right: auto;
 		margin-left: auto;
@@ -23,30 +22,30 @@
 		vertical-align: middle;
 		text-align: center;
 		background-color: beige;
-  	}  
-
-  	.statusDiv {
-    	text-align: right;
-    	margin: 1em;
-  	}
-
-  	.titleDiv {
-    	text-align: center;
-    	margin: 0em;
-  	}
-  
-  	.linksDiv {
-    	text-align: right;
-  	}
-
-    .centerMargin {
-        margin: 10px;
-    }
-      
-    .background {
-        background-color: white;
-    }
-  </ui:style>
+	}
+	
+	.statusDiv {
+		text-align: right;
+		margin: 1em;
+	}
+	
+	.titleDiv {
+		text-align: center;
+		margin: 0em;
+	}
+	
+	.linksDiv {
+		text-align: right;
+	}
+	
+	.centerMargin {
+		margin: 10px;
+	}
+	
+	.background {
+		background-color: white;
+	}
+	</ui:style>
 
 	<ui:with type="com.sencha.gxt.widget.core.client.container.MarginData"
 		field="outerDataTP" />
@@ -77,163 +76,193 @@
 
 	<!-- <container:SimpleContainer ui:field="outer" resize="true"> <container:BorderLayoutContainer 
 		ui:field="con" borders="true"> -->
- 	<container:SimpleContainer height="49px" borders="false">
-<!-- 	<container:child layoutData="{outerDataTP}">
+	<container:SimpleContainer height="49px"
+		borders="false">
+		<!-- <container:child layoutData="{outerDataTP}"> -->
+		<container:BorderLayoutContainer
+			ui:field="conTP" borders="false">
+
+			<container:north layoutData="{northDataTP}">
+				<menu:MenuBar borders="false">
+					<menu:MenuBarItem text="File">
+						<menu:menu>
+							<menu:Menu>
+								<menu:MenuItem text="New" icon="{images.new_con_en}" />
+								<menu:MenuItem text="Open File">
+									<menu:submenu>
+										<menu:Menu>
+											<menu:MenuItem text="readme.txt" />
+											<menu:MenuItem text="helloworld.txt" />
+										</menu:Menu>
+									</menu:submenu>
+								</menu:MenuItem>
+								<menu:MenuItem text="Save" icon="{images.save_edit_en}" />
+								<menu:MenuItem text="Save as..." icon="{images.saveas_edit_en}" />
+								<menu:MenuItem text="Save all" icon="{images.saveall_edit_en}" />
+								<menu:MenuItem text="Close" icon="{images.close}" />
+								<menu:SeparatorMenuItem />
+								<menu:MenuItem text="Settings" />
+							</menu:Menu>
+						</menu:menu>
+					</menu:MenuBarItem>
+					<menu:MenuBarItem text="Project">
+						<menu:menu>
+							<menu:Menu>
+								<menu:MenuItem text="New" icon="{images.new_wiz_en}"
+									ui:field="newVwmlProjField" />
+								<menu:MenuItem text="Open File" icon="{images.prj_obj}">
+									<menu:submenu>
+										<menu:Menu>
+											<menu:MenuItem text="readme.txt" />
+											<menu:MenuItem text="helloworld.txt" />
+										</menu:Menu>
+									</menu:submenu>
+								</menu:MenuItem>
+								<menu:MenuItem text="Save" />
+								<menu:MenuItem text="Close" />
+								<menu:MenuItem text="Add VWML files to project" />
+								<menu:MenuItem text="Remove VWML files from project" />
+								<menu:SeparatorMenuItem />
+								<menu:MenuItem text="Settings" />
+							</menu:Menu>
+						</menu:menu>
+					</menu:MenuBarItem>
+					<menu:MenuBarItem text="Build">
+						<menu:menu>
+							<menu:Menu>
+								<menu:MenuItem text="Compile VWML to Java" />
+								<menu:MenuItem text="Run Java code" />
+								<menu:MenuItem text="Compile and Run" />
+								<menu:SeparatorMenuItem />
+								<menu:MenuItem text="Settings" />
+							</menu:Menu>
+						</menu:menu>
+					</menu:MenuBarItem>
+					<menu:MenuBarItem text="View">
+						<menu:menu>
+							<menu:Menu>
+								<menu:MenuItem text="Toggle standard fringes views">
+									<menu:submenu>
+										<menu:Menu ui:field="viewsMenu">
+											<menu:CheckMenuItem text="Input" group="radios"
+												checked="true" />
+											<menu:CheckMenuItem text="Output" group="radios" />
+											<menu:CheckMenuItem text="Debug" group="radios" />
+										</menu:Menu>
+									</menu:submenu>
+								</menu:MenuItem>
+							</menu:Menu>
+						</menu:menu>
+					</menu:MenuBarItem>
+					<menu:MenuBarItem text="Fringes">
+						<menu:menu>
+							<menu:Menu ui:field="fringesMenu">
+								<menu:MenuItem text="Install new" />
+								<menu:MenuItem text="Remove" />
+								<menu:MenuItem text="List of installed" />
+							</menu:Menu>
+						</menu:menu>
+					</menu:MenuBarItem>
+					<menu:MenuBarItem text="Help">
+						<menu:menu>
+							<menu:Menu>
+								<menu:MenuItem text="Reference" />
+								<menu:MenuItem text="About" ui:field="miHelpAboutField" />
+							</menu:Menu>
+						</menu:menu>
+					</menu:MenuBarItem>
+				</menu:MenuBar>
+			</container:north>
+
+			<container:center layoutData="{centerDataTP}">
+				<toolbar:ToolBar borders="false">
+					<button:TextButton icon="{images.new_con_en}"
+						toolTip="New file" />
+					<button:TextButton icon="{images.new_wiz_en}"
+						itemId="idNewVwmlProjField" ui:field="bnNewVwmlProjField" toolTip="New project" />
+					<toolbar:SeparatorToolItem />
+					<button:TextButton icon="{images.save_edit_en}"
+						toolTip="Save" />
+					<button:TextButton icon="{images.saveas_edit_en}"
+						toolTip="Save as..." />
+					<button:TextButton icon="{images.saveall_edit_en}"
+						toolTip="Save all" />
+					<toolbar:SeparatorToolItem />
+					<button:TextButton icon="{images.continue_exec}"
+						toolTip="Continue execution" />
+					<button:TextButton icon="{images.suspend_en}"
+						toolTip="Suspend" />
+					<button:TextButton icon="{images.terminate_obj_en}"
+						toolTip="Terminate" />
+					<toolbar:SeparatorToolItem />
+					<button:TextButton icon="{images.skip_brkp_en}"
+						toolTip="Skip breakpoints" />
+					<button:TextButton icon="{images.debug_persp_en}"
+						toolTip="Debug" />
+					<toolbar:SeparatorToolItem />
+					<button:TextButton icon="{images.search_en}"
+						toolTip="Search" />
+					<toolbar:SeparatorToolItem />
+					<toolbar:FillToolItem />
+				</toolbar:ToolBar>
+			</container:center>
+
+			<container:east layoutData="{eastDataTP}">
+				<toolbar:ToolBar borders="false">
+
+					<button:TextButton text="Scrolling Menu">
+						<button:menu>
+							<menu:Menu ui:field="scrollMenu" maxHeight="300" />
+						</button:menu>
+					</button:TextButton>
+
+					<toolbar:SeparatorToolItem />
+					<!-- <container:HBoxLayoutContainer borders="false" hBoxLayoutAlign="MIDDLE" 
+						padding="{paddingComboboxes}"> -->
+
+<!-- 
+					<button:TextButton text="Options" icon="{images.menu_show}">
+						<button:menu>
+							<menu:Menu ui:field="menu1">
+								<menu:MenuItem text="m1" />
+								<menu:MenuItem text="m2">
+								</menu:MenuItem>
+							</menu:Menu>
+						</button:menu>
+					</button:TextButton>
  -->
- 			<container:BorderLayoutContainer
-				ui:field="conTP" borders="false" >
 
-				<container:north layoutData="{northDataTP}">
-					<menu:MenuBar borders="false">
-						<menu:MenuBarItem text="File">
-							<menu:menu>
-								<menu:Menu>
-									<menu:MenuItem text="New" icon="{images.new_con_en}"/>
-									<menu:MenuItem text="Open File">
-										<menu:submenu>
-											<menu:Menu>
-												<menu:MenuItem text="readme.txt" />
-												<menu:MenuItem text="helloworld.txt" />
-											</menu:Menu>
-										</menu:submenu>
-									</menu:MenuItem>
-									<menu:MenuItem text="Save" icon="{images.save_edit_en}"/>
-									<menu:MenuItem text="Save as..." icon="{images.saveas_edit_en}"/>
-									<menu:MenuItem text="Save all" icon="{images.saveall_edit_en}"/>
-									<menu:MenuItem text="Close" icon="{images.close}"/>
-									<menu:SeparatorMenuItem />
-									<menu:MenuItem text="Settings" />
-								</menu:Menu>
-							</menu:menu>
-						</menu:MenuBarItem>
-						<menu:MenuBarItem text="Project">
-							<menu:menu>
-								<menu:Menu>
-									<menu:MenuItem text="New" icon="{images.new_wiz_en}" ui:field="newVwmlProjField" />
-									<menu:MenuItem text="Open File" icon="{images.prj_obj}">
-										<menu:submenu>
-											<menu:Menu>
-												<menu:MenuItem text="readme.txt" />
-												<menu:MenuItem text="helloworld.txt" />
-											</menu:Menu>
-										</menu:submenu>
-									</menu:MenuItem>
-									<menu:MenuItem text="Save" />
-									<menu:MenuItem text="Close" />
-									<menu:MenuItem text="Add VWML files to project" />
-									<menu:MenuItem text="Remove VWML files from project" />
-									<menu:SeparatorMenuItem />
-									<menu:MenuItem text="Settings" />
-								</menu:Menu>
-							</menu:menu>
-						</menu:MenuBarItem>
-						<menu:MenuBarItem text="Build">
-							<menu:menu>
-								<menu:Menu>
-									<menu:MenuItem text="Compile VWML to Java" />
-									<menu:MenuItem text="Run Java code" />
-									<menu:MenuItem text="Compile and Run" />
-									<menu:SeparatorMenuItem />
-									<menu:MenuItem text="Settings" />
-								</menu:Menu>
-							</menu:menu>
-						</menu:MenuBarItem>
-						<menu:MenuBarItem text="View">
-							<menu:menu>
-								<menu:Menu>
-									<menu:MenuItem text="Toggle standard fringes views">
-										<menu:submenu>
-											<menu:Menu>
-												<menu:MenuItem text="Input" />
-												<menu:MenuItem text="Output" />
-												<menu:MenuItem text="Debug" />
-											</menu:Menu>
-										</menu:submenu>
-									</menu:MenuItem>
-								</menu:Menu>
-							</menu:menu>
-						</menu:MenuBarItem>
-						<menu:MenuBarItem text="Fringes">
-							<menu:menu>
-								<menu:Menu>
-									<menu:MenuItem text="Install new" />
-									<menu:MenuItem text="Remove" />
-									<menu:MenuItem text="List of installed" />
-								</menu:Menu>
-							</menu:menu>
-						</menu:MenuBarItem>
-						<menu:MenuBarItem text="Help">
-							<menu:menu>
-								<menu:Menu>
-									<menu:MenuItem text="Reference" />
-									<menu:MenuItem text="About" ui:field="miHelpAboutField" />
-								</menu:Menu>
-							</menu:menu>
-						</menu:MenuBarItem>
-					</menu:MenuBar>
-				</container:north>
 
-				<container:center layoutData="{centerDataTP}">
-					<toolbar:ToolBar borders="false">
-						<button:TextButton icon="{images.new_con_en}" toolTip="New file"/>
-						<button:TextButton icon="{images.new_wiz_en}" itemId="idNewVwmlProjField" ui:field="bnNewVwmlProjField" toolTip="New project"/>
-						<toolbar:SeparatorToolItem />
-						<button:TextButton icon="{images.save_edit_en}" toolTip="Save"/>
-						<button:TextButton icon="{images.saveas_edit_en}" toolTip="Save as..." />
-						<button:TextButton icon="{images.saveall_edit_en}" toolTip="Save all"/>
-						<toolbar:SeparatorToolItem />
-						<button:TextButton icon="{images.continue_exec}" toolTip="Continue execution"/>
-						<button:TextButton icon="{images.suspend_en}" toolTip="Suspend"/>
-						<button:TextButton icon="{images.terminate_obj_en}" toolTip="Terminate"/>
-						<toolbar:SeparatorToolItem />
-						<button:TextButton icon="{images.skip_brkp_en}" toolTip="Skip breakpoints"/>
-						<button:TextButton icon="{images.debug_persp_en}" toolTip="Debug"/>
-						<toolbar:SeparatorToolItem />
-						<button:TextButton icon="{images.search_en}" toolTip="Search"/>
-						<toolbar:SeparatorToolItem />
-						<toolbar:FillToolItem />
-					</toolbar:ToolBar>
-				</container:center>
 
-				<container:east layoutData="{eastDataTP}" >
-					<toolbar:ToolBar borders="false">
 
-						<button:TextButton text="Scrolling Menu">
-							<button:menu>
-								<menu:Menu ui:field="scrollMenu" maxHeight="300" />
-							</button:menu>
-						</button:TextButton>
+					<!-- </container:HBoxLayoutContainer> -->
+					<toolbar:SeparatorToolItem />
 
-						<toolbar:SeparatorToolItem />
-						<!-- <container:HBoxLayoutContainer borders="false" hBoxLayoutAlign="MIDDLE" 
-							padding="{paddingComboboxes}"> -->
-						<container:SimpleContainer ui:field="comboAceEditorPlaceCont">
+					<container:SimpleContainer ui:field="comboAceEditorPlaceCont">
+					</container:SimpleContainer>
+					<container:SimpleContainer ui:field="comboPlaceCont">
+					</container:SimpleContainer>
+
+
+
+					<container:HBoxLayoutContainer width="150px"
+						borders="false" hBoxLayoutAlign="MIDDLE" padding="{paddingUserName}">
+						<container:SimpleContainer ui:field="userNamePlaceCont">
+							<g:Label ui:field="userName" />
 						</container:SimpleContainer>
 						<toolbar:SeparatorToolItem />
-						<container:SimpleContainer ui:field="comboPlaceCont">
-						</container:SimpleContainer>
-						<!-- </container:HBoxLayoutContainer> -->
-						<toolbar:SeparatorToolItem />
+						<button:TextButton text="logout" itemId="idUserLogout"
+							ui:field="userLogout" />
+					</container:HBoxLayoutContainer>
 
-						<container:HBoxLayoutContainer
-							width="150px" borders="false" hBoxLayoutAlign="MIDDLE" padding="{paddingUserName}">
-							<container:SimpleContainer ui:field="userNamePlaceCont"  >
-								<g:Label ui:field="userName" />
-							</container:SimpleContainer>
-						<toolbar:SeparatorToolItem />
-						<button:TextButton text="logout" itemId="idUserLogout" ui:field="userLogout" />
-						</container:HBoxLayoutContainer>
+					<toolbar:FillToolItem />
 
-						<toolbar:FillToolItem />
+				</toolbar:ToolBar>
 
-					</toolbar:ToolBar>
-
-				</container:east>
-			</container:BorderLayoutContainer>
-<!--  
-		</container:child>
- -->
- 	</container:SimpleContainer>
+			</container:east>
+		</container:BorderLayoutContainer>
+		<!-- </container:child> -->
+	</container:SimpleContainer>
 
 	<!-- </container:BorderLayoutContainer> </container:SimpleContainer> -->
 

@@ -52,6 +52,8 @@
   <ui:with type="com.sencha.gxt.data.shared.TreeStore" field="store" />
   <ui:with type="com.sencha.gxt.core.client.ValueProvider" field="valueProvider" /> 
 
+  
+
 	<gxt:TabPanel width="450" addStyleNames="margin-10" borders="false">
 		<gxt:child config="{shortTextTabConfig}">
 			<container:SimpleContainer>

@@ -24,12 +24,15 @@ import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.projects.FileManager;
 import com.vw.ide.client.projects.FileManagerImpl;
+import com.vw.ide.client.projects.ProjectManager;
+import com.vw.ide.client.projects.ProjectManagerImpl;
 import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
+import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
@@ -49,6 +52,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public final HandlerManager eventBus;
 	private final PresenterViewerLink view;
 	public FileManager fileManager;
+	public ProjectManager projectManager;
 
 	public DevelopmentBoardPresenter(HandlerManager eventBus,
 			PresenterViewerLink view) {
@@ -59,6 +63,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		}
 
 		fileManager = new FileManagerImpl();
+		projectManager = new ProjectManagerImpl();
 	}
 
 	public void go(HasWidgets container) {
@@ -111,30 +116,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 			alertMessageBox.show();
 		}
 
-		public String extractJustPath(String input) {
-			String output = "";
-			String[] arrPath = input.split("\\\\");
-			String sLastItemName = arrPath[arrPath.length - 1];
-			if (sLastItemName.indexOf(".") == -1) {
-				return input;
-			} else {
-				for (int i = 0; i < arrPath.length - 2; i++) {
-					output += arrPath[i] + "\\";
-				}
-				output += arrPath[arrPath.length - 2];
-			}
-			return output;
-		}
 
-		public String extractJustFileName(String input) {
-			String output = "";
-			String[] arrPath = input.split("\\\\");
-			String sLastItemName = arrPath[arrPath.length - 1];
-			if (sLastItemName.indexOf(".") != -1) {
-				output = arrPath[arrPath.length - 1];
-			}
-			return output;
-		}
 
 		@Override
 		public void onSuccess(RequestDirOperationResult result) {
@@ -145,9 +127,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 						"Warning", messageAlert);
 				alertMessageBox.show();
 			} else {
+				
+				((DevelopmentBoardPresenter) presenter).projectManager.checkFile(result.getPath());
 
-				if (((DevelopmentBoardPresenter) presenter).fileManager
-						.checkIsFileOpened(result.getPath())) {
+				if (((DevelopmentBoardPresenter) presenter).fileManager.checkIsFileOpened(result.getPath())) {
 					Long fileId = ((DevelopmentBoardPresenter) presenter).fileManager
 							.getFileIdByFilePath(result.getPath());
 					((DevelopmentBoardPresenter) presenter).scrollToTab(fileId,
@@ -156,7 +139,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 					Long fileId = ((DevelopmentBoardPresenter) presenter).fileManager
 							.addFile(new FileItemInfo(
-									extractJustFileName(result.getPath()),
+									Utils.extractJustFileName(result.getPath()),
 									result.getPath(), false));
 
 					String fileMD5 = calculateCheckSum(result.getTextFile());
@@ -165,14 +148,14 @@ public class DevelopmentBoardPresenter extends Presenter {
 							.setFileContent(fileId, result.getTextFile());
 
 					FileSheet newFileSheet = new FileSheet(presenter, fileId,
-							extractJustFileName(result.getPath()));
+							Utils.extractJustFileName(result.getPath()));
 					
 					
-					newFileSheet.constructEditor(result.getTextFile(),FileItemInfo.getFyleType(extractJustFileName(result.getPath())));
+					newFileSheet.constructEditor(result.getTextFile(),FileItemInfo.getFileType(Utils.extractJustFileName(result.getPath())));
 					((DevelopmentBoardPresenter) presenter).fileManager.setAssociatedTabWidget(fileId, newFileSheet);
 
 					TabItemConfig tabItemConfig = new TabItemConfig(
-							extractJustFileName(result.getPath()));
+							Utils.extractJustFileName(result.getPath()));
 					tabItemConfig.setClosable(true);
 					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor
 							.getTabPanel().add(newFileSheet, tabItemConfig);

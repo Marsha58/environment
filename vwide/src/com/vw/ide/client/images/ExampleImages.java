@@ -168,4 +168,9 @@ public interface ExampleImages extends ClientBundle {
 
   @Source("git\\elcl16\\continue.gif")
   ImageResource continue_exec();    
+  
+  @Source("enabled//delete_edit.gif")
+  ImageResource delete_edit_en();
+  
+  
 }

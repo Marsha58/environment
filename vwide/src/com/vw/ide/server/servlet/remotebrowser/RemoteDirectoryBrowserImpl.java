@@ -5,10 +5,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,11 +21,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
- 
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.log4j.Logger;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -50,9 +53,30 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		}
 	}
 	
+	
+	private void loadProperties(ServletContext context) {
+		
+		Properties prop = new Properties();
+		try {
+		    //load a properties file from class path, inside static method
+			InputStream isPropertiesFile = context.getResourceAsStream("/WEB-INF/classes/config.properties");
+			if(isPropertiesFile != null) {
+				prop.load(isPropertiesFile);
+				if (prop.getProperty("root_dir") != null) {
+					s_defRootDir = prop.getProperty("root_dir");
+				}
+			}
+		} 
+		catch (IOException ex) {
+		    ex.printStackTrace();
+		}		
+	}
+	
+	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
+		loadProperties(config.getServletContext());
 		if (logger.isInfoEnabled()) {
 			logger.info("RemoteDirectoryBrowserImpl started and initialized");
 		}

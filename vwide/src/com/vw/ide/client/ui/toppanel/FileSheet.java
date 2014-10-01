@@ -119,13 +119,31 @@ public class FileSheet extends Composite {
 		
 		switch (fileType) {
 		case VWML:
-			aceEditor.setMode(AceEditorMode.LISP);	
+			aceEditor.setMode(AceEditorMode.VWML);	
 			break;
 		case JAVA:
 			aceEditor.setMode(AceEditorMode.JAVA);	
 			break;
+		case C:
+			aceEditor.setMode(AceEditorMode.C_CPP);	
+			break;
+		case CPP:
+			aceEditor.setMode(AceEditorMode.C_CPP);	
+			break;
+		case CSS:
+			aceEditor.setMode(AceEditorMode.CSS);	
+			break;
+		case HTML:
+			aceEditor.setMode(AceEditorMode.HTML);	
+			break;
+		case JSON:
+			aceEditor.setMode(AceEditorMode.JSON);	
+			break;
 		case XML:
 			aceEditor.setMode(AceEditorMode.XML);	
+			break;
+		case JS:
+			aceEditor.setMode(AceEditorMode.JAVASCRIPT);	
 			break;
 		default:
 			aceEditor.setMode(AceEditorMode.TEXT);	

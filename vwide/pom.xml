@@ -53,6 +53,17 @@
 			<version>1.9.2</version>
 		</dependency>
 		<dependency>
+			<groupId>com.seanchenxi.gwt</groupId>
+			<artifactId>gwt-storage</artifactId>
+			<version>1.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.version}</version>

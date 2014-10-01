@@ -248,6 +248,8 @@ public enum AceEditorMode {
 	VERILOG("verilog"),
 	/** VHDL. */
 	VHDL("vhdl"),
+	/** VWML. */
+	VWML("vwml"),	
 	/** XML. */
 	XML("xml"),
 	/** XQuery. */

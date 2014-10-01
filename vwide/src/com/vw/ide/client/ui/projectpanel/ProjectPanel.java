@@ -21,6 +21,7 @@ import java.util.List;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,8 +34,16 @@ import com.sencha.gxt.data.shared.TreeStore;
 //import com.sencha.gxt.examples.resources.client.images.ExampleImages;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
+import com.sencha.gxt.widget.core.client.event.BeforeShowContextMenuEvent;
+import com.sencha.gxt.widget.core.client.event.BeforeShowContextMenuEvent.BeforeShowContextMenuHandler;
+import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
+import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
+import com.vw.ide.client.images.ExampleImages;
 import com.vw.ide.client.model.BaseDto;
 import com.vw.ide.client.model.FileDto;
 import com.vw.ide.client.model.FolderDto;
@@ -57,7 +66,7 @@ import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
  * {@link com.google.gwt.user.client.ui.Tree}, and other custom widgets.
  */
 public class ProjectPanel extends Composite implements IsWidget,
-	PresenterViewerLink {
+		PresenterViewerLink {
 
 	interface Binder extends UiBinder<Widget, ProjectPanel> {
 	}
@@ -65,10 +74,16 @@ public class ProjectPanel extends Composite implements IsWidget,
 	private static final Binder uiBinder = GWT.create(Binder.class);
 
 	private Presenter presenter = null;
-	
+
+	@UiField
+	ExampleImages images;
+
 	public FolderDto selectedFolder = null;
 	public BaseDto treeSelectedItem;
+	public FileItemInfo selectedItem4ContextMenu;
 	public static final String SELECT_ID = "SELECT_ID";
+
+	public ProPanelContextMenu contextMenu;
 
 	class KeyProvider implements ModelKeyProvider<BaseDto> {
 		@Override
@@ -77,7 +92,6 @@ public class ProjectPanel extends Composite implements IsWidget,
 					+ item.getId().toString();
 		}
 	}
-	
 
 	@UiFactory
 	public ValueProvider<BaseDto, String> createValueProvider() {
@@ -105,8 +119,8 @@ public class ProjectPanel extends Composite implements IsWidget,
 
 	protected Presenter getAssociatedPresenter() {
 		return this.presenter;
-	}	
-	
+	}
+
 	public static class DirContentResult extends
 			ProcessedResult<RequestedDirScanResult> {
 
@@ -163,27 +177,28 @@ public class ProjectPanel extends Composite implements IsWidget,
 		widget.addStyleName("margin-10");
 		// tree.getStyle().setLeafIcon(ExampleImages.INSTANCE.music());
 
-		projectsDirsField.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		projectsDirsField.getSelectionModel().setSelectionMode(
+				SelectionMode.SINGLE);
 		projectsDirsField.getSelectionModel().addSelectionHandler(
 				new SelectionHandler<BaseDto>() {
 
 					public void onSelection(SelectionEvent<BaseDto> event) {
 						treeSelectedItem = event.getSelectedItem();
+						FileItemInfo fileItemInfo = new FileItemInfo();
+						fileItemInfo.setName(treeSelectedItem.getName());
+						fileItemInfo.setPath(treeSelectedItem
+								.getAbsolutePath());
+
 						if (treeSelectedItem.getType() == "file") {
-							
-							FileItemInfo fileItemInfo = new FileItemInfo();
 							fileItemInfo.setDir(false);
-							fileItemInfo.setName(treeSelectedItem.getName());
-							fileItemInfo.setPath(treeSelectedItem.getAbsolutePath());
-							
-							
 							if (presenter != null) {
-								presenter.fireEvent(new SelectFileEvent(fileItemInfo));
+								presenter.fireEvent(new SelectFileEvent(
+										fileItemInfo));
 							}
-							
-//							selectedFile = treeSelectedItem.getAbsolutePath();
-							
+						} else {
+							fileItemInfo.setDir(true);
 						}
+						selectedItem4ContextMenu = fileItemInfo; 
 					}
 				});
 
@@ -191,13 +206,25 @@ public class ProjectPanel extends Composite implements IsWidget,
 	}
 
 	public void prepare() {
-//		requestForDirContent(null);
-		
+		// requestForDirContent(null);
+		buildContextMenu();
 	}
-	
-	
-	
-	
+
+	public void buildContextMenu() {
+
+		contextMenu = new ProPanelContextMenu(); 
+		contextMenu.setWidth(160);
+
+		contextMenu.addBeforeShowHandler(new BeforeShowHandler(){
+			@Override
+			public void onBeforeShow(BeforeShowEvent event) {
+				contextMenu.checkEnabling(selectedItem4ContextMenu);
+			}	
+		});
+		
+		
+		projectsDirsField.setContextMenu(contextMenu);
+	}
 
 	public void requestForDirContent(String parent) {
 		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
@@ -210,9 +237,6 @@ public class ProjectPanel extends Composite implements IsWidget,
 			service.getDirScan(user, parent, cbk);
 		}
 	}
-
-
-
 
 	public FolderDto root = null;
 	public String basePath = "";

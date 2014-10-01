@@ -1,5 +1,7 @@
 package com.vw.ide.server.servlet.security;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +23,7 @@ public class UsersManager {
 	private Map<String,UserInfo> usersList = null; 
 	
 	private static String s_defUsersXmlFileName = "users.xml";
-	private static String fullPath2Users;
+	private static URL fullPath2Users;
 	private DOMParser parser;
 	
 	
@@ -104,11 +106,18 @@ public class UsersManager {
 	
 	
 	public void openAndParseUsersXml(ServletContext context){
-		fullPath2Users = context.getRealPath("/WEB-INF/classes/" + s_defUsersXmlFileName);
+//  Such approach work only  in case when server side deployed not as zip-file
+//		fullPath2Users = context.getRealPath("/WEB-INF/classes/" + s_defUsersXmlFileName);
+		
+		try {
+			fullPath2Users = context.getResource("/WEB-INF/classes/" + s_defUsersXmlFileName);
+		} catch (MalformedURLException e1) {
+			e1.printStackTrace();
+		}
 	
 		try {
 		    parser = new DOMParser();
-		    parser.parse(fullPath2Users);
+		    parser.parse(fullPath2Users.toString());
 		    Document doc = parser.getDocument();
 		    NodeList root = doc.getChildNodes();
 		    Node appl = getNode("appl", root);
