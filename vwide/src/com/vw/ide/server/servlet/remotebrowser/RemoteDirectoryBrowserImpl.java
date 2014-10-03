@@ -208,8 +208,10 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 
 	@Override
 	public RequestDirOperationResult readFile(String user, String parent,
-			String fileName) {
+			String fileName, Long projectId, Long fileId) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
+		res.setProjectId(projectId);
+		res.setFileId(fileId);
 		res.setOperation("read file");
 		res.setPath(fileName);
 		res.setRetCode(0);
@@ -260,7 +262,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 				+ "package = \"%s\"\n" + "path = \"%s\"\n"
 				+ "author = \"%s\"\n" + "project_name = \"%s\"\n"
 				+ "description = \"%s\"\n" + "beyond {\n" + "}\n" + "}\n"
-				+ "conflicting {\n" + "}\n" + "}",
+				+ "conflictring {\n" + "}\n" + "}",
 				packageName, javaSrcPath, author, projectName,	descr);		
 		return pattern;
 	}

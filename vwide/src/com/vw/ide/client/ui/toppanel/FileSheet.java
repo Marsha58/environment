@@ -30,8 +30,17 @@ import com.vw.ide.client.ui.toppanel.TopPanel.ActiveTheme;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceAnnotationType;
+import edu.ycp.cs.dh.acegwt.client.ace.AceCompletion;
+import edu.ycp.cs.dh.acegwt.client.ace.AceCompletionCallback;
+import edu.ycp.cs.dh.acegwt.client.ace.AceCompletionProvider;
+import edu.ycp.cs.dh.acegwt.client.ace.AceCompletionSnippet;
+import edu.ycp.cs.dh.acegwt.client.ace.AceCompletionSnippetSegment;
+import edu.ycp.cs.dh.acegwt.client.ace.AceCompletionSnippetSegmentLiteral;
+import edu.ycp.cs.dh.acegwt.client.ace.AceCompletionSnippetSegmentTabstopItem;
+import edu.ycp.cs.dh.acegwt.client.ace.AceCompletionValue;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditor;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorCallback;
+import edu.ycp.cs.dh.acegwt.client.ace.AceEditorCursorPosition;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorMode;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 
@@ -57,8 +66,36 @@ public class FileSheet extends Composite {
 	@UiField(provided = true)
 	Status wordCount = new Status(GWT.<StatusAppearance> create(BoxStatusAppearance.class));
 	
+	@UiField(provided = true)
+	Status rowCol = new Status(GWT.<StatusAppearance> create(BoxStatusAppearance.class));
+	@UiField(provided = true)
+	Status absPos = new Status(GWT.<StatusAppearance> create(BoxStatusAppearance.class));	
 
-	
+	private static class MyCompletionProvider implements AceCompletionProvider {
+		@Override		
+		public void getProposals(AceEditor editor, AceEditorCursorPosition pos, String prefix, AceCompletionCallback callback) {
+			GWT.log("sending completion proposals");
+			callback.invokeWithCompletions(new AceCompletion[]{
+					new AceCompletionValue("first", "firstcompletion", "custom", 10),
+					new AceCompletionValue("second", "secondcompletion", "custom", 11),
+					new AceCompletionValue("third", "thirdcompletion", "custom", 12),
+					new AceCompletionSnippet("fourth (snippets)",
+							new AceCompletionSnippetSegment[]{
+							new AceCompletionSnippetSegmentLiteral("filler_"),
+							new AceCompletionSnippetSegmentTabstopItem("tabstop1"),
+							new AceCompletionSnippetSegmentLiteral("_\\filler_"), // putting backslash in here to prove escaping is working
+							new AceCompletionSnippetSegmentTabstopItem("tabstop2"),
+							new AceCompletionSnippetSegmentLiteral("_$filler_"), // putting dollar in here to prove escaping is working
+							new AceCompletionSnippetSegmentTabstopItem("tabstop3"),
+							new AceCompletionSnippetSegmentLiteral("\nnextlinefiller_"),
+							new AceCompletionSnippetSegmentTabstopItem("tabstop}4"),
+							new AceCompletionSnippetSegmentLiteral("_filler_"),
+							new AceCompletionSnippetSegmentTabstopItem("") /* Empty tabstop -- tab to end of replacement text */
+					},"csnip", 14)
+			});
+		}
+
+	} 
 
 	public FileSheet() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -71,6 +108,15 @@ public class FileSheet extends Composite {
 		this.fileName = fileName;
 	}	
 
+
+	private void updateEditor1CursorPosition() {
+		AceEditorCursorPosition cursorPosition = aceEditor.getCursorPosition();
+		rowCol.setText(cursorPosition.toString());
+		
+		
+		int iAbsPos = aceEditor.getIndexFromPosition(cursorPosition);
+		absPos.setText(String.valueOf(iAbsPos));
+	}	
 	
 	public void setDockLayoutPanel(String sHeight) {
 		dockLayoutPanel.setHeight(sHeight);
@@ -104,7 +150,7 @@ public class FileSheet extends Composite {
 		aceEditor.setWidth("100%");
 		aceEditor.setHeight("100%");
 		
-		
+//		aceEditor.addCompletionProvider(new MyCompletionProvider()); 
 
 		// Try out custom code completer
 		// AceEditor.addCompletionProvider(new MyCompletionProvider());
@@ -116,6 +162,16 @@ public class FileSheet extends Composite {
 
 		
 		aceEditor.setText(textFile);
+		
+		
+		// use cursor position change events to keep a label updated
+		// with the current row/col
+		aceEditor.addOnCursorPositionChangeHandler(new AceEditorCallback() {
+			@Override
+			public void invokeAceCallback(JavaScriptObject obj) {
+				updateEditor1CursorPosition();
+			}
+		});
 		
 		switch (fileType) {
 		case VWML:

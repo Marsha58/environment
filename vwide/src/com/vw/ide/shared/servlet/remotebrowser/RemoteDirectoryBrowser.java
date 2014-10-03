@@ -44,15 +44,10 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 */
 	public RequestDirOperationResult removeDir(String user, String parent, String dir);
 	
-	/**
-	 * File reading
-	 * @param user
-	 * @param parent
-	 * @param fileName
-	 */
-	public RequestDirOperationResult readFile(String user, String parent, String fileName);
+	public RequestDirOperationResult readFile(String user, String parent,
+			String fileName, Long projectId, Long fileId);
 
-	RequestProjectCreationResult createProject(String userName,
+	public RequestProjectCreationResult createProject(String userName,
 			String projectName, String packageName, String javaSrcPath,
 			String author, String descr);
 	

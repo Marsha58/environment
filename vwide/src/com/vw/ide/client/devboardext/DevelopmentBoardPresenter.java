@@ -51,7 +51,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 	public final HandlerManager eventBus;
 	private final PresenterViewerLink view;
-	public FileManager fileManager;
+//	public FileManager fileManager;
 	public ProjectManager projectManager;
 
 	public DevelopmentBoardPresenter(HandlerManager eventBus,
@@ -62,7 +62,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 			view.associatePresenter(this);
 		}
 
-		fileManager = new FileManagerImpl();
+//		fileManager = new FileManagerImpl();
 		projectManager = new ProjectManagerImpl();
 	}
 
@@ -77,7 +77,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 		if (event instanceof SelectFileEvent) {
 			SelectFileEvent evt = (SelectFileEvent) event;
-			requestForReadingFile(evt.getFileItemInfo().getPath());
+			Long projectId = projectManager.getProjectIdByFilePath(evt.getFileItemInfo().getPath());
+			Long fileId    = projectManager.getFileIdByFilePath(evt.getFileItemInfo().getPath());
+			
+			requestForReadingFile(evt.getFileItemInfo().getPath(), projectId, fileId);
 		} else if (event instanceof AceColorThemeChangedEvent) {
 			doAceColorThemeChange((AceColorThemeChangedEvent) event);
 		} else if (event instanceof EditorTabClosedEvent) {
@@ -130,36 +133,38 @@ public class DevelopmentBoardPresenter extends Presenter {
 				
 				((DevelopmentBoardPresenter) presenter).projectManager.checkFile(result.getPath());
 
-				if (((DevelopmentBoardPresenter) presenter).fileManager.checkIsFileOpened(result.getPath())) {
-					Long fileId = ((DevelopmentBoardPresenter) presenter).fileManager
+				if (((DevelopmentBoardPresenter) presenter).projectManager.checkIsFileOpened(result.getPath())) {
+					Long fileId = ((DevelopmentBoardPresenter) presenter).projectManager
 							.getFileIdByFilePath(result.getPath());
 					((DevelopmentBoardPresenter) presenter).scrollToTab(fileId,
 							true);
 				} else {
 
-					Long fileId = ((DevelopmentBoardPresenter) presenter).fileManager
-							.addFile(new FileItemInfo(
-									Utils.extractJustFileName(result.getPath()),
+//					Long fileId = ((DevelopmentBoardPresenter) presenter).projectManager.getNewFileId();
+					
+					((DevelopmentBoardPresenter) presenter).projectManager.addFileToOpenedFilesContext(result.getProjectId(), result.getFileId(), 
+								    new FileItemInfo(Utils.extractJustFileName(result.getPath()),
 									result.getPath(), false));
 
 					String fileMD5 = calculateCheckSum(result.getTextFile());
 
-					((DevelopmentBoardPresenter) presenter).fileManager
+/*					((DevelopmentBoardPresenter) presenter).projectManager
 							.setFileContent(fileId, result.getTextFile());
+*/
 
-					FileSheet newFileSheet = new FileSheet(presenter, fileId,
+					FileSheet newFileSheet = new FileSheet(presenter, result.getFileId(),
 							Utils.extractJustFileName(result.getPath()));
 					
 					
 					newFileSheet.constructEditor(result.getTextFile(),FileItemInfo.getFileType(Utils.extractJustFileName(result.getPath())));
-					((DevelopmentBoardPresenter) presenter).fileManager.setAssociatedTabWidget(fileId, newFileSheet);
+					((DevelopmentBoardPresenter) presenter).projectManager.setAssociatedTabWidget(result.getFileId(), newFileSheet);
 
 					TabItemConfig tabItemConfig = new TabItemConfig(
 							Utils.extractJustFileName(result.getPath()));
 					tabItemConfig.setClosable(true);
 					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor
 							.getTabPanel().add(newFileSheet, tabItemConfig);
-					((DevelopmentBoardPresenter) presenter).scrollToTab(fileId,
+					((DevelopmentBoardPresenter) presenter).scrollToTab(result.getFileId(),
 							true);
 				}
 			}
@@ -168,14 +173,14 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 
 
-	protected void requestForReadingFile(String fileName) {
+	protected void requestForReadingFile(String fileName, Long projectId, Long fileId) {
 		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
 				.getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForAnyOperation cbk = RemoteBrowserService
 					.instance().buildCallbackForAnyOperation();
 			cbk.setProcessedResult(new DirOperationReadingFileResult(this));
-			service.readFile(getLoggedAsUser(), "", fileName, cbk);
+			service.readFile(getLoggedAsUser(), "", fileName, projectId, fileId, cbk);
 		}
 	}
 
@@ -200,8 +205,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	public void scrollToTab(Long fileId, boolean animate) {
-		FileSheet curFileSheet = (FileSheet) fileManager
-				.getAssociatedTabWidgets().get(fileId);
+		FileSheet curFileSheet = (FileSheet) projectManager.getAssociatedTabWidgetsContext().get(fileId);
 		((DevelopmentBoard) view).editor.getTabPanel().setActiveWidget(
 				curFileSheet);
 		((DevelopmentBoard) view).editor.getTabPanel().scrollToTab(
@@ -209,9 +213,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	private void doAceColorThemeChange(AceColorThemeChangedEvent event) {
-		for (Long lKey : fileManager.getAssociatedTabWidgets().keySet()) {
-			FileSheet curFileSheet = (FileSheet) fileManager
-					.getAssociatedTabWidgets().get(lKey);
+		for (Long lKey : projectManager.getAssociatedTabWidgetsContext().keySet()) {
+			FileSheet curFileSheet = (FileSheet) projectManager.getAssociatedTabWidgetsContext().get(lKey);
 
 			// curFileSheet.getAceEditor().setTheme(getTopPanel().comboATh.getCurrentValue());
 			curFileSheet.getAceEditor().setTheme(
@@ -222,10 +225,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 	private void doRemoveFile(EditorTabClosedEvent event) {
 		Long fileId = ((FileSheet) event.getEvent().getItem()).getFileId();
-		fileManager.getFilesFileInfoContext().remove(fileId);
-		fileManager.getFilesContext().remove(fileId);
-		FileSheet curFileSheet = (FileSheet) fileManager
-				.getAssociatedTabWidgets().remove(fileId);
+		projectManager.getOpenedFilesContext().remove(fileId);
+		FileSheet curFileSheet = (FileSheet) projectManager.getAssociatedTabWidgetsContext().remove(fileId);
 	}
 
 }

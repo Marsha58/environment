@@ -14,6 +14,8 @@ public class RequestDirOperationResult implements Serializable {
 	private String operation;
 	private Integer retCode;
 	private String sTextFile;
+    private Long projectId;
+    private Long fileId;
 	
 	public String getPath() {
 		return path;
@@ -54,5 +56,22 @@ public class RequestDirOperationResult implements Serializable {
 	public void setTextFile(String sTextFile) {
 		this.sTextFile = sTextFile;
 	}
+	
+	public Long getProjectId() {
+		return projectId;
+	}
+	
+	public void setProjectId(Long projectId) {
+		this.projectId = projectId;
+	}	
+
+	public Long getFileId() {
+		return fileId;
+	}
+	
+	public void setFileId(Long fileId) {
+		this.fileId = fileId;
+	}	
+	
 	
 }

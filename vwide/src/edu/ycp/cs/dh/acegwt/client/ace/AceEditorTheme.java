@@ -61,6 +61,7 @@ public enum AceEditorTheme {
 	TOMORROW("tomorrow"),
 	TWILIGHT("twilight"),
 	VIBRANT_INK("vibrant_ink"),
+	VWML_IDLE_FINGERS("vwml_idle_fingers"),
 	XCODE("xcode");
 	
 	private final String name;

@@ -44,7 +44,7 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param parent
 	 * @param filaName
 	 */
-	public void readFile(String user, String parent, String fileName, AsyncCallback<RequestDirOperationResult> callback);
+	public void readFile(String user, String parent, String fileName, Long projectId, Long fileId,  AsyncCallback<RequestDirOperationResult> callback);
 
 	/**
 	 * Project creating
