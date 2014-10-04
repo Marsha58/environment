@@ -150,7 +150,11 @@ public class FileSheet extends Composite {
 		aceEditor.setWidth("100%");
 		aceEditor.setHeight("100%");
 		
-//		aceEditor.addCompletionProvider(new MyCompletionProvider()); 
+		try {
+			AceEditor.addCompletionProvider(new MyCompletionProvider()); 
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
 		// Try out custom code completer
 		// AceEditor.addCompletionProvider(new MyCompletionProvider());
