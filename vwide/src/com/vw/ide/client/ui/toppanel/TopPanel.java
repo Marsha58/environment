@@ -178,7 +178,7 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 	// combo.getElement().getStyle().setFloat(Float.RIGHT);
 	comboATh.setWidth(200);
 //	comboATh.setEmptyText("Select a theme...");		
-	comboATh.setValue(AceEditorTheme.TOMORROW_NIGHT_BRIGHT);
+	comboATh.setValue(AceEditorTheme.VWML_IDLE_FINGERS);
 	comboATh.addSelectionHandler(new SelectionHandler<AceEditorTheme>() {
 		@Override
 		public void onSelection(SelectionEvent<AceEditorTheme> event) {
