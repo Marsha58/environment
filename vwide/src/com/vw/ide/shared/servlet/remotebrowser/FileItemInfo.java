@@ -13,7 +13,8 @@ import com.vw.ide.client.projects.FilesTypesEnum;
 @SuppressWarnings("serial")
 public class FileItemInfo implements Serializable {
 	private String name;
-	private String path;
+	private String absolutePath;
+	private String relPath;
 	private boolean isDir;
 	private String checkSumOnOpen;
 	private String checkSumOnClose;
@@ -23,13 +24,21 @@ public class FileItemInfo implements Serializable {
 		super();
 	}
 
-	public FileItemInfo(String name, String path, boolean isDir) {
+	public FileItemInfo(String name, String absolutePath, boolean isDir) {
 		super();
 		this.name = name;
-		this.path = path;
+		this.absolutePath = absolutePath;
 		this.isDir = isDir;
 	}
 
+	public FileItemInfo(String name, String absolutePath, String relPath, boolean isDir) {
+		super();
+		this.name = name;
+		this.absolutePath = absolutePath;
+		this.relPath = relPath;
+		this.isDir = isDir;
+	}
+	
 	public static FilesTypesEnum getFileType(String fileName) {
 		if (fileName.indexOf(".") != -1) {
 			String sSuffix = fileName.substring(fileName.indexOf(".") + 1);
@@ -61,14 +70,23 @@ public class FileItemInfo implements Serializable {
 		this.name = name;
 	}
 
-	public String getPath() {
-		return path;
+	public String getAbsolutePath() {
+		return absolutePath;
 	}
 
-	public void setPath(String path) {
-		this.path = path;
+	public void setAbsolutePath(String path) {
+		this.absolutePath = path;
+	}
+	
+	public String getRelPath() {
+		return relPath;
 	}
 
+	public void setRelPath(String path) {
+		this.relPath = path;
+	}
+
+	
 	public boolean isDir() {
 		return isDir;
 	}
@@ -103,7 +121,7 @@ public class FileItemInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "FileItemInfo [name=" + name + ", path=" + path + ", isDir="
+		return "FileItemInfo [name=" + name + ", absolutePath=" + absolutePath + ", relPath=" + relPath +", isDir="
 				+ isDir + "]";
 	}
 }

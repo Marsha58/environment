@@ -21,7 +21,6 @@ import java.util.List;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,15 +32,10 @@ import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 //import com.sencha.gxt.examples.resources.client.images.ExampleImages;
 import com.sencha.gxt.widget.core.client.Composite;
-import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
-import com.sencha.gxt.widget.core.client.event.BeforeShowContextMenuEvent;
-import com.sencha.gxt.widget.core.client.event.BeforeShowContextMenuEvent.BeforeShowContextMenuHandler;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
-import com.sencha.gxt.widget.core.client.menu.Menu;
-import com.sencha.gxt.widget.core.client.menu.MenuItem;
-import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.tree.Tree;
+import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.images.ExampleImages;
 import com.vw.ide.client.model.BaseDto;
@@ -51,11 +45,9 @@ import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForCompleteContent;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
-import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 /**
@@ -74,7 +66,14 @@ public class ProjectPanel extends Composite implements IsWidget,
 	private static final Binder uiBinder = GWT.create(Binder.class);
 
 	private Presenter presenter = null;
+	private static int autoId = 0;
+	private Widget widget;
+	private String selectedFile = "";
 
+	@UiField(provided = true)
+	TreeStore<BaseDto> store = new TreeStore<BaseDto>(new KeyProvider());
+	@UiField
+	Tree<BaseDto, String> projectsDirsField;
 	@UiField
 	ExampleImages images;
 
@@ -92,6 +91,9 @@ public class ProjectPanel extends Composite implements IsWidget,
 					+ item.getId().toString();
 		}
 	}
+	
+	
+	
 
 	@UiFactory
 	public ValueProvider<BaseDto, String> createValueProvider() {
@@ -142,21 +144,13 @@ public class ProjectPanel extends Composite implements IsWidget,
 		@Override
 		public void onSuccess(RequestedDirScanResult result) {
 			dialog.makeTreeData(result);
+			((DevelopmentBoardPresenter) dialog.presenter).updateProjects(((DevelopmentBoardPresenter) dialog.presenter).searchProjects());
+//			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsTree(dialog.store);
+			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsFiles(dialog.store);
+			((DevelopmentBoardPresenter) dialog.presenter).checkStoreFiles(dialog.store);
 		}
 	}
 
-	private static int autoId = 0;
-
-	private String selectedFile = "";
-	@UiField(provided = true)
-	TreeStore<BaseDto> store = new TreeStore<BaseDto>(new KeyProvider());
-	@UiField
-	Tree<BaseDto, String> projectsDirsField;
-
-	// @UiField
-	// Tree<BaseDto, String> tree;
-
-	private Widget widget;
 
 	/**
 	 * Constructs a new shortcuts widget using the specified images.
@@ -186,9 +180,9 @@ public class ProjectPanel extends Composite implements IsWidget,
 						treeSelectedItem = event.getSelectedItem();
 						FileItemInfo fileItemInfo = new FileItemInfo();
 						fileItemInfo.setName(treeSelectedItem.getName());
-						fileItemInfo.setPath(treeSelectedItem
+						fileItemInfo.setAbsolutePath(treeSelectedItem
 								.getAbsolutePath());
-
+						
 						if (treeSelectedItem.getType() == "file") {
 							fileItemInfo.setDir(false);
 							if (presenter != null) {
@@ -276,12 +270,12 @@ public class ProjectPanel extends Composite implements IsWidget,
 				} else {
 					sNewPath = fi.getName();
 				}
-				folder = makeFolder(fi.getName(), sNewPath, fi.getPath());
+				folder = makeFolder(fi.getName(), sNewPath, fi.getAbsolutePath());
 				owner.addOrReplaceChild(folder);
 				requestForDirContent(folder.getRelPath());
 			} else {
 				owner.addOrReplaceChild(makeFileItem(fi.getName(), owner,
-						owner.getRelPath(), fi.getPath()));
+						owner.getRelPath(), fi.getAbsolutePath()));
 			}
 		}
 
@@ -360,6 +354,10 @@ public class ProjectPanel extends Composite implements IsWidget,
 	private static FileDto makeFileItem(String fileName, String folder,
 			String relPath, String absolutePath) {
 		return new FileDto(++autoId, fileName, folder, relPath, absolutePath);
+	}
+	
+	public TreeStore<BaseDto> getStore() {
+		return store;
 	}
 
 }

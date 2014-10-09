@@ -7,6 +7,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.Component;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
@@ -20,10 +21,14 @@ import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
+import com.vw.ide.client.model.BaseDto;
+import com.vw.ide.client.model.FileDto;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.projects.FileManager;
 import com.vw.ide.client.projects.FileManagerImpl;
+import com.vw.ide.client.projects.ProjectItem;
+import com.vw.ide.client.projects.ProjectItemImpl;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.projects.ProjectManagerImpl;
 import com.vw.ide.client.service.ProcessedResult;
@@ -40,6 +45,9 @@ import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 
 import java.io.UnsupportedEncodingException;
 import java.security.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Development board screen
@@ -51,7 +59,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 	public final HandlerManager eventBus;
 	private final PresenterViewerLink view;
-//	public FileManager fileManager;
+	// public FileManager fileManager;
 	public ProjectManager projectManager;
 
 	public DevelopmentBoardPresenter(HandlerManager eventBus,
@@ -62,8 +70,9 @@ public class DevelopmentBoardPresenter extends Presenter {
 			view.associatePresenter(this);
 		}
 
-//		fileManager = new FileManagerImpl();
+		// fileManager = new FileManagerImpl();
 		projectManager = new ProjectManagerImpl();
+
 	}
 
 	public void go(HasWidgets container) {
@@ -77,10 +86,11 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 		if (event instanceof SelectFileEvent) {
 			SelectFileEvent evt = (SelectFileEvent) event;
-			Long projectId = projectManager.getProjectIdByFilePath(evt.getFileItemInfo().getPath());
-			Long fileId    = projectManager.getFileIdByFilePath(evt.getFileItemInfo().getPath());
-			
-			requestForReadingFile(evt.getFileItemInfo().getPath(), projectId, fileId);
+			Long projectId = projectManager.getProjectIdByFilePath(evt.getFileItemInfo().getAbsolutePath());
+			Long fileId = projectManager.getFileIdByFilePath(evt.getFileItemInfo().getAbsolutePath());
+
+			requestForReadingFile(evt.getFileItemInfo().getAbsolutePath(), projectId,
+					fileId);
 		} else if (event instanceof AceColorThemeChangedEvent) {
 			doAceColorThemeChange((AceColorThemeChangedEvent) event);
 		} else if (event instanceof EditorTabClosedEvent) {
@@ -99,6 +109,141 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public ContentPanel getEditorContentPanel() {
 		return ((DevelopmentBoard) view).editorContentPanel;
 	}
+
+	private String selectProjectName(String sPath) {
+		String sRes = sPath;
+		String delims = "[\\\\/]+"; // / parse such string as
+									// "\\aaaa\\bbbb\\\\cccc\\\\dddd/eeee//ffff/gggg"
+		if (sPath.length() > 0) {
+			String[] arrSpl = sPath.split(delims);
+			sRes = arrSpl[arrSpl.length - 1];
+		}
+		return sRes;
+	}
+
+	public ArrayList<ProjectItem> searchProjects() {
+		String sPath;
+		String sProjectName;
+		String sName;
+		ArrayList<ProjectItem> projectList = new ArrayList<ProjectItem>();
+
+		for (BaseDto allBaseDto : ((DevelopmentBoard) view).projectPanel.getStore().getAll()) {
+			sPath = allBaseDto.getRelPath();
+			sName = allBaseDto.getName();
+			sProjectName = selectProjectName(sPath);
+			if ((sProjectName + ".xml").equalsIgnoreCase(sName)) {
+				if (sProjectName.length() > 0) {
+					
+					ProjectItem newProjectItem = new ProjectItemImpl(sProjectName, sPath);
+					
+					projectList.add(newProjectItem);
+				}
+			}
+		}
+		return projectList;
+
+	}
+	
+	public void updateProjects(ArrayList<ProjectItem> projectsList) {
+		for(ProjectItem curPI: projectsList) {
+			Long projectId = projectManager.getProjectIdByProjectInfo(curPI);
+			if (projectId == -1L) {
+				projectManager.addProject(curPI);
+			}
+		}
+	}	
+
+
+/*	public void updateProjectsTree(TreeStore<BaseDto> store) {
+		
+		List<BaseDto> bdto = store.getAll();
+		
+//        for (int i = 0; i < store.getAllItemsCount(); i++) {
+        	for(BaseDto b: bdto)
+        	try {
+        		if(b instanceof FileDto) {
+        			FileDto curItemInStore = (FileDto) b;
+        			Long projectId =   curItemInStore.getProjectId();
+        			Long fileId =  curItemInStore.getFileId();
+        			if (projectId == null){
+        				curItemInStore.setProjectId(projectManager.getProjectIdByFilePath(curItemInStore.getName()));
+        			}
+        			if (fileId == null){
+        				curItemInStore.setFileId(projectManager.getProjectIdByFilePath(curItemInStore.getName()));
+        			}
+        		}
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+
+	}	
+*/	
+	
+	
+	public void updateProjectsFiles(TreeStore<BaseDto> store) {
+		List<BaseDto> bdto = store.getAll();
+		
+//      for (int i = 0; i < store.getAllItemsCount(); i++) {
+      	for(BaseDto b: bdto)
+      	try {
+      		if(b instanceof FileDto) {
+      			FileDto curItemInStore = (FileDto) b;
+      			Long projectId  =  projectManager.getProjectIdByRelPath(curItemInStore.getRelPath());
+      			projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
+
+      			Long fileId = -1l;
+      			if(!projectManager.checkIfFileExists(curItemInStore.getAbsolutePath())){
+      				FileItemInfo newFileItemInfo = new FileItemInfo();
+      				newFileItemInfo.setAbsolutePath(curItemInStore.getAbsolutePath());
+      				newFileItemInfo.setRelPath(curItemInStore.getRelPath());
+      				newFileItemInfo.setName(Utils.extractJustFileName(curItemInStore.getAbsolutePath()));
+      				newFileItemInfo.setDir(false);
+      				fileId = projectManager.addFile(newFileItemInfo); 
+      			} else {
+      				fileId = projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
+      			}
+      			
+      			curItemInStore.setProjectId(projectId);
+      			curItemInStore.setFileId(fileId);
+      			/*      			
+      			System.out.println("|- AbsolutePath:" + curItemInStore.getAbsolutePath() +
+      					"; \t\t\t\tName:" + curItemInStore.getName()+ "; \t\t\t\tprojectId:" + projectId+
+      					"; \t\t\t\tRelPath:" + curItemInStore.getRelPath()+
+      					"; \t\t\t\tFolder:" + curItemInStore.getFolder()
+      					);
+      			
+      			if (projectId == null){
+      				curItemInStore.setProjectId(projectId);
+      			}
+      			     			if (fileId == null){
+      				curItemInStore.setFileId(projectManager.getProjectIdByFilePath(curItemInStore.getName()));
+      			}*/
+      		}
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+	}	
+
+	
+	public void checkStoreFiles(TreeStore<BaseDto> store) {
+		List<BaseDto> bdto = store.getAll();
+      	for(BaseDto b: bdto)
+      	try {
+      		if(b instanceof FileDto) {
+      			FileDto curItemInStore = (FileDto) b;
+      			System.out.println("|- AbsolutePath:" + curItemInStore.getAbsolutePath() +
+      					"; \t\t\t\tName:" + curItemInStore.getName()+ "; \t\t\t\tprojectId:" + curItemInStore.getProjectId()+
+      					"; \t\t\t\tfileId:" + curItemInStore.getFileId()+
+      					"; \t\t\t\tRelPath:" + curItemInStore.getRelPath()+
+      					"; \t\t\t\tFolder:" + curItemInStore.getFolder()
+      					);
+      		}
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+	}	
+	
+	
 
 	public static class DirOperationReadingFileResult extends
 			ProcessedResult<RequestDirOperationResult> {
@@ -119,8 +264,6 @@ public class DevelopmentBoardPresenter extends Presenter {
 			alertMessageBox.show();
 		}
 
-
-
 		@Override
 		public void onSuccess(RequestDirOperationResult result) {
 			if (result.getRetCode().intValue() != 0) {
@@ -130,57 +273,59 @@ public class DevelopmentBoardPresenter extends Presenter {
 						"Warning", messageAlert);
 				alertMessageBox.show();
 			} else {
-				
+
 				((DevelopmentBoardPresenter) presenter).projectManager.checkFile(result.getPath());
 
 				if (((DevelopmentBoardPresenter) presenter).projectManager.checkIsFileOpened(result.getPath())) {
-					Long fileId = ((DevelopmentBoardPresenter) presenter).projectManager
-							.getFileIdByFilePath(result.getPath());
+					Long fileId = ((DevelopmentBoardPresenter) presenter).projectManager.getFileIdByFilePath(result.getPath());
 					((DevelopmentBoardPresenter) presenter).scrollToTab(fileId,
 							true);
 				} else {
 
-//					Long fileId = ((DevelopmentBoardPresenter) presenter).projectManager.getNewFileId();
-					
-					((DevelopmentBoardPresenter) presenter).projectManager.addFileToOpenedFilesContext(result.getProjectId(), result.getFileId(), 
-								    new FileItemInfo(Utils.extractJustFileName(result.getPath()),
-									result.getPath(), false));
+					// Long fileId = ((DevelopmentBoardPresenter)
+					// presenter).projectManager.getNewFileId();
+
+					((DevelopmentBoardPresenter) presenter).projectManager.addFileToOpenedFilesContext(
+									result.getProjectId(),
+									result.getFileId(),
+									new FileItemInfo(Utils
+											.extractJustFileName(result
+													.getPath()), result
+											.getPath(), false));
 
 					String fileMD5 = calculateCheckSum(result.getTextFile());
 
-/*					((DevelopmentBoardPresenter) presenter).projectManager
-							.setFileContent(fileId, result.getTextFile());
-*/
+					/*
+					 * ((DevelopmentBoardPresenter) presenter).projectManager
+					 * .setFileContent(fileId, result.getTextFile());
+					 */
 
-					FileSheet newFileSheet = new FileSheet(presenter, result.getFileId(),
+					FileSheet newFileSheet = new FileSheet(presenter,
+							result.getFileId(),
 							Utils.extractJustFileName(result.getPath()));
-					
-					
-					newFileSheet.constructEditor(result.getTextFile(),FileItemInfo.getFileType(Utils.extractJustFileName(result.getPath())));
-					((DevelopmentBoardPresenter) presenter).projectManager.setAssociatedTabWidget(result.getFileId(), newFileSheet);
 
-					TabItemConfig tabItemConfig = new TabItemConfig(
-							Utils.extractJustFileName(result.getPath()));
+					newFileSheet.constructEditor(result.getTextFile(),	FileItemInfo.getFileType(Utils.extractJustFileName(result.getPath())));
+					((DevelopmentBoardPresenter) presenter).projectManager.setAssociatedTabWidget(result.getFileId(),newFileSheet);
+
+					TabItemConfig tabItemConfig = new TabItemConfig(Utils.extractJustFileName(result.getPath()));
 					tabItemConfig.setClosable(true);
-					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor
-							.getTabPanel().add(newFileSheet, tabItemConfig);
-					((DevelopmentBoardPresenter) presenter).scrollToTab(result.getFileId(),
-							true);
+					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor.getTabPanel().add(newFileSheet, tabItemConfig);
+					((DevelopmentBoardPresenter) presenter).scrollToTab(result.getFileId(), true);
 				}
 			}
 		}
 	}
 
-
-
-	protected void requestForReadingFile(String fileName, Long projectId, Long fileId) {
+	protected void requestForReadingFile(String fileName, Long projectId,
+			Long fileId) {
 		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
 				.getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForAnyOperation cbk = RemoteBrowserService
 					.instance().buildCallbackForAnyOperation();
 			cbk.setProcessedResult(new DirOperationReadingFileResult(this));
-			service.readFile(getLoggedAsUser(), "", fileName, projectId, fileId, cbk);
+			service.readFile(getLoggedAsUser(), "", fileName, projectId,
+					fileId, cbk);
 		}
 	}
 
@@ -205,7 +350,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	public void scrollToTab(Long fileId, boolean animate) {
-		FileSheet curFileSheet = (FileSheet) projectManager.getAssociatedTabWidgetsContext().get(fileId);
+		FileSheet curFileSheet = (FileSheet) projectManager
+				.getAssociatedTabWidgetsContext().get(fileId);
 		((DevelopmentBoard) view).editor.getTabPanel().setActiveWidget(
 				curFileSheet);
 		((DevelopmentBoard) view).editor.getTabPanel().scrollToTab(
@@ -213,8 +359,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	private void doAceColorThemeChange(AceColorThemeChangedEvent event) {
-		for (Long lKey : projectManager.getAssociatedTabWidgetsContext().keySet()) {
-			FileSheet curFileSheet = (FileSheet) projectManager.getAssociatedTabWidgetsContext().get(lKey);
+		for (Long lKey : projectManager.getAssociatedTabWidgetsContext()
+				.keySet()) {
+			FileSheet curFileSheet = (FileSheet) projectManager
+					.getAssociatedTabWidgetsContext().get(lKey);
 
 			// curFileSheet.getAceEditor().setTheme(getTopPanel().comboATh.getCurrentValue());
 			curFileSheet.getAceEditor().setTheme(

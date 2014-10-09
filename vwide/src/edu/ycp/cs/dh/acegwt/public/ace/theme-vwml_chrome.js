@@ -55,10 +55,10 @@ color: #7433A3\
 color: #FF4167\
 }\
 .ace-vwml-chrome .ace_vwml_directives {\
-color: #F59B35\
+color: #B34EE9\
 }\
 .ace-vwml-chrome .ace_vwml_langs {\
-color: #FA69FF\
+color: #FFA500\
 }\
 .ace-vwml-chrome .ace_support.ace_type,\
 .ace-vwml-chrome .ace_support.ace_class\

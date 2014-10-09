@@ -163,7 +163,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		    for (File file : fList) {
 		    	FileItemInfo fi = new FileItemInfo();
 		    	fi.setName(file.getName());
-		    	fi.setPath(file.getAbsolutePath());
+		    	fi.setAbsolutePath(file.getAbsolutePath());
 		        fi.setDir(true);
 		    	if (file.isFile()) {
 		        	fi.setDir(false);

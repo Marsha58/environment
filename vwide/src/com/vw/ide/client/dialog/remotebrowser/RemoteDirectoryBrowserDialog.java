@@ -226,12 +226,12 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 			if (fi.isDir()) {
 				if (addItems) {
 					ItemResource r = new ItemResource();
-					r.setFullPath(fi.getPath());
+					r.setFullPath(fi.getAbsolutePath());
 					parent.addTextItem(fi.getName()).setUserObject(r);
 				}
 			}
 			else {
-				filesField.addItem(fi.getPath());
+				filesField.addItem(fi.getAbsolutePath());
 			}
 		}
 	}

@@ -384,12 +384,12 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 				} else {
 					sNewPath = fi.getName();
 				}
-				folder = makeFolder(fi.getName(), sNewPath, fi.getPath());
+				folder = makeFolder(fi.getName(), sNewPath, fi.getAbsolutePath());
 				owner.addOrReplaceChild(folder);
 				requestForDirContent(folder.getRelPath());
 			} else {
 				owner.addOrReplaceChild(makeFileItem(fi.getName(), owner,
-						owner.getRelPath(), fi.getPath()));
+						owner.getRelPath(), fi.getAbsolutePath()));
 			}
 		}
 

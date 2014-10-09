@@ -30,7 +30,7 @@ public class FileManagerImpl implements FileManager {
 		boolean isSuchFileExists = false;
 		for(Object key : filesFileInfoContext.keySet()) {
 			FileItemInfo value = filesFileInfoContext.get(key);
-			if(value.getPath().equalsIgnoreCase(fileItemInfo.getPath())) {
+			if(value.getAbsolutePath().equalsIgnoreCase(fileItemInfo.getAbsolutePath())) {
 				isSuchFileExists = true;
 				res = (Long) key; 	
 				break;
@@ -95,7 +95,7 @@ public class FileManagerImpl implements FileManager {
 		Long res = -1l;
 		for(Object key : filesFileInfoContext.keySet()) {
 			FileItemInfo value = filesFileInfoContext.get(key);
-			if(value.getPath().equalsIgnoreCase(fileItemInfo.getPath())) {
+			if(value.getAbsolutePath().equalsIgnoreCase(fileItemInfo.getAbsolutePath())) {
 				res = (Long) key; 	
 				break;
 			}
@@ -108,7 +108,7 @@ public class FileManagerImpl implements FileManager {
 		Long res = -1l;
 		for(Object key : filesFileInfoContext.keySet()) {
 			FileItemInfo value = filesFileInfoContext.get(key);
-			if(value.getPath().equalsIgnoreCase(path)) {
+			if(value.getAbsolutePath().equalsIgnoreCase(path)) {
 				res = (Long) key; 	
 				break;
 			}
@@ -121,7 +121,7 @@ public class FileManagerImpl implements FileManager {
 		boolean res = false;
 		for(Object key : filesFileInfoContext.keySet()) {
 			FileItemInfo value = filesFileInfoContext.get(key);
-			if(value.getPath().equalsIgnoreCase(path)) {
+			if(value.getAbsolutePath().equalsIgnoreCase(path)) {
 				res = true; 	
 				break;
 			}

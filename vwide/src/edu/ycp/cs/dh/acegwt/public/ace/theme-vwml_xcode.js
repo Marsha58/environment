@@ -93,10 +93,10 @@ color: #197DFF\
 color: #FF4167\
 }\
 .ace-vwml-xcode .ace_vwml_directives {\
-color: #F59B35\
+color: #B34EE9\
 }\
 .ace-vwml-xcode .ace_vwml_langs {\
-color: #FA69FF\
+color: #FFA500\
 }\
 .ace-vwml-xcode .ace_indent-guide {\
 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==) right repeat-y\

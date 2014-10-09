@@ -67,10 +67,10 @@ color: #197DFF\
 color: #FF4167\
 }\
 .ace-vwml-idle-fingers .ace_vwml_directives {\
-color: #F59B35\
+color: #B34EE9\
 }\
 .ace-vwml-idle-fingers .ace_vwml_langs {\
-color: #FF00FF\
+color: #FFA500\
 }\
 .ace-vwml-idle-fingers .ace_invalid {\
 color: #FFFFFF;\

@@ -70,6 +70,9 @@ public class BaseDto implements Serializable, TreeStore.TreeNode<BaseDto> {
 	  this.absolutePath = absolutePath;
   }  
 
+  
+  
+  
   @Override
   public BaseDto getData() {
     return this;
