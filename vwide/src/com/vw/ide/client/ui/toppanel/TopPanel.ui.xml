@@ -182,7 +182,7 @@
 						itemId="idNewVwmlProjField" ui:field="bnNewVwmlProjField" toolTip="New project" />
 					<toolbar:SeparatorToolItem />
 					<button:TextButton icon="{images.save_edit_en}"
-						toolTip="Save" />
+						itemId="idSaveSelectedFile" ui:field="bnSaveSelectedFile" toolTip="Save selected file" />
 					<button:TextButton icon="{images.saveas_edit_en}"
 						toolTip="Save as..." />
 					<button:TextButton icon="{images.saveall_edit_en}"
@@ -212,7 +212,7 @@
 
 					<button:TextButton text="Scrolling Menu">
 						<button:menu>
-							<menu:Menu ui:field="scrollMenu" maxHeight="300" />
+							<menu:Menu ui:field="scrollMenu" maxHeight="500" minWidth="400"/>
 						</button:menu>
 					</button:TextButton>
 

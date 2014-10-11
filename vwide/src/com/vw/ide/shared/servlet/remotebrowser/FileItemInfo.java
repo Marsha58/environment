@@ -16,6 +16,8 @@ public class FileItemInfo implements Serializable {
 	private String absolutePath;
 	private String relPath;
 	private boolean isDir;
+	private Long projectId;
+	private Long fileId;
 	private String checkSumOnOpen;
 	private String checkSumOnClose;
 	private boolean isEdited;
@@ -70,6 +72,22 @@ public class FileItemInfo implements Serializable {
 		this.name = name;
 	}
 
+	public Long getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Long projectId) {
+		this.projectId = projectId;
+	}
+	
+	public Long getFileId() {
+		return fileId;
+	}
+
+	public void setFileId(Long fileId) {
+		this.fileId = fileId;
+	}
+	
 	public String getAbsolutePath() {
 		return absolutePath;
 	}

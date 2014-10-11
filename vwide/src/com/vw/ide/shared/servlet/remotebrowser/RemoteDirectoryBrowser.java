@@ -44,12 +44,64 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 */
 	public RequestDirOperationResult removeDir(String user, String parent, String dir);
 	
-	public RequestDirOperationResult readFile(String user, String parent,
-			String fileName, Long projectId, Long fileId);
-
+	
+	/**
+	 * Creates new project
+	 * @param userName
+	 * @param projectName
+	 * @param packageName
+	 * @param javaSrcPath
+	 * @param author
+	 * @param descr
+	 */
 	public RequestProjectCreationResult createProject(String userName,
 			String projectName, String packageName, String javaSrcPath,
 			String author, String descr);
+
+	/**
+	 * Deletes project
+	 * @param userName
+	 * @param projectName
+	 * @param projectId
+	 */
+	public RequestProjectCreationResult deleteProject(String userName,
+			String projectName, Long projectId);
+
+	
+	/**
+	 * Adds file
+	 * @param user
+	 * @param parent
+	 * @param filename
+	 * @param projectId
+	 * @param fileId
+	 */
+	public RequestDirOperationResult addFile(String user, String parent,
+			String fileName, Long projectId, Long fileId);
+
+
+	/**
+	 * Opens file
+	 * @param user
+	 * @param parent
+	 * @param filename
+	 * @param projectId
+	 * @param fileId
+	 */
+	public RequestDirOperationResult readFile(String user, String parent,
+			String fileName, Long projectId, Long fileId);
+	
+	/**
+	 * Deletes file from the project
+	 * @param user
+	 * @param filename
+	 * @param fileId
+	 */
+	public RequestDirOperationResult deleteFile(String user, String fileName, Long fileId);
+
+	RequestFileSavingResult saveFile(String user, String fileName,
+			Long projectId, Long fileId, String content);
+
 	
 	
 }

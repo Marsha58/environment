@@ -24,10 +24,13 @@ import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
+import com.vw.ide.client.event.uiflow.FileEditedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.client.ui.toppanel.TopPanel.ActiveTheme;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
+import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceAnnotationType;
 import edu.ycp.cs.dh.acegwt.client.ace.AceCompletion;
@@ -54,13 +57,19 @@ public class FileSheet extends Composite {
 
 	private AceEditor aceEditor;
 	private Presenter presenter;
+	private Long projectId;
 	private Long fileId;
 	private String fileName;
+	private String filePath;
+	private Boolean isFileEdited;
 
 	@UiField
 	SimpleContainer fileContainer;
 	@UiField
 	DockLayoutPanel dockLayoutPanel;
+	
+	@UiField(provided = true)
+	Status status  = new Status(GWT.<StatusAppearance> create(BoxStatusAppearance.class));
 	@UiField(provided = true)
 	Status charCount = new Status(GWT.<StatusAppearance> create(BoxStatusAppearance.class));
 	@UiField(provided = true)
@@ -101,11 +110,13 @@ public class FileSheet extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
-	public FileSheet(Presenter presenter, Long fileId, String fileName) {
+	public FileSheet(Presenter presenter, Long projectId, Long fileId, String fileFullPathWithName) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.presenter = presenter;
+		this.projectId = projectId;
 		this.fileId = fileId;
-		this.fileName = fileName;
+		this.filePath = Utils.extractJustPath(fileFullPathWithName);
+		this.fileName = Utils.extractJustFileName(fileFullPathWithName);
 	}	
 
 
@@ -122,11 +133,17 @@ public class FileSheet extends Composite {
 		dockLayoutPanel.setHeight(sHeight);
 	}	
 	
+	public void setProjectId(Long projectId) {
+		this.projectId = projectId;
+	}
+	
+	public Long getProjectId() {
+		return projectId;
+	}
+	
 	public void setFileId(Long fileId) {
 		this.fileId = fileId;
 	}
-
-	
 	
 	public Long getFileId() {
 		return fileId;
@@ -139,6 +156,15 @@ public class FileSheet extends Composite {
 	public String getFileName() {
 		return fileName;
 	}
+	
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+	
+	public String getFilePath() {
+		return filePath;
+	}
+	
 	
 	
 	public AceEditor getAceEditor() {
@@ -215,7 +241,12 @@ public class FileSheet extends Composite {
 		aceEditor.addOnChangeHandler(new AceEditorCallback() {
 			@Override
 			public void invokeAceCallback(JavaScriptObject obj) {
-				
+				FileItemInfo fileItemInfo = new FileItemInfo(); 
+				fileItemInfo.setAbsolutePath(getFilePath() + "\\" +getFileName());
+				fileItemInfo.setProjectId(projectId);
+				fileItemInfo.setFileId(fileId);
+				FileEditedEvent event= new FileEditedEvent(fileItemInfo); 
+				presenter.fireEvent(event);
 				System.out.println("invokeAceCallback: ");
 			}
 			
@@ -231,5 +262,22 @@ public class FileSheet extends Composite {
 		MarginData layoutData = new MarginData(1,1,1,1);
 		fileContainer.add(aceEditor,layoutData);
 	}
+	
+	public void setIsFileEdited(Boolean value) {
+		isFileEdited = value;
+		if(value) {
+			status.setText("File have been edited");
+		} else {
+			status.setText("File havn't been edited");
+		}
+	}
+	
+	public Boolean getIsFileEdited() {
+		return isFileEdited;
+	}
+	
+	
+	
 
+	
 }

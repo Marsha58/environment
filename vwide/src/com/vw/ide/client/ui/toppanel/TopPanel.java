@@ -20,6 +20,8 @@ import java.util.Arrays;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
+import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 //import com.google.gwt.sample.mail.client.AboutDialog;
@@ -47,11 +49,14 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.dialog.about.AboutDialogExt;
 import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
+import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.sencha.gxt.widget.core.client.button.TextButton;
@@ -79,6 +84,7 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 //	 @UiField MenuItem logoutField;
 	 @UiField MenuItem newVwmlProjField;
 	 @UiField TextButton bnNewVwmlProjField;
+	 @UiField TextButton bnSaveSelectedFile;
 	 @UiField MenuItem miHelpAboutField;
 //	 @UiField FlowPanel panelEditor;
 	 @UiField SimpleContainer comboAceEditorPlaceCont;
@@ -87,6 +93,7 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 //	 @UiField SimpleContainer outer;
 	 @UiField Label userName;
 	 @UiField TextButton userLogout;
+	 @UiField Menu scrollMenu;
 
 
 		@UiField(provided = true)
@@ -236,6 +243,19 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
       comboPlaceCont.add(combo);
       
 
+      scrollMenu.addBeforeSelectionHandler(new BeforeSelectionHandler<Item>() {
+		
+		@Override
+		public void onBeforeSelection(BeforeSelectionEvent<Item> event) {
+			if (event.getItem().getData("fileId") != null) {
+				Long fileId = event.getItem().getData("fileId");
+				((DevelopmentBoardPresenter) presenter).scrollToTab(fileId,	true);	
+			}
+			
+		}
+	});
+      
+      
       bind();
     
   }
@@ -270,7 +290,7 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 	}	
 
 
-	@UiHandler({"userLogout", "bnNewVwmlProjField"})
+	@UiHandler({"userLogout", "bnNewVwmlProjField", "bnSaveSelectedFile"})
 	  public void onToolBarrButtonClick(SelectEvent event) {
 	    Info.display("Click", ((TextButton) event.getSource()).getText() + " clicked");
 //	    History.newItem("loginGxt");
@@ -282,6 +302,8 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 			break;
 		case "idNewVwmlProjField": executeProjectNew();
 			break;
+		case "idSaveSelectedFile": getAssociatedPresenter().fireEvent(new SaveFileEvent());
+			break;			
 		default:
 			break;
 		}
@@ -330,7 +352,25 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 	private void bind() {
 
 	}  
+	
+	public void addItemToScrollMenu(String sFullFileName, Long fileId) {
+		MenuItem mi = new MenuItem(sFullFileName);
+		mi.setData("fileId", fileId);
+		scrollMenu.add(mi);
+	}
   
+	public void delItemFromScrollMenu(Long fileId) {
+		
+		for (int i = 0; i < scrollMenu.getWidgetCount(); i++) {
+			if(((MenuItem) scrollMenu.getWidget(i)).getData("fileId") == fileId) {
+				scrollMenu.remove(scrollMenu.getWidget(i));
+				break;
+			}
+		}
+	}
+
+	
+	
 	
 	
   

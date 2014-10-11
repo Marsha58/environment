@@ -38,20 +38,66 @@ public interface RemoteDirectoryBrowserAsync {
 	public void removeDir(String user, String parent, String dir, AsyncCallback<RequestDirOperationResult> callback);
 
 	
-	/**
-	 * Creates directory
-	 * @param user
-	 * @param parent
-	 * @param filaName
-	 */
-	public void readFile(String user, String parent, String fileName, Long projectId, Long fileId,  AsyncCallback<RequestDirOperationResult> callback);
 
 	/**
 	 * Project creating
+	 * @param userName
 	 * @param projectName
-	 * @param params
+	 * @param packageName
+	 * @param javaSrcPath
+	 * @param author
+	 * @param descr
 	 */
 	public void createProject(String userName,String projectName, String packageName,
 			String javaSrcPath, String author, String descr, AsyncCallback<RequestProjectCreationResult> callback);
+
+	/**
+	 * Project deleting
+	 * @param userName
+	 * @param projectName
+	 * @param projectId
+	 */
+	public void deleteProject(String userName, String projectName, Long projectId,
+			AsyncCallback<RequestProjectCreationResult> callback);
+
+	/**
+	 * Adding file to theProject
+	 * @param user
+	 * @param parent
+	 * @param fileName
+	 * @param projectId
+	 */
+	public void addFile(String user, String parent, String fileName, Long projectId,
+			Long fileId, AsyncCallback<RequestDirOperationResult> callback);
+
+	/**
+	 * Deleting file
+	 * @param user
+	 * @param fileName
+	 * @param fileId
+	 */
+	public void deleteFile(String user, String fileName, Long fileId,
+			AsyncCallback<RequestDirOperationResult> callback);
+
+	/**
+	 * Reads a file
+	 * @param user
+	 * @param parent
+	 * @param fileName
+	 * @param fileId
+	 */
+	public void readFile(String user, String parent, String fileName, Long projectId, Long fileId,  AsyncCallback<RequestDirOperationResult> callback);
+	
+
+	/**
+	 * Save a file
+	 * @param user
+	 * @param parent
+	 * @param fileName
+	 * @param projectId
+	 * @param fileId
+	 */
+	public void saveFile(String user, String fileName, Long projectId, Long fileId, String content,  AsyncCallback<RequestFileSavingResult> callback);
+	
 	
 }

@@ -122,25 +122,29 @@ public class Utils {
 	
 	public static String extractJustPath(String input) {
 		String output = "";
-		String[] arrPath = input.split("\\\\");
-		String sLastItemName = arrPath[arrPath.length - 1];
-		if (sLastItemName.indexOf(".") == -1) {
-			return input;
-		} else {
-			for (int i = 0; i < arrPath.length - 2; i++) {
-				output += arrPath[i] + "\\";
+		if (input != null) {
+			String[] arrPath = input.split("\\\\");
+			String sLastItemName = arrPath[arrPath.length - 1];
+			if (sLastItemName.indexOf(".") == -1) {
+				return input;
+			} else {
+				for (int i = 0; i < arrPath.length - 2; i++) {
+					output += arrPath[i] + "\\";
+				}
+				output += arrPath[arrPath.length - 2];
 			}
-			output += arrPath[arrPath.length - 2];
 		}
 		return output;
 	}
 
 	public static String extractJustFileName(String input) {
 		String output = "";
-		String[] arrPath = input.split("\\\\");
-		String sLastItemName = arrPath[arrPath.length - 1];
-		if (sLastItemName.indexOf(".") != -1) {
-			output = arrPath[arrPath.length - 1];
+		if (input != null) {		
+			String[] arrPath = input.split("\\\\");
+			String sLastItemName = arrPath[arrPath.length - 1];
+			if (sLastItemName.indexOf(".") != -1) {
+				output = arrPath[arrPath.length - 1];
+			}
 		}
 		return output;
 	}	

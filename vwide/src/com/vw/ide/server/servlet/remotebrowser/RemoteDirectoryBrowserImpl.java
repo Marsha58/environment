@@ -1,11 +1,15 @@
 package com.vw.ide.server.servlet.remotebrowser;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +35,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestFileSavingResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
@@ -206,24 +211,6 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	    }
 	}
 
-	@Override
-	public RequestDirOperationResult readFile(String user, String parent,
-			String fileName, Long projectId, Long fileId) {
-		RequestDirOperationResult res = new RequestDirOperationResult();
-		res.setProjectId(projectId);
-		res.setFileId(fileId);
-		res.setOperation("read file");
-		res.setPath(fileName);
-		res.setRetCode(0);
-		try {
-			res.setTextFile(openFile(fileName));
-		}
-		catch(Exception ex) {
-			res.setResult(ex.getMessage());
-			res.setRetCode(-1);
-		}
-		return res;
-	}
 
 	private String makeMainProjectFileName(String projectName) {
 		StringBuffer sPackageFileName = new StringBuffer();
@@ -369,6 +356,91 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			res.setRetCode(-1);
 		}		
 		
+		return res;
+	}
+
+
+	@Override
+	public RequestProjectCreationResult deleteProject(String userName,
+			String projectName, Long projectId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public RequestDirOperationResult addFile(String user, String parent,
+			String fileName, Long projectId, Long fileId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public RequestDirOperationResult deleteFile(String user, String fileName,
+			Long fileId) {
+		RequestDirOperationResult res = new RequestDirOperationResult();
+		res.setFileId(fileId);
+		res.setOperation("deleting file");
+		res.setPath(fileName);
+		res.setRetCode(0);
+		try{
+	        File fileTemp = new File(fileName);
+	          if (fileTemp.exists()){
+	             fileTemp.delete();
+	          }   
+	      }catch(Exception ex){
+				res.setResult(ex.getMessage());
+				res.setRetCode(-1);
+	      }
+		return res;
+	}
+
+	@Override
+	public RequestDirOperationResult readFile(String user, String parent,
+			String fileName, Long projectId, Long fileId) {
+		RequestDirOperationResult res = new RequestDirOperationResult();
+		res.setProjectId(projectId);
+		res.setFileId(fileId);
+		res.setOperation("reading file");
+		res.setPath(fileName);
+		res.setRetCode(0);
+		try {
+			res.setTextFile(openFile(fileName));
+		}
+		catch(Exception ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(-1);
+		}
+		return res;
+	}
+
+	@Override
+	public RequestFileSavingResult saveFile(String user, 
+			String fileName, Long projectId, Long fileId, String content) {
+		RequestFileSavingResult res = new RequestFileSavingResult();
+		res.setFileName(fileName);
+		res.setFileId(fileId);
+		res.setOperation("saving file");
+		res.setRetCode(0);
+		
+		Writer writer = null;
+		
+		try {
+			writer = new BufferedWriter(new OutputStreamWriter(
+			          new FileOutputStream(fileName), "utf-8"));
+			writer.write(content);
+		}
+		catch(IOException ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(-1);
+		} finally {
+		   try {writer.close();}
+		   catch (Exception ex) {
+				res.setResult(ex.getMessage());
+				res.setRetCode(-1);
+		   }
+		}
 		return res;
 	}
 

@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
+import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -44,12 +45,13 @@ public class EditorPanel extends Composite {
 		tabPanel.setAnimScroll(true);
 		tabPanel.setCloseContextMenu(true);
 		
+		
 		tabPanel.addBeforeSelectionHandler(new BeforeSelectionHandler<Widget>() {
 			
 			@Override
 			public void onBeforeSelection(BeforeSelectionEvent<Widget> event) {
 				FileSheet curFileSheet = (FileSheet) event.getItem();
-				((DevelopmentBoardPresenter)presenter).getEditorContentPanel().setHeadingText(curFileSheet.getFileName());
+				((DevelopmentBoardPresenter)presenter).getEditorContentPanel().setHeadingText(curFileSheet.getFilePath() + "\\" + curFileSheet.getFileName());
 			}
 		});
 		
@@ -96,6 +98,20 @@ public class EditorPanel extends Composite {
 		widget = uiBinder.createAndBindUi(this);
 		widget.addStyleName("margin-10");
 		return widget;
+	}
+	
+	
+	public void setFileEditedState(Widget associatedTabWidget, Boolean isEdited) {
+		String sTitle = tabPanel.getConfig(associatedTabWidget).getText();
+		if (sTitle.length()>1) {
+			if((sTitle.charAt(0) != '*')&&isEdited) {
+				sTitle = "*" + sTitle;
+			} else if((sTitle.charAt(0) == '*')&&(!isEdited)) {
+				sTitle = sTitle.substring(1);
+			}
+			tabPanel.getConfig(associatedTabWidget).setText(sTitle);
+			((FileSheet) associatedTabWidget).setIsFileEdited(isEdited);
+		}
 	}
 	
 

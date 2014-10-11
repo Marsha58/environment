@@ -49,8 +49,8 @@
 		type="com.sencha.gxt.core.client.resources.ThemeStyles.ThemeAppearance"
 		field="theme" />
 
-	<gxt:TabPanel addStyleNames="margin-10" ui:field="tabPanel" 
-	              borders="false" resizeTabs="true" >
+	<gxt:TabPanel addStyleNames="margin-10" ui:field="tabPanel" tabScroll="true" 
+	              borders="false" resizeTabs="false" >
 	</gxt:TabPanel>
 
 </ui:UiBinder> 

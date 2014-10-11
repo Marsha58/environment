@@ -147,7 +147,7 @@ public class ProjectPanel extends Composite implements IsWidget,
 			((DevelopmentBoardPresenter) dialog.presenter).updateProjects(((DevelopmentBoardPresenter) dialog.presenter).searchProjects());
 //			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsTree(dialog.store);
 			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsFiles(dialog.store);
-			((DevelopmentBoardPresenter) dialog.presenter).checkStoreFiles(dialog.store);
+//			((DevelopmentBoardPresenter) dialog.presenter).checkStoreFiles(dialog.store);
 		}
 	}
 
@@ -180,11 +180,11 @@ public class ProjectPanel extends Composite implements IsWidget,
 						treeSelectedItem = event.getSelectedItem();
 						FileItemInfo fileItemInfo = new FileItemInfo();
 						fileItemInfo.setName(treeSelectedItem.getName());
-						fileItemInfo.setAbsolutePath(treeSelectedItem
-								.getAbsolutePath());
-						
+						fileItemInfo.setAbsolutePath(treeSelectedItem.getAbsolutePath());
 						if (treeSelectedItem.getType() == "file") {
 							fileItemInfo.setDir(false);
+							fileItemInfo.setProjectId(((FileDto) treeSelectedItem).getProjectId());
+							fileItemInfo.setFileId(((FileDto) treeSelectedItem).getFileId());
 							if (presenter != null) {
 								presenter.fireEvent(new SelectFileEvent(
 										fileItemInfo));
