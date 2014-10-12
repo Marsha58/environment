@@ -8,11 +8,8 @@ import java.io.Serializable;
  *
  */
 @SuppressWarnings("serial")
-public class RequestDirOperationResult implements Serializable {
+public class RequestDirOperationResult extends RequestResult implements Serializable {
 	private String path;
-	private String result;
-	private String operation;
-	private Integer retCode;
 	private String sTextFile;
     private Long projectId;
     private Long fileId;
@@ -23,30 +20,6 @@ public class RequestDirOperationResult implements Serializable {
 	
 	public void setPath(String path) {
 		this.path = path;
-	}
-	
-	public String getResult() {
-		return result;
-	}
-	
-	public void setResult(String result) {
-		this.result = result;
-	}
-	
-	public Integer getRetCode() {
-		return retCode;
-	}
-	
-	public void setRetCode(Integer retCode) {
-		this.retCode = retCode;
-	}
-
-	public String getOperation() {
-		return operation;
-	}
-
-	public void setOperation(String operation) {
-		this.operation = operation;
 	}
 	
 	public String getTextFile() {
@@ -73,5 +46,10 @@ public class RequestDirOperationResult implements Serializable {
 		this.fileId = fileId;
 	}	
 	
+	@Override
+	public String toString() {
+		return "RequestedDirOperationResult [path=" + path + ", sTextFile=" + sTextFile  + ", projectId=" + projectId + ", fileId=" + fileId +   
+				 ", result="  + getResult() + ", retCode="  + getRetCode() + ", operation=" + getOperation()  + "]";
+	}	
 	
 }

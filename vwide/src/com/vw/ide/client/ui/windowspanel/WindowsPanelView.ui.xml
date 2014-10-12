@@ -23,6 +23,15 @@
 	}
 	</ui:style>
 
+	<ui:with type="com.sencha.gxt.core.client.util.Margins" field="margins1">
+		<ui:attributes top="1" right="1" bottom="1" left="1" />
+	</ui:with>
+	<ui:with
+		type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData"
+		field="mainRow">
+		<ui:attributes width="1" height="1" margins="{margins1}" />
+	</ui:with>
+	
 	<ui:with type="com.sencha.gxt.widget.core.client.TabItemConfig"
 		field="shortTextTabDebug">
 		<ui:attributes text="Debug" />
@@ -80,10 +89,8 @@
 			<container:BorderLayoutContainer ui:field="con" borders="false" resize="true" >
 				<container:center layoutData="{centerData}">
 					<gxt:ContentPanel headingText="Messages from server" ui:field='editorContentPanel' resize="true" borders="false">
-						<g:ScrollPanel>
-							<g:HTML styleName='{style.body}' ui:field='bodyConsoleIn'
-								wordWrap='true' />
-						</g:ScrollPanel>
+						<container:SimpleContainer ui:field="serverLogContainer"
+							layoutData="{mainRow}" />
 					</gxt:ContentPanel>
 				</container:center>
 				<container:south layoutData="{southData}" >

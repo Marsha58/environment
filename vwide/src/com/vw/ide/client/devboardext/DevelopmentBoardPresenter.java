@@ -1,6 +1,7 @@
 package com.vw.ide.client.devboardext;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
@@ -12,7 +13,6 @@ import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
-import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt.ProjectCreationResult;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.FileEditedEvent;
@@ -20,6 +20,7 @@ import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
+import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.model.BaseDto;
 import com.vw.ide.client.model.FileDto;
 import com.vw.ide.client.presenters.Presenter;
@@ -32,7 +33,6 @@ import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForFileSaving;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForProjectCreation;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.utils.Utils;
@@ -40,7 +40,6 @@ import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileSavingResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 
 /**
  * Development board screen
@@ -90,7 +89,9 @@ public class DevelopmentBoardPresenter extends Presenter {
 			((DevelopmentBoard) view).projectPanel.requestForDirContent(null);
 		} else if (event instanceof LogoutEvent) {
 			History.newItem("loginGxt");
-		}
+		} else if (event instanceof ServerLogEvent) {
+			doLog((ServerLogEvent) event);
+		} 
 	}
 
 	public TopPanel getTopPanel() {
@@ -384,8 +385,35 @@ public class DevelopmentBoardPresenter extends Presenter {
 				AlertMessageBox alertMessageBox = new AlertMessageBox(
 						"Info", "file " + result.getFileName() + " saved");
 			}
+			
+			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
+			fireEvent(serverLogEvent);
 		}
 
+	}
+	
+	
+
+	
+	public void doLog(ServerLogEvent event) {
+		 Date curDate = new Date();
+		 
+	     String nodeRecord = "\n<record time='"+ curDate.toLocaleString()+ "'>";
+	     String nodeRecordOperation = "\n\t<operation>"+ event.getRequestResult().getOperation()+ "</operation>";
+	     String nodeRecordResCode = "\n\t<res_code>"+ event.getRequestResult().getRetCode()+ "</res_code>";
+	     nodeRecord += nodeRecordOperation + nodeRecordResCode; 
+		if (event.getRequestResult() instanceof RequestFileSavingResult) {
+			RequestFileSavingResult result = (RequestFileSavingResult) event.getRequestResult();
+		    String nodeRecordFile = "\n\t\t<file>";
+			String nodeRecordFileId = "\n\t\t\t<file_id>"+ result.getFileId()+ "</file_id>";
+ 		    String nodeRecordFileName = "\n\t\t\t<file_name>"+ result.getFileName()+ "</file_name>";
+		    nodeRecordFile += nodeRecordFileId + nodeRecordFileName + "\n\t\t</file>";
+		    nodeRecord += nodeRecordFile; 
+		} else {
+//			System.out.println("Operation : " + event.getRequestResult().getOperation() + "; result code : " + event.getRequestResult().getRetCode()); 
+		}
+		nodeRecord += "\n</record>";
+		((DevelopmentBoard) view).windows.appendLog(nodeRecord);
 	}
 
 	public void doSaveCurrentFile() {
@@ -405,5 +433,6 @@ public class DevelopmentBoardPresenter extends Presenter {
 			service.saveFile(this.getLoggedAsUser(), fileName, projectId, fileId, content,  cbk);
 		}
 	}
+	
 
 }

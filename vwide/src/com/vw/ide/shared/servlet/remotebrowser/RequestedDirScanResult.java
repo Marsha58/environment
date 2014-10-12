@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class RequestedDirScanResult implements Serializable {
+public class RequestedDirScanResult extends RequestResult implements Serializable {
 	private String parentPath;
 	private List<FileItemInfo> files;
 	
@@ -27,6 +27,7 @@ public class RequestedDirScanResult implements Serializable {
 	@Override
 	public String toString() {
 		return "RequestedDirScanResult [parentPath=" + parentPath + ", files="
-				+ files + "]";
+				+ files + ", result="  + getResult() + 
+				", retCode="  + getRetCode() + ", operation=" + getOperation()  + "]";
 	}
 }

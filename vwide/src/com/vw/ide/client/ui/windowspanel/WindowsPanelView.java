@@ -5,13 +5,16 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Composite;
-import com.sencha.gxt.widget.core.client.container.HasLayout;
-import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
+import com.sencha.gxt.widget.core.client.container.MarginData;
+import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.vw.ide.client.presenters.Presenter;
+
+import edu.ycp.cs.dh.acegwt.client.ace.AceEditor;
+import edu.ycp.cs.dh.acegwt.client.ace.AceEditorMode;
+import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 
 public class WindowsPanelView extends Composite {
 
@@ -21,10 +24,15 @@ public class WindowsPanelView extends Composite {
 	interface WindowsPanelViewUiBinder extends 	UiBinder<Widget, WindowsPanelView>  {
 	}
 
+	private AceEditor logAceEditor;
+	
 	@UiField HTML bodyDebug;
 	@UiField HTML bodyProblems;
 	@UiField HTML bodyErrors;
 	@UiField HTML bodySearch;
+	
+	@UiField
+	SimpleContainer serverLogContainer;
 
 	@UiField(provided = true)
 	MarginData centerData = new MarginData();
@@ -54,27 +62,30 @@ public class WindowsPanelView extends Composite {
 		return this.presenter;
 	}
 
-	  private Widget constructUi() {
-		    widget = uiBinder.createAndBindUi(this);
-		    widget.addStyleName("margin-10");
-		    return widget;
-		  }	
+   private Widget constructUi() {
+	    widget = uiBinder.createAndBindUi(this);
+	    widget.addStyleName("margin-10");
+	    constructEditor();
+	    return widget;
+   }	
 	
-/*		    subject.setInnerText(item.subject);
-	  public void setItem(MailItem item) {
-		    sender.setInnerText(item.sender);
-		    recipient.setInnerHTML("foo@example.com");
-
-		    // WARNING: For the purposes of this demo, we're using HTML directly, on
-		    // the assumption that the "server" would have appropriately scrubbed the
-		    // HTML. Failure to do so would open your application to XSS attacks.
-		    body.setHTML(item.body);
-		  }
- */		    
-	  
-	  
-	  
-
-
+   private void constructEditor() {
+	   logAceEditor = new AceEditor();
+	   logAceEditor.setWidth("100%");
+	   logAceEditor.setHeight("100%");
+	   logAceEditor.startEditor(); // must be called before calling
+									// setTheme/setMode/etc.
+	   logAceEditor.setTheme(AceEditorTheme.CHROME);
+	   logAceEditor.setText("");
+	   logAceEditor.setMode(AceEditorMode.XML);	
+	   MarginData layoutData = new MarginData(1,1,1,1);
+	   serverLogContainer.add(logAceEditor,layoutData); 
+   }
+   
+   public void appendLog(String logContent) {
+	   String sTmp = logAceEditor.getText();
+	   sTmp += logContent;
+	   logAceEditor.setText(sTmp);
+   }   
 
 }
