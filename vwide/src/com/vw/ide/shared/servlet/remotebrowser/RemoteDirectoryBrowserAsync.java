@@ -48,7 +48,7 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param author
 	 * @param descr
 	 */
-	public void createProject(String userName,String projectName, String packageName,
+	public void createProject(String userName,String projectName, String projectPath, String packageName,
 			String javaSrcPath, String author, String descr, AsyncCallback<RequestProjectCreationResult> callback);
 
 	/**
@@ -70,14 +70,6 @@ public interface RemoteDirectoryBrowserAsync {
 	public void addFile(String user, String parent, String fileName, Long projectId,
 			Long fileId, AsyncCallback<RequestDirOperationResult> callback);
 
-	/**
-	 * Deleting file
-	 * @param user
-	 * @param fileName
-	 * @param fileId
-	 */
-	public void deleteFile(String user, String fileName, Long fileId,
-			AsyncCallback<RequestDirOperationResult> callback);
 
 	/**
 	 * Reads a file
@@ -97,7 +89,14 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param projectId
 	 * @param fileId
 	 */
-	public void saveFile(String user, String fileName, Long projectId, Long fileId, String content,  AsyncCallback<RequestFileSavingResult> callback);
+	public void saveFile(String user, String fileName, Long projectId, Long fileId, String content,  AsyncCallback<RequestFileOperationResult> callback);
 	
+	/**
+	 * Deleting file
+	 * @param user
+	 * @param fileName
+	 * @param fileId
+	 */
+	public void deleteFile(String user, String fileName, Long fileId, 	AsyncCallback<RequestFileOperationResult> callback);
 	
 }

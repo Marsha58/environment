@@ -26,6 +26,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
+import org.gwtbootstrap3.extras.card.client.ui.Card;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -33,7 +34,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestFileSavingResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
@@ -305,7 +306,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	
 	@Override
 	public RequestProjectCreationResult createProject(String userName,
-			String projectName, String packageName, String javaSrcPath,
+			String projectName, String projectPath, String packageName, String javaSrcPath,
 			String author, String descr) {
 		RequestProjectCreationResult res = new RequestProjectCreationResult();
 		res.setOperation("project creating");
@@ -314,13 +315,23 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		res.setRetCode(0);
 		
 		String sUserBasePath = constructUserHomePath(userName);
-		String sFullProjectPath = sUserBasePath + "\\" + projectName; 
+		String sFullProjectPath = "";
+		if((projectPath.length()>0)&&(!projectPath.startsWith("\\"))) {
+			sFullProjectPath = projectPath; 
+		} else {
+			sFullProjectPath = sUserBasePath + "\\" + projectName; 
+		}
 		try {
 			
 			File dir = new File(sFullProjectPath);
 			if (!dir.exists()) {
 				dir.mkdirs();
 			};
+
+			File dirJavaSrc = new File(sFullProjectPath + "\\" + javaSrcPath);
+			if (!dirJavaSrc.exists()) {
+				dirJavaSrc.mkdirs();
+			};			
 			
 			String sProjectMainFileName = makeMainProjectFileName(projectName);
 			
@@ -375,12 +386,12 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 
 
 	@Override
-	public RequestDirOperationResult deleteFile(String user, String fileName,
+	public RequestFileOperationResult deleteFile(String user, String fileName,
 			Long fileId) {
-		RequestDirOperationResult res = new RequestDirOperationResult();
+		RequestFileOperationResult res = new RequestFileOperationResult();
 		res.setFileId(fileId);
 		res.setOperation("deleting file");
-		res.setPath(fileName);
+		res.setFileName(fileName);
 		res.setRetCode(0);
 		try{
 	        File fileTemp = new File(fileName);
@@ -414,9 +425,9 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	}
 
 	@Override
-	public RequestFileSavingResult saveFile(String user, 
+	public RequestFileOperationResult saveFile(String user, 
 			String fileName, Long projectId, Long fileId, String content) {
-		RequestFileSavingResult res = new RequestFileSavingResult();
+		RequestFileOperationResult res = new RequestFileOperationResult();
 		res.setFileName(fileName);
 		res.setFileId(fileId);
 		res.setOperation("saving file");

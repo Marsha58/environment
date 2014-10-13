@@ -49,13 +49,14 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 * Creates new project
 	 * @param userName
 	 * @param projectName
+	 * @param projectPath 
 	 * @param packageName
 	 * @param javaSrcPath
 	 * @param author
 	 * @param descr
 	 */
 	public RequestProjectCreationResult createProject(String userName,
-			String projectName, String packageName, String javaSrcPath,
+			String projectName, String projectPath, String packageName, String javaSrcPath,
 			String author, String descr);
 
 	/**
@@ -91,16 +92,11 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	public RequestDirOperationResult readFile(String user, String parent,
 			String fileName, Long projectId, Long fileId);
 	
-	/**
-	 * Deletes file from the project
-	 * @param user
-	 * @param filename
-	 * @param fileId
-	 */
-	public RequestDirOperationResult deleteFile(String user, String fileName, Long fileId);
+	
+	RequestFileOperationResult deleteFile(String user, String fileName,	Long fileId);
 
-	RequestFileSavingResult saveFile(String user, String fileName,
-			Long projectId, Long fileId, String content);
+	
+	RequestFileOperationResult saveFile(String user, String fileName,	Long projectId, Long fileId, String content);
 
 	
 	

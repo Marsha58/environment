@@ -56,6 +56,7 @@ import com.vw.ide.client.dialog.about.AboutDialogExt;
 import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
+import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -285,7 +286,7 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 	    if(item.getText().equalsIgnoreCase("about")) {
 	    	executeHelpAbout();
 	    } else {
-	    	executeProjectNew();
+	    	presenter.fireEvent(new ProjectMenuEvent("idNewProject")); 
 	    }
 	}	
 
@@ -294,25 +295,18 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 	  public void onToolBarrButtonClick(SelectEvent event) {
 	    Info.display("Click", ((TextButton) event.getSource()).getText() + " clicked");
 //	    History.newItem("loginGxt");
-	    
 	    String sItemId = ((TextButton)event.getSource()).getItemId(); 
-	    
 	    switch (sItemId) {
 		case "idUserLogout": History.newItem("loginGxt");
 			break;
-		case "idNewVwmlProjField": executeProjectNew();
+		case "idNewVwmlProjField": presenter.fireEvent(new ProjectMenuEvent("idNewProject"));
 			break;
-		case "idSaveSelectedFile": getAssociatedPresenter().fireEvent(new SaveFileEvent());
+		case "idSaveSelectedFile": presenter.fireEvent(new SaveFileEvent());
 			break;			
 		default:
 			break;
 		}
-	    
-	    
   }
-
-    
-    
     
     public void executeHelpAbout() {
 		AboutDialogExt d = new AboutDialogExt();
@@ -329,24 +323,6 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 		d.setSize("350", "270");
 		d.showCenter(s_HelpAboutCaption, null);
 	}    
-    
-    
-    public void executeProjectNew() {
-		NewVwmlProjectDialogExt d = new NewVwmlProjectDialogExt();
-		if (getAssociatedPresenter() != null) {
-			
-			String user = getAssociatedPresenter().getLoggedAsUser();
-			if(user == null) {
-				user = "olmel";
-			}
-			d.setLoggedAsUser(user);	
-		} else {
-			d.setLoggedAsUser("olmel");	
-		}
-		d.associatePresenter(getAssociatedPresenter());
-		d.setSize("480", "380");
-		d.showCenter(s_newVwmlProjectCaption, null);
-	}
     
     
 	private void bind() {

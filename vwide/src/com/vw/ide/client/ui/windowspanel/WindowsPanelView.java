@@ -77,7 +77,7 @@ public class WindowsPanelView extends Composite {
 									// setTheme/setMode/etc.
 	   logAceEditor.setTheme(AceEditorTheme.CHROME);
 	   logAceEditor.setText("");
-	   logAceEditor.setMode(AceEditorMode.XML);	
+	   logAceEditor.setMode(AceEditorMode.JSON);	
 	   MarginData layoutData = new MarginData(1,1,1,1);
 	   serverLogContainer.add(logAceEditor,layoutData); 
    }

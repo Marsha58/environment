@@ -2,6 +2,7 @@ package com.vw.ide.client.devboardext;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
@@ -13,11 +14,13 @@ import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
+import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.FileEditedEvent;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
+import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
@@ -32,14 +35,16 @@ import com.vw.ide.client.projects.ProjectManagerImpl;
 import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForFileSaving;
+import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForFileOperation;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestFileSavingResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 /**
  * Development board screen
@@ -52,6 +57,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public final HandlerManager eventBus;
 	private final PresenterViewerLink view;
 	public ProjectManager projectManager;
+	
+	private static String s_HelpAboutCaption = "About";
+	private static String s_newVwmlProjectCaption = "New VWML project";
+	
 
 	public DevelopmentBoardPresenter(HandlerManager eventBus,
 			PresenterViewerLink view) {
@@ -89,6 +98,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 			((DevelopmentBoard) view).projectPanel.requestForDirContent(null);
 		} else if (event instanceof LogoutEvent) {
 			History.newItem("loginGxt");
+		} if (event instanceof ProjectMenuEvent) {
+			doMenuItemClickProceed((ProjectMenuEvent) event);
 		} else if (event instanceof ServerLogEvent) {
 			doLog((ServerLogEvent) event);
 		} 
@@ -153,27 +164,20 @@ public class DevelopmentBoardPresenter extends Presenter {
 			try {
 				if (b instanceof FileDto) {
 					FileDto curItemInStore = (FileDto) b;
-					Long projectId = projectManager
-							.getProjectIdByRelPath(curItemInStore.getRelPath());
-					projectManager.getFileIdByFilePath(curItemInStore
-							.getAbsolutePath());
+					Long projectId = projectManager.getProjectIdByRelPath(curItemInStore.getRelPath());
+					projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
 
 					Long fileId = -1l;
 					if (!projectManager.checkIfFileExists(curItemInStore
 							.getAbsolutePath())) {
 						FileItemInfo newFileItemInfo = new FileItemInfo();
-						newFileItemInfo.setAbsolutePath(curItemInStore
-								.getAbsolutePath());
+						newFileItemInfo.setAbsolutePath(curItemInStore.getAbsolutePath());
 						newFileItemInfo.setRelPath(curItemInStore.getRelPath());
-						newFileItemInfo.setName(Utils
-								.extractJustFileName(curItemInStore
-										.getAbsolutePath()));
+						newFileItemInfo.setName(Utils.extractJustFileName(curItemInStore.getAbsolutePath()));
 						newFileItemInfo.setDir(false);
 						fileId = projectManager.addFile(newFileItemInfo);
 					} else {
-						fileId = projectManager
-								.getFileIdByFilePath(curItemInStore
-										.getAbsolutePath());
+						fileId = projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
 					}
 
 					curItemInStore.setProjectId(projectId);
@@ -279,6 +283,9 @@ public class DevelopmentBoardPresenter extends Presenter {
 									result.getFileId());
 				}
 			}
+			
+			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
+			this.presenter.fireEvent(serverLogEvent);			
 		}
 	}
 
@@ -359,7 +366,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	public class FileSavingResult extends
-			ProcessedResult<RequestFileSavingResult> {
+			ProcessedResult<RequestFileOperationResult> {
 
 		public FileSavingResult() {
 
@@ -373,7 +380,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		}
 
 		@Override
-		public void onSuccess(RequestFileSavingResult result) {
+		public void onSuccess(RequestFileOperationResult result) {
 			if (result.getRetCode().intValue() != 0) {
 				String messageAlert = "The operation '" + result.getOperation()
 						+ "' failed.\r\nResult'" + result.getResult() + "'";
@@ -393,26 +400,54 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 	
 	
-
 	
 	public void doLog(ServerLogEvent event) {
 		 Date curDate = new Date();
 		 
-	     String nodeRecord = "\n<record time='"+ curDate.toLocaleString()+ "'>";
-	     String nodeRecordOperation = "\n\t<operation>"+ event.getRequestResult().getOperation()+ "</operation>";
-	     String nodeRecordResCode = "\n\t<res_code>"+ event.getRequestResult().getRetCode()+ "</res_code>";
-	     nodeRecord += nodeRecordOperation + nodeRecordResCode; 
-		if (event.getRequestResult() instanceof RequestFileSavingResult) {
-			RequestFileSavingResult result = (RequestFileSavingResult) event.getRequestResult();
-		    String nodeRecordFile = "\n\t\t<file>";
-			String nodeRecordFileId = "\n\t\t\t<file_id>"+ result.getFileId()+ "</file_id>";
- 		    String nodeRecordFileName = "\n\t\t\t<file_name>"+ result.getFileName()+ "</file_name>";
-		    nodeRecordFile += nodeRecordFileId + nodeRecordFileName + "\n\t\t</file>";
+	     String nodeRecord = "\n{\"time\":\""+ curDate.toLocaleString()+ "\",";
+	     String nodeRecordOperation = "\"operation\":"+ event.getRequestResult().getOperation()+ ",";
+	     String nodeRecordResCode = "\"res_code\":"+ event.getRequestResult().getRetCode()+ ",";
+	     String nodeRecordResult = "\"result\":"+ event.getRequestResult().getResult()+ ",";
+	     nodeRecord += nodeRecordOperation + nodeRecordResCode + nodeRecordResult; 
+		if (event.getRequestResult() instanceof RequestProjectCreationResult) {
+			RequestProjectCreationResult result = (RequestProjectCreationResult) event.getRequestResult();
+		    String nodeRecordProject = "\"project\":{";
+			String nodeRecordProjectName = "\"name\":"+ result.getProjectName() + ",";
+ 		    String nodeRecordProjectPath = "\"<path\":"+ result.getProjectPath();
+		    nodeRecordProject += nodeRecordProjectName + nodeRecordProjectPath + "}";
+		    nodeRecord += nodeRecordProject; 
+		} else if (event.getRequestResult() instanceof RequestFileOperationResult) {
+			RequestFileOperationResult result = (RequestFileOperationResult) event.getRequestResult();
+		    String nodeRecordFile = "\"file\":{";
+			String nodeRecordFileId = "\"id\":"+ result.getFileId()+ ",";
+ 		    String nodeRecordFileName = "\"name\":"+ result.getFileName();
+		    nodeRecordFile += nodeRecordFileId + nodeRecordFileName + "}";
 		    nodeRecord += nodeRecordFile; 
+		} else if (event.getRequestResult() instanceof RequestDirOperationResult) {
+			RequestDirOperationResult result = (RequestDirOperationResult) event.getRequestResult();
+ 		    nodeRecord += "\"project_id\":"+ result.getProjectId()+ ",\"file\":{\"id\":"  + result.getFileId()+ ",\"path\":"+ result.getPath(); 
+		} else if (event.getRequestResult() instanceof RequestedDirScanResult) {
+			RequestedDirScanResult result = (RequestedDirScanResult) event.getRequestResult();
+			String nodeRecordParentPath = "\"parent_path\":"+ result.getParentPath()+ ",";
+		    String nodeRecordFiles = "\"files\":[";
+		    boolean bIsFirst = true;
+ 		    for (FileItemInfo curFile : result.getFiles()) {
+ 		    	if (bIsFirst == false) {
+ 		    		nodeRecordFiles += ",";
+ 		    	}
+	    		bIsFirst = false;
+ 		    	
+ 		    	nodeRecordFiles += "\"name\":"+ curFile.getName();
+/* 		    	nodeRecordFiles += "{\"name\":"+ curFile.getName() + "\"rel_path\":"+ curFile.getRelPath() + 
+ 		    			"\"project_id\":"+ curFile.getProjectId() + 
+ 		    			"\"file_id\":"+ curFile.getFileId() + "}";
+*/ 		    	
+			}; 
+		    nodeRecord += nodeRecordParentPath + nodeRecordFiles + "]"; 
 		} else {
 //			System.out.println("Operation : " + event.getRequestResult().getOperation() + "; result code : " + event.getRequestResult().getRetCode()); 
 		}
-		nodeRecord += "\n</record>";
+		nodeRecord += "}";
 		((DevelopmentBoard) view).windows.appendLog(nodeRecord);
 	}
 
@@ -427,12 +462,64 @@ public class DevelopmentBoardPresenter extends Presenter {
 				.getServiceImpl();
 
 		if (service != null) {
-			ServiceCallbackForFileSaving cbk = RemoteBrowserService
-					.instance().buildCallbackForSavingFile();
+			ServiceCallbackForFileOperation cbk = RemoteBrowserService
+					.instance().buildCallbackForFileOperation();
 			cbk.setProcessedResult(new FileSavingResult());
 			service.saveFile(this.getLoggedAsUser(), fileName, projectId, fileId, content,  cbk);
 		}
 	}
+	
+	public void doMenuItemClickProceed(ProjectMenuEvent event) {
+		String menuId = event.getMenuId();
+		FileItemInfo fileItemInfo =  ((DevelopmentBoard) view).projectPanel.selectedItem4ContextMenu;
+       
+		if (menuId != null) {
+			switch (menuId) {  
+			case "idNewProject":
+				String sPath;
+				if(fileItemInfo == null) {
+					sPath = "";
+				} else {
+					sPath = Utils.extractJustPath(fileItemInfo.getAbsolutePath());
+				}
+				makeProjectNew(sPath);
+				break;
+			case "idDelFile":
+				doDelCurrentFile(fileItemInfo);
+				projectManager.removeFile(fileItemInfo.getFileId());
+				break;
+			default:
+				break;
+			}
+		}
+		
+	}
+	
+	
+    public void makeProjectNew(String path4project) {
+		NewVwmlProjectDialogExt d = new NewVwmlProjectDialogExt();
+		d.setLoggedAsUser(getLoggedAsUser());
+		d.setPath4project(path4project);
+		d.associatePresenter(this);
+		d.setSize("480", "380");
+		d.showCenter(s_newVwmlProjectCaption, null);
+	}
+    
+    public void doDelCurrentFile(FileItemInfo fileItemInfo) {
+    	requestForFileDeleting(fileItemInfo.getAbsolutePath(), fileItemInfo.getFileId());
+	}	    
+    
+	
+	public void requestForFileDeleting(String fileName, Long fileId) {
+		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
+				.getServiceImpl();
+
+		if (service != null) {
+			ServiceCallbackForFileOperation cbk = RemoteBrowserService.instance().buildCallbackForFileOperation();
+			cbk.setProcessedResult(new FileSavingResult());
+			service.deleteFile(this.getLoggedAsUser(), fileName, fileId,   cbk);
+		}
+	}    
 	
 
 }

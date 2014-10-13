@@ -35,10 +35,10 @@
 							<form:widget>
 								<container:HBoxLayoutContainer  hBoxLayoutAlign="MIDDLE">						    
 									<container:child>
-										<form:TextField ui:field="tfVWMLProjectPath" allowBlank="false" width="280px"/>
+										<form:TextField ui:field="tfVWMLProjectPath" allowBlank="false" width="280px" enabled="false"/>
 									</container:child>
 									<container:child>
-										<button:TextButton ui:field="browseVwmlProjPath" text="Browse" />
+										<button:TextButton ui:field="browseVwmlProjPath" text="Browse" enabled="false"/>
 									</container:child>
 								</container:HBoxLayoutContainer>		
 							</form:widget>

@@ -37,6 +37,7 @@ import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler
 import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
+import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.images.ExampleImages;
 import com.vw.ide.client.model.BaseDto;
 import com.vw.ide.client.model.FileDto;
@@ -148,6 +149,9 @@ public class ProjectPanel extends Composite implements IsWidget,
 //			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsTree(dialog.store);
 			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsFiles(dialog.store);
 //			((DevelopmentBoardPresenter) dialog.presenter).checkStoreFiles(dialog.store);
+			
+			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
+			dialog.getAssociatedPresenter().fireEvent(serverLogEvent);
 		}
 	}
 
@@ -212,6 +216,7 @@ public class ProjectPanel extends Composite implements IsWidget,
 		contextMenu.addBeforeShowHandler(new BeforeShowHandler(){
 			@Override
 			public void onBeforeShow(BeforeShowEvent event) {
+				contextMenu.associatePresenter(getAssociatedPresenter());
 				contextMenu.checkEnabling(selectedItem4ContextMenu);
 			}	
 		});

@@ -47,6 +47,7 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 			.create(NewVwmlProjectDialogExtUiBinder.class);
 	
 	private Presenter presenter = null;
+	private String path4project = "";
 
 	// @UiField FlowPanel dialogMainPanel;
 	@UiField
@@ -91,6 +92,7 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 			public void onBlur(BlurEvent event) {
 				String sName = tfVWMLProjectName.getText();
 				tfJavaPackageName.setText(makePackageName(sName));
+				tfVWMLProjectPath.setText(path4project + "\\" + sName);
 			}
 		});
 
@@ -192,14 +194,14 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 	protected void onButtonPressed(TextButton textButton) {
 		super.onButtonPressed(textButton);
 		if (textButton == getButton(PredefinedButton.OK)) {
-			requestForProjectCreation(tfVWMLProjectName.getText(), tfJavaPackageName.getText(),
+			requestForProjectCreation(tfVWMLProjectName.getText(),tfVWMLProjectPath.getText(), tfJavaPackageName.getText(),
 					 tfJavaSourcePath.getText(),tfVWMLAuthor.getText(),	tfVWMLDescr.getText()
 					);
 			hide();
 		}
 	}
 
-	protected void requestForProjectCreation(String projectName, String packageName,
+	protected void requestForProjectCreation(String projectName, String projectPath, String packageName,
 			String javaSrcPath, String author, String descr) {
 		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
 				.getServiceImpl();
@@ -208,9 +210,13 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 			ServiceCallbackForProjectCreation cbk = RemoteBrowserService
 					.instance().buildCallbackForProjectCreation();
 			cbk.setProcessedResult(new ProjectCreationResult());
-			service.createProject(this.getLoggedAsUser(), projectName, packageName,
+			service.createProject(this.getLoggedAsUser(), projectName,  projectPath, packageName, 
 					javaSrcPath, author, descr, cbk);
 		}
+	}
+	
+	public void setPath4project(String path4project) {
+		this.path4project = path4project;
 	}
 
 }
