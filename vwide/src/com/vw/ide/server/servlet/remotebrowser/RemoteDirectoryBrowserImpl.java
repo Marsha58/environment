@@ -244,12 +244,22 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	
 	private String makeProjectFileHeaderPattern(String projectName, String packageName, String javaSrcPath,
 			String author, String descr) {
-		String pattern = format("options {\n" + "language=_java_ {\n"
-				+ "package = \"%s\"\n" + "path = \"%s\"\n"
-				+ "author = \"%s\"\n" + "project_name = \"%s\"\n"
-				+ "description = \"%s\"\n" + "beyond {\n" + "}\n" + "}\n"
-				+ "conflictring {\n" + "}\n" + "}",
-				packageName, javaSrcPath, author, projectName,	descr);		
+		String pattern = format("options {\n" + 
+				"\tlanguage=_java_ {\n" +
+				"\t\tpackage = \"%s\"\n" + 
+				"\t\tpath = \"%s\"\n" +
+				"\t\tauthor = \"%s\"\n" + 
+				"\t\tproject_name = \"%s\"\n" +
+				"\t\tdescription = \"%s\"\n" + 
+				"\t\tbeyond {\n" + 
+				"\t\t}\n" + 
+				"\t}\n" +
+				"\tconflictring {\n" + 
+				"\t}\n" + 
+				"}\n" +
+				"module %s {\n" +
+				"}",
+				packageName, javaSrcPath, author, projectName,	descr, packageName.toLowerCase());		
 		return pattern;
 	}
 	
@@ -369,19 +379,68 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	}
 
 
+	public void deleteFolder(File folder) {
+	    File[] files = folder.listFiles();
+	    if(files!=null) { //some JVMs return null for empty dirs
+	        for(File f: files) {
+	            if(f.isDirectory()) {
+	                deleteFolder(f);
+	            } else {
+	                f.delete();
+	            }
+	        }
+	    }
+	    folder.delete();
+	}
+	
+	
 	@Override
-	public RequestProjectCreationResult deleteProject(String userName,
+	public RequestDirOperationResult deleteProject(String userName,
 			String projectName, Long projectId) {
-		// TODO Auto-generated method stub
-		return null;
+		RequestDirOperationResult res = new RequestDirOperationResult();
+		res.setProjectId(projectId);
+		res.setOperation("deleting project");
+		res.setPath(projectName);
+		res.setRetCode(0);
+		try {
+			File fileTemp = new File(projectName);
+			deleteFolder(fileTemp);
+  
+		}
+		catch(Exception ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(-1);
+		}
+		return res;
 	}
 
 
 	@Override
 	public RequestDirOperationResult addFile(String user, String parent,
 			String fileName, Long projectId, Long fileId) {
-		// TODO Auto-generated method stub
-		return null;
+		RequestDirOperationResult res = new RequestDirOperationResult();
+		res.setOperation("file creating");
+//		res.setProjectPath(projectPath);
+		res.setProjectId(projectId);
+		res.setRetCode(0);
+		String sFullProjectPath = parent + "\\" + fileName; 
+		try {
+			
+			File fNewFile = new File(sFullProjectPath);
+			if (!fNewFile.exists()) {
+				fNewFile.createNewFile();
+				FileWriter writer = new FileWriter(fNewFile); 
+				writer.write("");
+				writer.flush();
+				writer.close();
+			}
+		}
+		catch(Exception ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(-1);
+		}		
+		
+		return res;
 	}
 
 

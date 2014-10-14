@@ -51,6 +51,7 @@ import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.dialog.about.AboutDialogExt;
 import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt;
@@ -236,6 +237,8 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
             default:
               assert false : "Unsupported theme enum";
           }
+          
+          ((DevelopmentBoardPresenter) getAssociatedPresenter()).getProjectPanel().requestForDirContent(null);
         }
 
 

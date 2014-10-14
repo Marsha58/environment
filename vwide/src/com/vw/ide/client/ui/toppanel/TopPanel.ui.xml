@@ -236,8 +236,8 @@
 
 
 					<!-- </container:HBoxLayoutContainer> -->
-					<toolbar:SeparatorToolItem />
-
+<!-- 					<toolbar:SeparatorToolItem />
+ -->
 					<container:SimpleContainer ui:field="comboAceEditorPlaceCont">
 					</container:SimpleContainer>
 					<container:SimpleContainer ui:field="comboPlaceCont">

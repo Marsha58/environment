@@ -144,11 +144,18 @@ public class ProjectPanel extends Composite implements IsWidget,
 
 		@Override
 		public void onSuccess(RequestedDirScanResult result) {
+			
 			dialog.makeTreeData(result);
+			
+			
 			((DevelopmentBoardPresenter) dialog.presenter).updateProjects(((DevelopmentBoardPresenter) dialog.presenter).searchProjects());
 //			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsTree(dialog.store);
 			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsFiles(dialog.store);
 //			((DevelopmentBoardPresenter) dialog.presenter).checkStoreFiles(dialog.store);
+			
+			BaseDto rootItem = ((DevelopmentBoardPresenter) dialog.presenter).getProjectPanel().store.getRootItems().get(0);					
+			((DevelopmentBoardPresenter) dialog.presenter).getProjectPanel().projectsDirsField.getSelectionModel().select(rootItem, true);
+			((DevelopmentBoardPresenter) dialog.presenter).getProjectPanel().projectsDirsField.setExpanded(rootItem, true);
 			
 			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
 			dialog.getAssociatedPresenter().fireEvent(serverLogEvent);
@@ -313,8 +320,8 @@ public class ProjectPanel extends Composite implements IsWidget,
 					}
 				}
 
-				System.out.println("el.getName(): " + el.getName()
-						+ "; sFolderName: " + sFolderName);
+/*				System.out.println("el.getName(): " + el.getName()
+						+ "; sFolderName: " + sFolderName);*/
 				if (el.getRelPath().trim()
 						.equalsIgnoreCase(sRelPathFromAbsPath.trim())) {
 					IsCatched = true;

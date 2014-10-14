@@ -65,7 +65,7 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 * @param projectName
 	 * @param projectId
 	 */
-	public RequestProjectCreationResult deleteProject(String userName,
+	public RequestDirOperationResult deleteProject(String userName,
 			String projectName, Long projectId);
 
 	

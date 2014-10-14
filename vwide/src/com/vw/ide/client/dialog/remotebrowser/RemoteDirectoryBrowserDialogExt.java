@@ -422,8 +422,8 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 					}
 				}
 
-				System.out.println("el.getName(): " + el.getName()
-						+ "; sFolderName: " + sFolderName);
+/*				System.out.println("el.getName(): " + el.getName()
+						+ "; sFolderName: " + sFolderName);*/
 				if (el.getRelPath().trim()
 						.equalsIgnoreCase(sRelPathFromAbsPath.trim())) {
 					IsCatched = true;
