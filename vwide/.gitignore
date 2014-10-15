@@ -1,5 +1,7 @@
 /test-classes
 /target
-/war
+/war/META-INF
+/war/WEB-INF
+/war/vwide
 /gwt-unitCache
 /.gwt
