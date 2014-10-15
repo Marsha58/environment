@@ -11,7 +11,9 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletConfig;
@@ -26,17 +28,19 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
-import org.gwtbootstrap3.extras.card.client.ui.Card;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
+import com.vw.ide.shared.servlet.remotebrowser.UserStateInfo;
 
 
 /**
@@ -49,6 +53,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 
 	private Logger logger = Logger.getLogger(RemoteDirectoryBrowserImpl.class);
 	private static String s_defRootDir = "/var/projects";
+	private  Map<String, UserStateInfo> usersStates = new HashMap <String, UserStateInfo>(); 
 	
 	public RemoteDirectoryBrowserImpl() {
 		super();
@@ -426,6 +431,11 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		String sFullProjectPath = parent + "\\" + fileName; 
 		try {
 			
+			File parentPath = new File(Utils.extractJustPath(sFullProjectPath));
+			if (!parentPath.exists()) {
+				parentPath.mkdirs();
+			}
+			
 			File fNewFile = new File(sFullProjectPath);
 			if (!fNewFile.exists()) {
 				fNewFile.createNewFile();
@@ -467,6 +477,22 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	@Override
 	public RequestDirOperationResult readFile(String user, String parent,
 			String fileName, Long projectId, Long fileId) {
+		UserStateInfo userStateInfo;
+		
+		if (usersStates.get(user) == null) {
+			userStateInfo = new UserStateInfo();
+		} else {
+			userStateInfo = usersStates.get(user);
+		}
+		FileItemInfo fileItemInfo = new FileItemInfo(Utils.extractJustFileName(fileName),Utils.extractJustPath(fileName),false);
+		fileItemInfo.setFileId(fileId);
+		fileItemInfo.setProjectId(projectId);
+		
+		userStateInfo.addFile2OpenedFiles(fileId, fileItemInfo);
+		userStateInfo.setProjectIdSelected(projectId);
+		userStateInfo.setFileIdSelected(fileId);
+		usersStates.put(user,userStateInfo);
+		
 		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setProjectId(projectId);
 		res.setFileId(fileId);
@@ -508,6 +534,22 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 				res.setResult(ex.getMessage());
 				res.setRetCode(-1);
 		   }
+		}
+		return res;
+	}
+
+
+	@Override
+	public RequestUserStateResult getUserState(String user) {
+		RequestUserStateResult res = new RequestUserStateResult();
+		res.setOperation("getting user state info");
+		res.setRetCode(0);
+		if (usersStates.get(user) != null) {
+			UserStateInfo userStateInfo = usersStates.get(user);
+			res.setUserStateInfo(userStateInfo);
+		} else {
+			res.setResult("user not found");
+			res.setRetCode(-1);
 		}
 		return res;
 	}

@@ -14,6 +14,7 @@ public abstract class Presenter {
 	
 	public abstract void go(final HasWidgets container);
 	public abstract void fireEvent(GwtEvent<?> event);
+	public abstract void handleEvent(GwtEvent<?> event);
 	
 	public String getLoggedAsUser() {
 		return loggedAsUser;

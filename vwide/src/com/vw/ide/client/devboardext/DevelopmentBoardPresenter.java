@@ -49,6 +49,7 @@ import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallb
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForDirList;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForDirOperation;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForFileOperation;
+import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForUserState;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
@@ -58,6 +59,7 @@ import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 /**
@@ -88,7 +90,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public void go(HasWidgets container) {
 		container.clear();
 		container.add(view.asWidget());
-
+        requestForGettingUserState(getLoggedAsUser());
 	}
 
 	public void fireEvent(GwtEvent<?> event) {
@@ -117,6 +119,11 @@ public class DevelopmentBoardPresenter extends Presenter {
 		} else if (event instanceof ServerLogEvent) {
 			doLog((ServerLogEvent) event);
 		}
+	}
+
+	@Override
+	public void handleEvent(GwtEvent<?> event) {
+
 	}
 
 	public TopPanel getTopPanel() {
@@ -182,8 +189,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 			try {
 				if (b instanceof FileDto) {
 					FileDto curItemInStore = (FileDto) b;
-					Long projectId = projectManager.getProjectIdByRelPath(curItemInStore.getRelPath());
-					projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
+					Long projectId = projectManager
+							.getProjectIdByRelPath(curItemInStore.getRelPath());
+					projectManager.getFileIdByFilePath(curItemInStore
+							.getAbsolutePath());
 
 					Long fileId = -1l;
 					if (!projectManager.checkIfFileExists(curItemInStore
@@ -206,27 +215,6 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 					curItemInStore.setProjectId(projectId);
 					curItemInStore.setFileId(fileId);
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-	}
-
-	// function just for testing purpose
-	public void checkStoreFiles(TreeStore<BaseDto> store) {
-		List<BaseDto> bdto = store.getAll();
-		for (BaseDto b : bdto)
-			try {
-				if (b instanceof FileDto) {
-					FileDto curItemInStore = (FileDto) b;
-					System.out.println("|- AbsolutePath:"
-							+ curItemInStore.getAbsolutePath()
-							+ "; \t\t\tName:" + curItemInStore.getName()
-							+ "; \t\t\tprojectId:"
-							+ curItemInStore.getProjectId() + "; \t\t\tfileId:"
-							+ curItemInStore.getFileId() + "; \t\t\tRelPath:"
-							+ curItemInStore.getRelPath() + "; \t\t\tFolder:"
-							+ curItemInStore.getFolder());
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -579,6 +567,9 @@ public class DevelopmentBoardPresenter extends Presenter {
 			case "idDelFile":
 				doDelCurrentFile(selectedItemInTheProjectTree);
 				break;
+			case "idNewFolder":
+				doCreateFolder(selectedItemInTheProjectTree);
+				break;
 			default:
 				break;
 			}
@@ -647,7 +638,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 			String s = event.getHideButton().name();
 
 			if (s.equalsIgnoreCase("YES")) {
-				
+
 				projectManager.removeProject(selectedProjectInTheProjectTree);
 				requestForProjectDeleting(
 						selectedItemInTheProjectTree.getAbsolutePath(),
@@ -658,10 +649,12 @@ public class DevelopmentBoardPresenter extends Presenter {
 	};
 
 	public Long selectedProjectInTheProjectTree;
-	
+
 	public void doDelCurrentProject(FileItemInfo fileItemInfo) {
-		
-		selectedProjectInTheProjectTree = projectManager.getProjectIdByProjectPath(getLoggedAsUser(), fileItemInfo.getAbsolutePath());
+
+		selectedProjectInTheProjectTree = projectManager
+				.getProjectIdByProjectPath(getLoggedAsUser(),
+						fileItemInfo.getAbsolutePath());
 		String msg = Format.substitute(
 				"Are you sure you want to delete project '{0}'?",
 				fileItemInfo.getName());
@@ -685,34 +678,40 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	public boolean isValidFileName(String fileName) {
-		// TODO: make this function		
+		// TODO: make this function
 		return true;
 	}
-	
-	public void doCreateFile(FileItemInfo fileItemInfo) {
-		
-		selectedProjectInTheProjectTree = projectManager.getProjectIdByProjectPath(getLoggedAsUser(), fileItemInfo.getAbsolutePath());
-		
-		final PromptMessageBox box = new PromptMessageBox("Name", "Please enter file name:");
-        box.addDialogHideHandler(new DialogHideHandler() {
 
-        	@Override
-        	public void onDialogHide(DialogHideEvent event) {
-        		if (box.getValue() != null) {
-        			if (isValidFileName(box.getValue())) {
-        				String fileName = box.getValue();
-        				Long fileId = 1000L;
-        				requestForFileCreating(Utils.extractJustPath(selectedItemInTheProjectTree.getAbsolutePath()), fileName,
-        						selectedProjectInTheProjectTree, fileId);
-        			}
-        		}
-        	}
-        });
-        
-        box.show();		
+	public void doCreateFile(FileItemInfo fileItemInfo) {
+
+		selectedProjectInTheProjectTree = projectManager
+				.getProjectIdByProjectPath(getLoggedAsUser(),
+						fileItemInfo.getAbsolutePath());
+
+		final PromptMessageBox box = new PromptMessageBox("Name",
+				"Please enter file name:");
+		box.addDialogHideHandler(new DialogHideHandler() {
+
+			@Override
+			public void onDialogHide(DialogHideEvent event) {
+				if (box.getValue() != null) {
+					if (isValidFileName(box.getValue())) {
+						String fileName = box.getValue();
+						Long fileId = 1000L;
+						requestForFileCreating(Utils
+								.extractJustPath(selectedItemInTheProjectTree
+										.getAbsolutePath()), fileName,
+								selectedProjectInTheProjectTree, fileId);
+					}
+				}
+			}
+		});
+
+		box.show();
 	}
 
-	public void requestForFileCreating(String parent, String fileName, Long projectId, Long fileId) {
+	public void requestForFileCreating(String parent, String fileName,
+			Long projectId, Long fileId) {
 		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
 				.getServiceImpl();
 
@@ -720,8 +719,102 @@ public class DevelopmentBoardPresenter extends Presenter {
 			ServiceCallbackForDirOperation cbk = RemoteBrowserService
 					.instance().buildCallbackForDirOperation();
 			cbk.setProcessedResult(new DirOperationResult());
-			service.addFile(this.getLoggedAsUser(), parent, fileName, projectId, fileId, cbk);
+			service.addFile(this.getLoggedAsUser(), parent, fileName,
+					projectId, fileId, cbk);
 		}
-	}	
+	}
+
+	public void doCreateFolder(FileItemInfo fileItemInfo) {
+
+		final PromptMessageBox box = new PromptMessageBox("Name",
+				"Please enter folder name:");
+		box.addDialogHideHandler(new DialogHideHandler() {
+
+			@Override
+			public void onDialogHide(DialogHideEvent event) {
+				if (box.getValue() != null) {
+					if (isValidFileName(box.getValue())) {
+						String folderName = box.getValue();
+						requestForFolderCreating(Utils
+								.extractJustPath(selectedItemInTheProjectTree
+										.getAbsolutePath()), folderName);
+					}
+				}
+			}
+		});
+
+		box.show();
+	}
+
+	public void requestForFolderCreating(String folderParentPath,
+			String folderName) {
+		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
+				.getServiceImpl();
+
+		if (service != null) {
+			ServiceCallbackForDirOperation cbk = RemoteBrowserService
+					.instance().buildCallbackForDirOperation();
+			cbk.setProcessedResult(new DirOperationResult());
+			service.createDir(this.getLoggedAsUser(), folderParentPath,
+					folderName, cbk);
+		}
+	}
+
+	protected void requestForGettingUserState(String user) {
+		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance().getServiceImpl();
+		if (service != null) {
+			ServiceCallbackForUserState cbk = RemoteBrowserService.instance()
+					.buildCallbackForUserState();
+			cbk.setProcessedResult(new GettingUserStateResult(this));
+			service.getUserState(getLoggedAsUser(), cbk);
+		}
+	}
+
+	public static class GettingUserStateResult extends
+			ProcessedResult<RequestUserStateResult> {
+
+		private DevelopmentBoardPresenter presenter;
+
+		public GettingUserStateResult() {
+		}
+
+		public GettingUserStateResult(DevelopmentBoardPresenter presenter) {
+			this.presenter = presenter;
+		}
+
+		@Override
+		public void onFailure(Throwable caught) {
+			AlertMessageBox alertMessageBox = new AlertMessageBox("Error",
+					caught.getMessage());
+			alertMessageBox.show();
+		}
+
+		@Override
+		public void onSuccess(RequestUserStateResult result) {
+			if (result.getRetCode().intValue() != 0) {
+				String messageAlert = "The operation '" + result.getOperation()
+						+ "' failed.\r\nResult'" + result.getResult() + "'";
+				AlertMessageBox alertMessageBox = new AlertMessageBox(
+						"Warning", messageAlert);
+//				alertMessageBox.show();
+			} else {
+				Long fileIdSelected = result.getUserStateInfo().getFileIdSelected();
+				Long projectIdSelected = result.getUserStateInfo().getProjectIdSelected();
+				FileItemInfo value = null;
+				for(Object key :  result.getUserStateInfo().getOpenedFiles().keySet()) {
+					value = result.getUserStateInfo().getOpenedFiles().get(key);
+					if (fileIdSelected != key) {
+						presenter.requestForReadingFile(value.getAbsolutePath() + "/" + value.getName(), value.getProjectId(),value.getFileId());
+					}
+				}	
+				value = result.getUserStateInfo().getOpenedFiles().get(fileIdSelected);
+				presenter.requestForReadingFile(value.getAbsolutePath() + "/" + value.getName(), value.getProjectId(),value.getFileId());
+				
+			}
+
+			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
+			this.presenter.fireEvent(serverLogEvent);
+		}
+	}
 
 }

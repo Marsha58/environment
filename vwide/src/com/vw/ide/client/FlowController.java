@@ -2,56 +2,57 @@ package com.vw.ide.client;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
-import com.vw.ide.client.ui.projectpanel.ProjectPanel;
-import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
+import com.vw.ide.client.event.handler.LoggedInHandler;
 import com.vw.ide.client.event.handler.LoginHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
-import com.vw.ide.client.event.handler.SelectFileHandler;
-import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
+import com.vw.ide.client.event.uiflow.LoggedInEvent;
 import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
-import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.login.LoginGxtPresenter;
 import com.vw.ide.client.login.LoginViewGxt;
 import com.vw.ide.client.presenters.Presenter;
-import com.vw.ide.client.service.factory.ServicesBrokerFactory;
 
 /**
  * Dispatches application events
  * @author Oleg
  *
  */
-public class FlowController extends Presenter implements ValueChangeHandler<String> {
+public class FlowController implements ValueChangeHandler<String> {
 	private HasWidgets container;
+	private Presenter presenter = null;
+	private static String loggedAsUser = null;
 
 	private final HandlerManager eventBus;
 	
 	public FlowController(HandlerManager eventBus) {
 		this.eventBus = eventBus;
 		bind();
-		ServicesBrokerFactory.instantiateAllServices(eventBus);
 	}
 
-	
+	public static String getLoggedAsUser() {
+		return loggedAsUser;
+	}
+
+	public static void setLoggedAsUser(String userName) {
+		loggedAsUser = userName;
+	}
+
+	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 	    String token = event.getValue();
 	    
-	    
 	    if (token != null) {
-			Presenter presenter = null;
-
 			if (token.equals("loginGxt")) {
 				presenter = new LoginGxtPresenter(eventBus, new LoginViewGxt());
-			} else 	if (token.equals("dev")) {
+			} else 	if (token.startsWith("dev")) {
+				setLoggedAsUser(getUserNameFromDevBoardLoginString(token));
 			    presenter = new DevelopmentBoardPresenter(eventBus, new DevelopmentBoard());
 			    presenter.setLoggedAsUser(getLoggedAsUser());
-			    
 			} 
 			if (presenter != null) {
 				presenter.go(container);
@@ -62,7 +63,6 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 	public void go(HasWidgets container) {
 	    this.container = container;
 	    if ("".equals(History.getToken())) {
-//	    	History.newItem("login");
 	    	History.newItem("loginGxt");
 	    }
 	    else {
@@ -79,6 +79,12 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 				doLogin(event);
 			}
 		});
+		// successful logged in
+		eventBus.addHandler(LoggedInEvent.TYPE, new LoggedInHandler() {
+			public void onLoggedIn(LoggedInEvent event) {
+				doLoggedIn(event);
+			}
+		});
 		// Logout event
 		eventBus.addHandler(LogoutEvent.TYPE, new LogoutHandler() {
 			public void onLogout(LogoutEvent event) {
@@ -86,19 +92,32 @@ public class FlowController extends Presenter implements ValueChangeHandler<Stri
 			}
 		});
 	}
-	
+
 	private void doLogin(LoginEvent event) {
-		setLoggedAsUser(event.getLoggedAsUser());
-//		History.newItem("dev");
+		presenter.handleEvent(event);
+	}
+
+	private void doLoggedIn(LoggedInEvent event) {
+		setLoggedAsUser(event.getUserName());
+		History.newItem(formDevBoardLoginString(event.getUserName()));
 	}
 	
 	private void doLogout(LogoutEvent event) {
 		setLoggedAsUser(null);
-		History.newItem("login");
+		History.newItem("loginExt");
 	}
 	
+	private String formDevBoardLoginString(String user) {
+		return "dev@" + user;
+	}
 	
-	
-	public void fireEvent(GwtEvent<?> event) {
+	private String getUserNameFromDevBoardLoginString(String loginString) {
+		if (loginString != null) {
+			String s[] = loginString.split("@");
+			if (s != null && s.length == 2) {
+				return s[1];
+			}
+		}
+		return "";
 	}
 }

@@ -99,5 +99,11 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param fileId
 	 */
 	public void deleteFile(String user, String fileName, Long fileId, 	AsyncCallback<RequestFileOperationResult> callback);
+
+	/**
+	 * Getting information about user state
+	 * @param user
+	 */	
+	public void getUserState(String user, AsyncCallback<RequestUserStateResult> callback);
 	
 }

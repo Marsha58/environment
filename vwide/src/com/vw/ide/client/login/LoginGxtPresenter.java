@@ -12,6 +12,7 @@ import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter.DirOperationReadingFileResult;
+import com.vw.ide.client.event.uiflow.LoggedInEvent;
 import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -35,41 +36,14 @@ import com.vw.ide.shared.servlet.security.RequestLoginResult;
  */
 public class LoginGxtPresenter extends Presenter {
 
-	private final HandlerManager eventBus;
-	private final PresenterViewerLink view;
+	public static class LoginResult extends ProcessedResult<RequestLoginResult> {
 
-	public LoginGxtPresenter(HandlerManager eventBus, PresenterViewerLink view) {
-		this.eventBus = eventBus;
-		this.view = view;
-		if (view != null) {
-			view.associatePresenter(this);
-		}
-	}
-
-	public void go(HasWidgets container) {
-		container.clear();
-		container.add(view.asWidget());
-	}
-
-	public void fireEvent(GwtEvent<?> event) {
-		eventBus.fireEvent(event);
-
-		if (event instanceof LoginEvent) {
-			LoginEvent evt = (LoginEvent) event;
-			requestForLogin(((LoginViewGxt) view).userNameField.getText(), 
- 					((LoginViewGxt) view).passwordField.getText());
-		}
-	}
-
-	public static class LoginResult extends
-			ProcessedResult<RequestLoginResult> {
-
-		private Presenter presenter;
+		private LoginGxtPresenter presenter;
 
 		public LoginResult() {
 		}
 
-		public LoginResult(Presenter presenter) {
+		public LoginResult(LoginGxtPresenter presenter) {
 			this.presenter = presenter;
 		}
 
@@ -91,54 +65,58 @@ public class LoginGxtPresenter extends Presenter {
 						"Warning", messageAlert);
 				alertMessageBox.show();
 			} else {
-				// String path = extractJustPath(result.getPath());
-				// String name = extractJustFileName(result.getPath());
-				
 				switch (result.getResult()) {
-				case 0:
-					History.newItem("dev");
-					break;
-				case -1:
-					messageAlert = "Password is incorrect";
-					AlertMessageBox alertMessageBox = new AlertMessageBox(
-							"Warning", messageAlert);
-					alertMessageBox.show();	
-//					History.newItem("dev");
-					break;
-				case -2:
-					messageAlert = "Such user doesn't exist";
-					AlertMessageBox alertMessageBox2 = new AlertMessageBox(
-							"Warning", messageAlert);
-					alertMessageBox2.show();	
-//					History.newItem("dev");
-					break;
-
-				default:
-					break;
-				}  ;
-
-				// editor.tabPanel.add(newFileSheet,"test");
+					case 0:
+						presenter.onSuccessLogin(result.getUserName());
+						break;
+					case -1:
+						messageAlert = "Password is incorrect";
+						AlertMessageBox alertMessageBox = new AlertMessageBox(
+								"Warning", messageAlert);
+						alertMessageBox.show();	
+						break;
+					case -2:
+						messageAlert = "Such user doesn't exist";
+						AlertMessageBox alertMessageBox2 = new AlertMessageBox(
+								"Warning", messageAlert);
+						alertMessageBox2.show();	
+						break;
+	
+					default:
+						break;
+				}
 			}
 		}
-
-
 	}
+	
+	private final HandlerManager eventBus;
+	private final PresenterViewerLink view;
 
-	protected void requestForLogin(String userName, String password) {
-		
-		String sPasswordMD5 = calculateCheckSum(password.trim());
-		
-		RemoteSecurityAsync service = RemoteSecurityService.instance()
-				.getServiceImpl();
-		if (service != null) {
-			ServiceCallbackForLogin cbk = RemoteSecurityService.instance()
-					.buildCallbackForLogin();
-			cbk.setProcessedResult(new LoginResult(this));
-			service.login(userName, sPasswordMD5, cbk);
+	public LoginGxtPresenter(HandlerManager eventBus, PresenterViewerLink view) {
+		this.eventBus = eventBus;
+		this.view = view;
+		if (view != null) {
+			view.associatePresenter(this);
 		}
 	}
-	
-	
+
+	public void go(HasWidgets container) {
+		container.clear();
+		container.add(view.asWidget());
+	}
+
+	public void fireEvent(GwtEvent<?> event) {
+		eventBus.fireEvent(event);
+	}
+
+	@Override
+	public void handleEvent(GwtEvent<?> event) {
+		if (event instanceof LoginEvent) {
+			LoginEvent loginEvent = (LoginEvent)event;  
+			requestForLogin(loginEvent.getLoggedAsUser(), loginEvent.getLoggedWithPassword());
+		}
+	}
+
 	public String calculateCheckSum(String md5) {
 		   try {
 		        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
@@ -150,8 +128,22 @@ public class LoginGxtPresenter extends Presenter {
 		        return sb.toString();
 		    } catch (java.security.NoSuchAlgorithmException e) {
 		    }
-		    return null;
-		}	
+		   return null;
+	}	
+	
+	protected void onSuccessLogin(String userName) {
+		fireEvent(new LoggedInEvent(userName));
+	}
+	
+	protected void requestForLogin(String userName, String password) {
+		String sPasswordMD5 = calculateCheckSum(password.trim());
+		RemoteSecurityAsync service = RemoteSecurityService.instance().getServiceImpl();
+		if (service != null) {
+			ServiceCallbackForLogin cbk = RemoteSecurityService.instance().buildCallbackForLogin();
+			cbk.setProcessedResult(new LoginResult(this));
+			service.login(userName, sPasswordMD5, cbk);
+		}
+	}
 	
 	
 }

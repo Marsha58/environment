@@ -6,28 +6,30 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.resources.client.CssResource.NotStrict;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.sencha.gxt.widget.core.client.ContentPanel;
-import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.Viewport;
-import com.sencha.gxt.widget.core.client.event.ResizeEndEvent;
 import com.vw.ide.client.service.factory.ServicesBrokerFactory;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class Vwide implements EntryPoint {
-	
 
-	  interface GlobalResources extends ClientBundle {
+    private static final HandlerManager eventBus = new HandlerManager(null);
+    private static final FlowController mainController = new FlowController(eventBus);
+	
+    public Vwide() {
+    	init();
+    }
+    
+	interface GlobalResources extends ClientBundle {
 	    @NotStrict
 	    @Source("global.css")
 	    CssResource css();
 	  }	
 	  
-	  private Viewport viewport = null;  
-	  
+	private Viewport viewport = null;  
+	
 	/**
 	 * This is the entry point method.
 	 */
@@ -37,16 +39,14 @@ public class Vwide implements EntryPoint {
     }
   
 	public void onModuleLoad() {
-		
-	    Boolean isInjected = GWT.<GlobalResources>create(GlobalResources.class).css().ensureInjected();
-		
-	    HandlerManager eventBus = new HandlerManager(null);
-	    FlowController mainController = new FlowController(eventBus);
-	    ServicesBrokerFactory.instantiateAllServices(eventBus);
+	    GWT.<GlobalResources>create(GlobalResources.class).css().ensureInjected();
 	    viewport = new Viewport();
 	    RootPanel.get().add(viewport);
 	    viewport.forceLayout();
 	    mainController.go(viewport);
 	}
 	
+	protected void init() {
+	    ServicesBrokerFactory.instantiateAllServices(eventBus);
+	}
 }

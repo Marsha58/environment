@@ -240,7 +240,7 @@
  -->
 					<container:SimpleContainer ui:field="comboAceEditorPlaceCont">
 					</container:SimpleContainer>
-					<container:SimpleContainer ui:field="comboPlaceCont">
+					<container:SimpleContainer ui:field="comboPlaceCont" visible="true">
 					</container:SimpleContainer>
 
 

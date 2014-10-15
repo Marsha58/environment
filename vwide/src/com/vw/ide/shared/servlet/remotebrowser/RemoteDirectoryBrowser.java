@@ -97,6 +97,8 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 
 	
 	RequestFileOperationResult saveFile(String user, String fileName,	Long projectId, Long fileId, String content);
+	
+	RequestUserStateResult getUserState(String user);
 
 	
 	

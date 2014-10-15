@@ -19,11 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.Style.SelectionMode;
@@ -34,6 +38,7 @@ import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
@@ -92,8 +97,6 @@ public class ProjectPanel extends Composite implements IsWidget,
 					+ item.getId().toString();
 		}
 	}
-	
-	
 	
 
 	@UiFactory
@@ -182,8 +185,9 @@ public class ProjectPanel extends Composite implements IsWidget,
 		widget.addStyleName("margin-10");
 		// tree.getStyle().setLeafIcon(ExampleImages.INSTANCE.music());
 
-		projectsDirsField.getSelectionModel().setSelectionMode(
-				SelectionMode.SINGLE);
+		projectsDirsField.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		
+		
 		projectsDirsField.getSelectionModel().addSelectionHandler(
 				new SelectionHandler<BaseDto>() {
 
@@ -211,7 +215,7 @@ public class ProjectPanel extends Composite implements IsWidget,
 	}
 
 	public void prepare() {
-		// requestForDirContent(null);
+//		requestForDirContent(null);
 		buildContextMenu();
 	}
 

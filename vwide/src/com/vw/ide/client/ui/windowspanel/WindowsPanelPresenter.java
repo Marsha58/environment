@@ -16,7 +16,6 @@ public class WindowsPanelPresenter extends Presenter {
 	private final HandlerManager eventBus;
 	private final PresenterViewerLink view;
 
-
 	public WindowsPanelPresenter(HandlerManager eventBus, PresenterViewerLink view) {
 		this.eventBus = eventBus;
 		this.view = view;
@@ -32,5 +31,9 @@ public class WindowsPanelPresenter extends Presenter {
 	
 	public void fireEvent(GwtEvent<?> event) {
 		eventBus.fireEvent(event);
+	}
+
+	@Override
+	public void handleEvent(GwtEvent<?> event) {
 	}
 }

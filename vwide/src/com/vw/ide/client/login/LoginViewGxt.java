@@ -117,13 +117,9 @@ public class LoginViewGxt extends Composite implements HasText, PresenterViewerL
 		if (proceed) {
 			System.out.println("proceeding to login");
 			if (presenter != null) {
-//				Utils.messageBox("Login", "Please wait...", null);
-				presenter.fireEvent(new LoginEvent(userName, password));
+				LoginEvent login = new LoginEvent(userNameField.getText(), passwordField.getText());
+				presenter.fireEvent(login);
 			}
 		}
-		
-		presenter.setLoggedAsUser(userName);
 	}	
-
-
 }
