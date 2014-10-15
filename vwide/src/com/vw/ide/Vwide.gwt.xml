@@ -22,7 +22,7 @@
 	<!-- For support for IE8 you need to inherit the Respond module into your 
 		*.gwt.xml. <inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
 
- 	
+	<inherits name='com.google.web.bindery.requestfactory.RequestFactory' />
 
 	<!-- Other module inherits -->
 	<inherits name='edu.ycp.cs.dh.acegwt.AceGWT' />

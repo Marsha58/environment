@@ -7,7 +7,8 @@ public enum MenuItemsEnum {
    NEW_FILE("new_file"),
    IMPORT_FILE("import_file"),
    OPEN_FILE("open_file"),
-   save_FILE("save_file");
+   SAVE_FILE("save_file"),
+   SAVE_ALL_FILES("save_all_files");
    
 	private final String name;
 	

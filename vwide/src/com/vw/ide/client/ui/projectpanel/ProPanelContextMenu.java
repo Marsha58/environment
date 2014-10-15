@@ -15,7 +15,8 @@ import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 public class ProPanelContextMenu extends Menu{
 	
-	private MenuItem newFile;
+	private MenuItem importFile; 
+	private MenuItem newFile; 
 	private MenuItem delFile;
 	private MenuItem newProject;
 	private MenuItem importProject;
@@ -42,6 +43,16 @@ public class ProPanelContextMenu extends Menu{
 	
 	public ProPanelContextMenu() {
 		
+		importFile = new MenuItem();
+		importFile.setItemId("idImportFile");
+		importFile.setText("Import file");
+		importFile.setIcon(Resources.IMAGES.new_con_en());
+		importFile.addSelectionHandler(selectionHandler);
+		this.add(importFile);
+
+		this.add(new SeparatorMenuItem());
+
+		
 		newFile = new MenuItem();
 		newFile.setItemId("idNewFile");
 		newFile.setText("New file");
@@ -56,18 +67,17 @@ public class ProPanelContextMenu extends Menu{
 		delFile.addSelectionHandler(selectionHandler);
 		this.add(delFile);
 
-		SeparatorMenuItem smiFile = new SeparatorMenuItem();
-		this.add(smiFile);
+		this.add(new SeparatorMenuItem());
 
 		importProject = new MenuItem();
 		importProject.setItemId("idImportProject");
-		importProject.setText("New project");
+		importProject.setText("Import project");
 		importProject.setIcon(Resources.IMAGES.new_wiz_en());
 		importProject.addSelectionHandler(selectionHandler);
+		importProject.disable();
 		this.add(importProject);
 
-		SeparatorMenuItem smiImportProject = new SeparatorMenuItem();
-		this.add(smiImportProject);
+		this.add(new SeparatorMenuItem());
 
 		newProject = new MenuItem();
 		newProject.setItemId("idNewProject");
@@ -83,8 +93,7 @@ public class ProPanelContextMenu extends Menu{
 		delProject.addSelectionHandler(selectionHandler);
 		this.add(delProject);
 
-		SeparatorMenuItem smiProject = new SeparatorMenuItem();
-		this.add(smiProject);
+		this.add(new SeparatorMenuItem());
 		
 		newFolder = new MenuItem();
 		newFolder.setItemId("idNewFolder");
