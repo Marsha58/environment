@@ -261,6 +261,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 	public RemoteDirectoryBrowserDialogExt() {
 		super.setWidget(uiBinder.createAndBindUi(this));
 		setPredefinedButtons(PredefinedButton.CANCEL);
+		
 		bnSelect.setId(SELECT_ID);
 		bnSelect.addSelectHandler(new SelectHandler() {
 

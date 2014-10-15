@@ -11,6 +11,7 @@
 		<spring.version>3.0.5.RELEASE</spring.version>
 		<gwtVersion>2.6.0</gwtVersion>
 		<gwtBootstrap3.version>0.8</gwtBootstrap3.version>
+		<libgwtFileVersion>0.3.1</libgwtFileVersion>
 	</properties>
 
 	<dependencies>
@@ -59,6 +60,11 @@
 			<groupId>com.google.web.bindery</groupId>
 			<artifactId>requestfactory-apt</artifactId>
 			<version>${gwtVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.vectomatic</groupId>
+			<artifactId>lib-gwt-file</artifactId>
+			<version>${libgwtFileVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>

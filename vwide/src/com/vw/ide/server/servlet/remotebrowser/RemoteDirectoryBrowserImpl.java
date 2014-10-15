@@ -111,7 +111,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	 * Returns full directory content
 	 */
 	public RequestedDirScanResult getDirScan(String user, String dir) {
-		String path = constructUserHomePath(user) + ((dir != null) ? ("/" + dir) : "");
+		String path  = constructUserHomePath(user) + ((dir != null) ? ("/" + dir) : "");
 		RequestedDirScanResult r = new RequestedDirScanResult();
 		r.setParentPath(new File(path).getAbsolutePath());
 		if (user != null) {
@@ -422,7 +422,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 
 	@Override
 	public RequestDirOperationResult addFile(String user, String parent,
-			String fileName, Long projectId, Long fileId) {
+			String fileName, Long projectId, Long fileId, String content) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setOperation("file creating");
 //		res.setProjectPath(projectPath);
@@ -439,8 +439,12 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			File fNewFile = new File(sFullProjectPath);
 			if (!fNewFile.exists()) {
 				fNewFile.createNewFile();
-				FileWriter writer = new FileWriter(fNewFile); 
-				writer.write("");
+				FileWriter writer = new FileWriter(fNewFile);
+				if (content != null) {
+					writer.write(content);
+				} else {
+					writer.write("");
+				}
 				writer.flush();
 				writer.close();
 			}
@@ -551,6 +555,35 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			res.setResult("user not found");
 			res.setRetCode(-1);
 		}
+		return res;
+	}
+
+
+	@Override
+	public RequestFileOperationResult closeFile(String user, String fileName, Long fileId) {
+		RequestFileOperationResult res = new RequestFileOperationResult();
+		UserStateInfo	userStateInfo = usersStates.get(user);
+		if (userStateInfo != null) {
+			FileItemInfo value = null;
+			for(Object key :  userStateInfo.getOpenedFiles().keySet()) {
+				value = userStateInfo.getOpenedFiles().get(key);
+				String sFullName = value.getAbsolutePath() + "\\" + value.getName();  
+				if (sFullName.equalsIgnoreCase(fileName)) {
+					userStateInfo.getOpenedFiles().remove(key);
+					break;
+				}
+			}			
+			usersStates.remove(user);
+			usersStates.put(user,userStateInfo);
+			
+			res.setFileId(fileId);
+			res.setOperation("closing file");
+			res.setFileName(fileName);
+			res.setRetCode(0);
+		} else {
+			res.setResult("user not found");
+			res.setRetCode(-1);
+        }
 		return res;
 	}
 

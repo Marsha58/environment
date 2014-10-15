@@ -67,9 +67,10 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param parent
 	 * @param fileName
 	 * @param projectId
+	 * @param content
 	 */
 	public void addFile(String user, String parent, String fileName, Long projectId,
-			Long fileId, AsyncCallback<RequestDirOperationResult> callback);
+			Long fileId, String content, AsyncCallback<RequestDirOperationResult> callback);
 
 
 	/**
@@ -105,5 +106,7 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param user
 	 */	
 	public void getUserState(String user, AsyncCallback<RequestUserStateResult> callback);
+
+	void closeFile(String user, String fileName, Long fileId, AsyncCallback<RequestFileOperationResult> callback);
 	
 }

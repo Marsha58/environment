@@ -1,5 +1,9 @@
 package com.vw.ide.client.devboardext;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -25,6 +29,7 @@ import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.box.PromptMessageBox;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
+import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
 import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
@@ -121,6 +126,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 		}
 	}
 
+	
+
+	
+	
 	@Override
 	public void handleEvent(GwtEvent<?> event) {
 
@@ -358,17 +367,26 @@ public class DevelopmentBoardPresenter extends Presenter {
 	private void doRemoveFile(EditorTabClosedEvent event) {
 		Long fileId = ((FileSheet) event.getEvent().getItem()).getFileId();
 		projectManager.getOpenedFilesContext().remove(fileId);
-		FileSheet curFileSheet = (FileSheet) projectManager
-				.getAssociatedTabWidgetsContext().remove(fileId);
+		FileSheet curFileSheet = (FileSheet) projectManager.getAssociatedTabWidgetsContext().remove(fileId);
 
-		if (projectManager.getOpenedFilesContext().isEmpty()) {
-			getEditorContentPanel().setHeadingText(
-					"files have not been selected");
+		if (projectManager.getOpenedFilesContext().isEmpty()) {	getEditorContentPanel().setHeadingText(	"files have not been selected");
 		}
-
 		((DevelopmentBoard) view).topPanel.delItemFromScrollMenu(fileId);
-
+		
+		String fileFullName = ((FileSheet) event.getEvent().getItem()).getFilePath() + "\\" + ((FileSheet) event.getEvent().getItem()).getFileName();
+		requestForFileClosing(fileFullName, fileId);
 	}
+	
+	public void requestForFileClosing(String fileName, Long fileId) {
+		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
+				.getServiceImpl();
+
+		if (service != null) {
+			ServiceCallbackForFileOperation cbk = RemoteBrowserService.instance().buildCallbackForFileOperation();
+			cbk.setProcessedResult(new FileOperationResult());
+			service.closeFile(this.getLoggedAsUser(), fileName, fileId, cbk);
+		}
+	}		
 
 	private void doChangeFileStateToEdited(FileEditedEvent event) {
 		Long fileId = event.getFileItemInfo().getFileId();
@@ -548,7 +566,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 		if (menuId != null) {
 			switch (menuId) {
-			case "idNewProject":
+			case "new_project":
 				String sPath;
 				if (selectedItemInTheProjectTree == null) {
 					sPath = "";
@@ -558,16 +576,19 @@ public class DevelopmentBoardPresenter extends Presenter {
 				}
 				makeProjectNew(sPath);
 				break;
-			case "idDelProject":
+			case "delete_project":
 				doDelCurrentProject(selectedItemInTheProjectTree);
 				break;
-			case "idNewFile":
+			case "import_file":
+				doImportFile(selectedItemInTheProjectTree);
+				break;
+			case "new_file":
 				doCreateFile(selectedItemInTheProjectTree);
 				break;
-			case "idDelFile":
+			case "delete_file":
 				doDelCurrentFile(selectedItemInTheProjectTree);
 				break;
-			case "idNewFolder":
+			case "new_folder":
 				doCreateFolder(selectedItemInTheProjectTree);
 				break;
 			default:
@@ -698,10 +719,11 @@ public class DevelopmentBoardPresenter extends Presenter {
 					if (isValidFileName(box.getValue())) {
 						String fileName = box.getValue();
 						Long fileId = 1000L;
+						String content = "";
 						requestForFileCreating(Utils
 								.extractJustPath(selectedItemInTheProjectTree
 										.getAbsolutePath()), fileName,
-								selectedProjectInTheProjectTree, fileId);
+								selectedProjectInTheProjectTree, fileId, content);
 					}
 				}
 			}
@@ -711,7 +733,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	public void requestForFileCreating(String parent, String fileName,
-			Long projectId, Long fileId) {
+			Long projectId, Long fileId, String content) {
 		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
 				.getServiceImpl();
 
@@ -720,7 +742,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 					.instance().buildCallbackForDirOperation();
 			cbk.setProcessedResult(new DirOperationResult());
 			service.addFile(this.getLoggedAsUser(), parent, fileName,
-					projectId, fileId, cbk);
+					projectId, fileId, content, cbk);
 		}
 	}
 
@@ -804,11 +826,11 @@ public class DevelopmentBoardPresenter extends Presenter {
 				for(Object key :  result.getUserStateInfo().getOpenedFiles().keySet()) {
 					value = result.getUserStateInfo().getOpenedFiles().get(key);
 					if (fileIdSelected != key) {
-						presenter.requestForReadingFile(value.getAbsolutePath() + "/" + value.getName(), value.getProjectId(),value.getFileId());
+						presenter.requestForReadingFile(value.getAbsolutePath() + "\\" + value.getName(), value.getProjectId(),value.getFileId());
 					}
 				}	
 				value = result.getUserStateInfo().getOpenedFiles().get(fileIdSelected);
-				presenter.requestForReadingFile(value.getAbsolutePath() + "/" + value.getName(), value.getProjectId(),value.getFileId());
+				presenter.requestForReadingFile(value.getAbsolutePath() + "\\" + value.getName(), value.getProjectId(),value.getFileId());
 				
 			}
 
@@ -816,5 +838,47 @@ public class DevelopmentBoardPresenter extends Presenter {
 			this.presenter.fireEvent(serverLogEvent);
 		}
 	}
+	
+
+
+	
+	public void doImportFile(FileItemInfo fileItemInfo) {
+
+		Long projectId = projectManager.getProjectIdByProjectPath(getLoggedAsUser(),
+						fileItemInfo.getAbsolutePath());
+		String parentPath = Utils.extractJustPath(fileItemInfo.getAbsolutePath());
+
+		final FileOpenDialog box = new FileOpenDialog();
+		box.setEditLabelText("Select file to import");
+		box.setParentPath(parentPath);
+		box.setProjectId(projectId);
+
+		
+		box.addDialogHideHandler(new DialogHideHandler() {
+			@Override
+			public void onDialogHide(DialogHideEvent event) {
+				if(box.getLoadedFiles() > 0) {
+					requestForFileCreating(box.getParentPath(), box.getFileName(0), box.getProjectId(), 0L, box.getContent(0));
+				}
+			}
+		});
+
+		box.show();
+	}
+
+	public void requestForFileImporting(String parent, String fileName,
+			Long projectId, Long fileId, String content) {
+		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
+				.getServiceImpl();
+
+		if (service != null) {
+			ServiceCallbackForDirOperation cbk = RemoteBrowserService
+					.instance().buildCallbackForDirOperation();
+			cbk.setProcessedResult(new DirOperationResult());
+			service.addFile(this.getLoggedAsUser(), parent, fileName,
+					projectId, fileId, content, cbk);
+		}
+	}
+	
 
 }

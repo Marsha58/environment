@@ -76,9 +76,10 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 * @param filename
 	 * @param projectId
 	 * @param fileId
+	 * @param content
 	 */
 	public RequestDirOperationResult addFile(String user, String parent,
-			String fileName, Long projectId, Long fileId);
+			String fileName, Long projectId, Long fileId, String content);
 
 
 	/**
@@ -97,6 +98,8 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 
 	
 	RequestFileOperationResult saveFile(String user, String fileName,	Long projectId, Long fileId, String content);
+
+	RequestFileOperationResult closeFile(String user, String fileName,	Long fileId);
 	
 	RequestUserStateResult getUserState(String user);
 

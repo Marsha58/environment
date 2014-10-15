@@ -11,6 +11,7 @@ import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
+import com.vw.ide.client.projects.MenuItemsEnum;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 public class ProPanelContextMenu extends Menu{
@@ -44,7 +45,7 @@ public class ProPanelContextMenu extends Menu{
 	public ProPanelContextMenu() {
 		
 		importFile = new MenuItem();
-		importFile.setItemId("idImportFile");
+		importFile.setItemId(MenuItemsEnum.IMPORT_FILE.getName());
 		importFile.setText("Import file");
 		importFile.setIcon(Resources.IMAGES.new_con_en());
 		importFile.addSelectionHandler(selectionHandler);
@@ -54,14 +55,14 @@ public class ProPanelContextMenu extends Menu{
 
 		
 		newFile = new MenuItem();
-		newFile.setItemId("idNewFile");
+		newFile.setItemId(MenuItemsEnum.NEW_FILE.getName());
 		newFile.setText("New file");
 		newFile.setIcon(Resources.IMAGES.new_con_en());
 		newFile.addSelectionHandler(selectionHandler);
 		this.add(newFile);
 
 		delFile = new MenuItem();
-		delFile.setItemId("idDelFile");
+		delFile.setItemId(MenuItemsEnum.DELETE_FILE.getName());
 		delFile.setText("Delete selected file");
 		delFile.setIcon(Resources.IMAGES.delete_edit_en());
 		delFile.addSelectionHandler(selectionHandler);
@@ -70,7 +71,7 @@ public class ProPanelContextMenu extends Menu{
 		this.add(new SeparatorMenuItem());
 
 		importProject = new MenuItem();
-		importProject.setItemId("idImportProject");
+		importProject.setItemId(MenuItemsEnum.IMPORT_PROJECT.getName());
 		importProject.setText("Import project");
 		importProject.setIcon(Resources.IMAGES.new_wiz_en());
 		importProject.addSelectionHandler(selectionHandler);
@@ -80,14 +81,14 @@ public class ProPanelContextMenu extends Menu{
 		this.add(new SeparatorMenuItem());
 
 		newProject = new MenuItem();
-		newProject.setItemId("idNewProject");
+		newProject.setItemId(MenuItemsEnum.NEW_PROJECT.getName());
 		newProject.setText("New project");
 		newProject.setIcon(Resources.IMAGES.new_wiz_en());
 		newProject.addSelectionHandler(selectionHandler);
 		this.add(newProject);
 		
 		delProject = new MenuItem();
-		delProject.setItemId("idDelProject");
+		delProject.setItemId(MenuItemsEnum.DELETE_PROJECT.getName());
 		delProject.setText("Delete selected project");
 		delProject.setIcon(Resources.IMAGES.delete_edit_en());
 		delProject.addSelectionHandler(selectionHandler);

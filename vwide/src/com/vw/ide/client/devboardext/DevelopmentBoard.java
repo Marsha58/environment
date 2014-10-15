@@ -54,7 +54,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 	@UiField(provided = true)
 	MarginData outerData = new MarginData(1);
 	@UiField(provided = true)
-	BorderLayoutData northData = new BorderLayoutData(81);
+	BorderLayoutData northData = new BorderLayoutData(83);
 	@UiField(provided = true)
 	BorderLayoutData westData = new BorderLayoutData(200);
 	@UiField(provided = true)
@@ -127,7 +127,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 				case NEPTUNE:
 					Window.Location.assign(GWT.getHostPageBaseURL()
 							+ "Vwide-neptune.html" + Window.Location.getHash());
-					northData.setSize(89);
+					northData.setSize(94);
 					break;
 				default:
 					assert false : "Unsupported theme enum";
@@ -144,7 +144,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget,
 		} else if (Theme.GRAY.isActive()) {
 			northData.setSize(76);
 		} else {
-			northData.setSize(89);
+			northData.setSize(94);
 		}		
 		
 		initWidget(uiBinder.createAndBindUi(this));

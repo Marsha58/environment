@@ -122,6 +122,7 @@ public class Utils {
 	
 	public static String extractJustPath(String input) {
 		String output = "";
+		input.replaceAll("[/]", "\\\\");
 		if (input != null) {
 			String[] arrPath = input.split("\\\\");
 			String sLastItemName = arrPath[arrPath.length - 1];
@@ -139,6 +140,8 @@ public class Utils {
 
 	public static String extractJustFileName(String input) {
 		String output = "";
+			input.replaceAll("[/]", "\\\\");
+		
 		if (input != null) {		
 			String[] arrPath = input.split("\\\\");
 			String sLastItemName = arrPath[arrPath.length - 1];
