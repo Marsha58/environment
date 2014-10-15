@@ -21,9 +21,9 @@
 		</public> <stylesheet src='css/theme.css'/> <script src='js/theme.js'/> -->
 	<!-- For support for IE8 you need to inherit the Respond module into your 
 		*.gwt.xml. <inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
-
+<!-- --> 
 	<inherits name='com.google.web.bindery.requestfactory.RequestFactory' />
-
+ 
 	<!-- Other module inherits -->
 	<inherits name='edu.ycp.cs.dh.acegwt.AceGWT' />
 	<inherits name='com.sencha.gxt.ui.GXT' />
@@ -59,8 +59,9 @@
 <!-- 
   However, if you want to use both RPC and XML to define persistable classes, 
   Use the following line.
--->
 	<set-configuration-property name="storage.type.finder" value="mix"/>
+
+-->
 
 
 	<!-- Specify the app entry point class. -->
