@@ -17,7 +17,8 @@ public class ProPanelContextMenu extends Menu{
 	
 	private MenuItem newFile;
 	private MenuItem delFile;
-	private MenuItem newProject; 
+	private MenuItem newProject;
+	private MenuItem importProject;
 	private MenuItem delProject;
 	private MenuItem newFolder;
 	
@@ -58,13 +59,23 @@ public class ProPanelContextMenu extends Menu{
 		SeparatorMenuItem smiFile = new SeparatorMenuItem();
 		this.add(smiFile);
 
+		importProject = new MenuItem();
+		importProject.setItemId("idImportProject");
+		importProject.setText("New project");
+		importProject.setIcon(Resources.IMAGES.new_wiz_en());
+		importProject.addSelectionHandler(selectionHandler);
+		this.add(importProject);
+
+		SeparatorMenuItem smiImportProject = new SeparatorMenuItem();
+		this.add(smiImportProject);
+
 		newProject = new MenuItem();
 		newProject.setItemId("idNewProject");
 		newProject.setText("New project");
 		newProject.setIcon(Resources.IMAGES.new_wiz_en());
 		newProject.addSelectionHandler(selectionHandler);
 		this.add(newProject);
-
+		
 		delProject = new MenuItem();
 		delProject.setItemId("idDelProject");
 		delProject.setText("Delete selected project");
