@@ -1,6 +1,6 @@
-package com.vw.ide.client.projects;
+package com.vw.ide.shared;
 
-public enum MenuItemsEnum {
+public enum OperationTypes {
    NEW_FOLDER("new_folder"),	
    NEW_PROJECT("new_project"),
    IMPORT_PROJECT("import_project"),
@@ -10,11 +10,12 @@ public enum MenuItemsEnum {
    OPEN_FILE("open_file"),
    SAVE_FILE("save_file"),
    DELETE_FILE("delete_file"),
+   RENAME_FILE("rename_file"),
    SAVE_ALL_FILES("save_all_files");
    
 	private final String name;
 	
-	private MenuItemsEnum(String name) {
+	private OperationTypes(String name) {
 		this.name = name;
 	}
 	

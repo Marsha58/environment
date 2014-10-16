@@ -24,6 +24,7 @@ public interface ProjectManager {
 	public Long getFileIdByFileInfo(FileItemInfo fileItemInfo);
 	public Long getFileIdByFilePath(String path);
 	public boolean checkIsFileOpened(String path);
+    public void changeFileName(Long fileId, String FileNewName);
 	
 	public void setAssociatedTabWidget(Long fileId, Widget widget);
 	public Widget getAssociatedTabWidget(Long fileId);	

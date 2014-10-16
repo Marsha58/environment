@@ -11,13 +11,14 @@ import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
-import com.vw.ide.client.projects.MenuItemsEnum;
+import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 public class ProPanelContextMenu extends Menu{
 	
 	private MenuItem importFile; 
 	private MenuItem newFile; 
+	private MenuItem renameFile; 
 	private MenuItem delFile;
 	private MenuItem newProject;
 	private MenuItem importProject;
@@ -45,33 +46,39 @@ public class ProPanelContextMenu extends Menu{
 	public ProPanelContextMenu() {
 		
 		importFile = new MenuItem();
-		importFile.setItemId(MenuItemsEnum.IMPORT_FILE.getName());
+		importFile.setItemId(OperationTypes.IMPORT_FILE.getName());
 		importFile.setText("Import file");
 		importFile.setIcon(Resources.IMAGES.new_con_en());
 		importFile.addSelectionHandler(selectionHandler);
 		this.add(importFile);
 
 		this.add(new SeparatorMenuItem());
-
 		
 		newFile = new MenuItem();
-		newFile.setItemId(MenuItemsEnum.NEW_FILE.getName());
+		newFile.setItemId(OperationTypes.NEW_FILE.getName());
 		newFile.setText("New file");
 		newFile.setIcon(Resources.IMAGES.new_con_en());
 		newFile.addSelectionHandler(selectionHandler);
 		this.add(newFile);
 
+		renameFile = new MenuItem();
+		renameFile.setItemId(OperationTypes.RENAME_FILE.getName());
+		renameFile.setText("Renaming selected file");
+		renameFile.setIcon(Resources.IMAGES.delete_edit_en());
+		renameFile.addSelectionHandler(selectionHandler);
+		this.add(renameFile);
+		
 		delFile = new MenuItem();
-		delFile.setItemId(MenuItemsEnum.DELETE_FILE.getName());
+		delFile.setItemId(OperationTypes.DELETE_FILE.getName());
 		delFile.setText("Delete selected file");
 		delFile.setIcon(Resources.IMAGES.delete_edit_en());
 		delFile.addSelectionHandler(selectionHandler);
-		this.add(delFile);
+		this.add(delFile);		
 
 		this.add(new SeparatorMenuItem());
 
 		importProject = new MenuItem();
-		importProject.setItemId(MenuItemsEnum.IMPORT_PROJECT.getName());
+		importProject.setItemId(OperationTypes.IMPORT_PROJECT.getName());
 		importProject.setText("Import project");
 		importProject.setIcon(Resources.IMAGES.new_wiz_en());
 		importProject.addSelectionHandler(selectionHandler);
@@ -81,14 +88,14 @@ public class ProPanelContextMenu extends Menu{
 		this.add(new SeparatorMenuItem());
 
 		newProject = new MenuItem();
-		newProject.setItemId(MenuItemsEnum.NEW_PROJECT.getName());
+		newProject.setItemId(OperationTypes.NEW_PROJECT.getName());
 		newProject.setText("New project");
 		newProject.setIcon(Resources.IMAGES.new_wiz_en());
 		newProject.addSelectionHandler(selectionHandler);
 		this.add(newProject);
 		
 		delProject = new MenuItem();
-		delProject.setItemId(MenuItemsEnum.DELETE_PROJECT.getName());
+		delProject.setItemId(OperationTypes.DELETE_PROJECT.getName());
 		delProject.setText("Delete selected project");
 		delProject.setIcon(Resources.IMAGES.delete_edit_en());
 		delProject.addSelectionHandler(selectionHandler);

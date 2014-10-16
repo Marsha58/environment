@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
@@ -128,7 +129,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 
 	public RequestDirOperationResult createDir(String user, String parent, String dir) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
-		String fullPath = parent + "/" + dir;
+		String fullPath = parent + "\\" + dir;
 		res.setPath(fullPath);
 		res.setRetCode(0);
 		res.setOperation("create directory");
@@ -184,7 +185,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	}
 	
 	private String constructUserHomePath(String user) {
-		return s_defRootDir + "/" + user;
+		return s_defRootDir + "\\" + user;
 	}
 	
 	private void purgeDirectory(File dir) {
@@ -584,6 +585,44 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			res.setResult("user not found");
 			res.setRetCode(-1);
         }
+		return res;
+	}
+
+
+	private void changeFileNameInUserStateInfo(String user, Long fileId, String fileNewName) {
+		if(usersStates.get(user) != null) {
+			if (usersStates.get(user).getOpenedFiles().get(fileId) != null) {
+				usersStates.get(user).getOpenedFiles().get(fileId).setAbsolutePath(fileNewName);
+				usersStates.get(user).getOpenedFiles().get(fileId).setName(Utils.extractJustFileName(fileNewName));
+			}
+		}	
+	}
+	
+	
+	@Override
+	public RequestFileOperationResult renameFile(String user, String fileName, 	Long fileId, String fileNewName) {
+		RequestFileOperationResult res = new RequestFileOperationResult();
+		res.setFileId(fileId);
+//		res.setOperation("renaming file");
+		res.setOperationType(OperationTypes.RENAME_FILE);
+		res.setFileName(fileName);
+		res.setFileNewName(fileNewName);
+	    File oldFile = new File(fileName);
+	    File newFile = new File(fileNewName);
+	    if(!newFile.exists()) {
+	    	if (oldFile.renameTo(newFile)) {
+	    		
+	    		changeFileNameInUserStateInfo(user, fileId, fileNewName);
+				res.setResult("File has been renamed");
+				res.setRetCode(0);
+	    	} else {
+				res.setResult("Error while renaming");
+				res.setRetCode(-1);
+	    	}
+		} else {
+			res.setResult("File with such name exists");
+			res.setRetCode(-2);
+		}
 		return res;
 	}
 

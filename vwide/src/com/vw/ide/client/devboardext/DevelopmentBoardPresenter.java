@@ -1,22 +1,11 @@
 package com.vw.ide.client.devboardext;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.Box;
-
-import org.gwtbootstrap3.client.shared.event.HideEvent;
-import org.gwtbootstrap3.client.shared.event.HideHandler;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.logging.client.DefaultLevel.Info;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,7 +40,6 @@ import com.vw.ide.client.projects.ProjectManagerImpl;
 import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForDirList;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForDirOperation;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForFileOperation;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForUserState;
@@ -59,6 +47,7 @@ import com.vw.ide.client.ui.projectpanel.ProjectPanel;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
@@ -95,7 +84,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public void go(HasWidgets container) {
 		container.clear();
 		container.add(view.asWidget());
-        requestForGettingUserState(getLoggedAsUser());
+		requestForGettingUserState(getLoggedAsUser());
 	}
 
 	public void fireEvent(GwtEvent<?> event) {
@@ -113,7 +102,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		} else if (event instanceof AceColorThemeChangedEvent) {
 			doAceColorThemeChange((AceColorThemeChangedEvent) event);
 		} else if (event instanceof EditorTabClosedEvent) {
-			doRemoveFile((EditorTabClosedEvent) event);
+			doCloseFile((EditorTabClosedEvent) event);
 		} else if (event instanceof GetDirContentEvent) {
 			((DevelopmentBoard) view).projectPanel.requestForDirContent(null);
 		} else if (event instanceof LogoutEvent) {
@@ -126,10 +115,6 @@ public class DevelopmentBoardPresenter extends Presenter {
 		}
 	}
 
-	
-
-	
-	
 	@Override
 	public void handleEvent(GwtEvent<?> event) {
 
@@ -233,12 +218,12 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public static class DirOperationReadingFileResult extends
 			ProcessedResult<RequestDirOperationResult> {
 
-		private Presenter presenter;
+		private DevelopmentBoardPresenter presenter;
 
 		public DirOperationReadingFileResult() {
 		}
 
-		public DirOperationReadingFileResult(Presenter presenter) {
+		public DirOperationReadingFileResult(DevelopmentBoardPresenter presenter) {
 			this.presenter = presenter;
 		}
 
@@ -279,25 +264,20 @@ public class DevelopmentBoardPresenter extends Presenter {
 													.getPath()), result
 											.getPath(), false));
 
-					String fileMD5 = calculateCheckSum(result.getTextFile());
+//					String fileMD5 = calculateCheckSum(result.getTextFile());
 					FileSheet newFileSheet = new FileSheet(presenter,
 							result.getProjectId(), result.getFileId(),
 							result.getPath());
 
-					newFileSheet.constructEditor(result.getTextFile(),
-							FileItemInfo.getFileType(Utils
+					newFileSheet.constructEditor(result.getTextFile(),FileItemInfo.getFileType(Utils
 									.extractJustFileName(result.getPath())));
-					((DevelopmentBoardPresenter) presenter).projectManager
-							.setAssociatedTabWidget(result.getFileId(),
-									newFileSheet);
+					presenter.projectManager.setAssociatedTabWidget(result.getFileId(), newFileSheet);
 
-					TabItemConfig tabItemConfig = new TabItemConfig(
-							Utils.extractJustFileName(result.getPath()));
+					TabItemConfig tabItemConfig = new TabItemConfig(Utils.extractJustFileName(result.getPath()));
 					tabItemConfig.setClosable(true);
-					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor
-							.getTabPanel().add(newFileSheet, tabItemConfig);
-					((DevelopmentBoardPresenter) presenter).scrollToTab(
-							result.getFileId(), true);
+					
+					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).editor.getTabPanel().add(newFileSheet, tabItemConfig);
+					((DevelopmentBoardPresenter) presenter).scrollToTab(result.getFileId(), true);
 
 					((DevelopmentBoard) ((DevelopmentBoardPresenter) presenter).view).topPanel
 							.addItemToScrollMenu(result.getPath(),
@@ -339,9 +319,9 @@ public class DevelopmentBoardPresenter extends Presenter {
 		return null;
 	}
 
-	private void doSelectFile(SelectFileEvent event) {
+/*	private void doSelectFile(SelectFileEvent event) {
 		History.newItem("selectFile");
-	}
+	}*/
 
 	public void scrollToTab(Long fileId, boolean animate) {
 		FileSheet curFileSheet = (FileSheet) projectManager
@@ -364,29 +344,35 @@ public class DevelopmentBoardPresenter extends Presenter {
 
 	}
 
-	private void doRemoveFile(EditorTabClosedEvent event) {
+	private void doCloseFile(EditorTabClosedEvent event) {
 		Long fileId = ((FileSheet) event.getEvent().getItem()).getFileId();
 		projectManager.getOpenedFilesContext().remove(fileId);
-		FileSheet curFileSheet = (FileSheet) projectManager.getAssociatedTabWidgetsContext().remove(fileId);
+		projectManager.getAssociatedTabWidgetsContext().remove(fileId);
 
-		if (projectManager.getOpenedFilesContext().isEmpty()) {	getEditorContentPanel().setHeadingText(	"files have not been selected");
+		if (projectManager.getOpenedFilesContext().isEmpty()) {
+			getEditorContentPanel().setHeadingText(
+					"files have not been selected");
 		}
 		((DevelopmentBoard) view).topPanel.delItemFromScrollMenu(fileId);
-		
-		String fileFullName = ((FileSheet) event.getEvent().getItem()).getFilePath() + "\\" + ((FileSheet) event.getEvent().getItem()).getFileName();
+
+		String fileFullName = ((FileSheet) event.getEvent().getItem())
+				.getFilePath()
+				+ "\\"
+				+ ((FileSheet) event.getEvent().getItem()).getFileName();
 		requestForFileClosing(fileFullName, fileId);
 	}
-	
+
 	public void requestForFileClosing(String fileName, Long fileId) {
 		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
 				.getServiceImpl();
 
 		if (service != null) {
-			ServiceCallbackForFileOperation cbk = RemoteBrowserService.instance().buildCallbackForFileOperation();
+			ServiceCallbackForFileOperation cbk = RemoteBrowserService
+					.instance().buildCallbackForFileOperation();
 			cbk.setProcessedResult(new FileOperationResult());
 			service.closeFile(this.getLoggedAsUser(), fileName, fileId, cbk);
 		}
-	}		
+	}
 
 	private void doChangeFileStateToEdited(FileEditedEvent event) {
 		Long fileId = event.getFileItemInfo().getFileId();
@@ -453,9 +439,13 @@ public class DevelopmentBoardPresenter extends Presenter {
 						"Warning", messageAlert);
 				alertMessageBox.show();
 			} else {
-				// fireEvent(new FileSavedEvent());
-				AlertMessageBox alertMessageBox = new AlertMessageBox("Info",
-						"file " + result.getFileName() + " saved");
+				if (result.getOperationType() == OperationTypes.RENAME_FILE) {
+					updateFileName(result.getFileId(),result.getFileName(),result.getFileNewName()); 
+				} else if (result.getOperationType() == OperationTypes.SAVE_FILE) {
+					FileSheet savedFileSheet = (FileSheet) projectManager.getAssociatedTabWidget(result.getFileId());
+					savedFileSheet.setIsFileEdited(false);
+				}
+
 			}
 
 			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
@@ -559,6 +549,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	public FileItemInfo selectedItemInTheProjectTree;
+	public String newFileName;
 
 	public void doMenuItemClickProceed(ProjectMenuEvent event) {
 		String menuId = event.getMenuId();
@@ -584,6 +575,9 @@ public class DevelopmentBoardPresenter extends Presenter {
 				break;
 			case "new_file":
 				doCreateFile(selectedItemInTheProjectTree);
+				break;
+			case "rename_file":
+				doRenameFile(selectedItemInTheProjectTree);
 				break;
 			case "delete_file":
 				doDelCurrentFile(selectedItemInTheProjectTree);
@@ -723,7 +717,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 						requestForFileCreating(Utils
 								.extractJustPath(selectedItemInTheProjectTree
 										.getAbsolutePath()), fileName,
-								selectedProjectInTheProjectTree, fileId, content);
+								selectedProjectInTheProjectTree, fileId,
+								content);
 					}
 				}
 			}
@@ -783,7 +778,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 	}
 
 	protected void requestForGettingUserState(String user) {
-		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance().getServiceImpl();
+		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
+				.getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForUserState cbk = RemoteBrowserService.instance()
 					.buildCallbackForUserState();
@@ -818,47 +814,54 @@ public class DevelopmentBoardPresenter extends Presenter {
 						+ "' failed.\r\nResult'" + result.getResult() + "'";
 				AlertMessageBox alertMessageBox = new AlertMessageBox(
 						"Warning", messageAlert);
-//				alertMessageBox.show();
+				// alertMessageBox.show();
 			} else {
-				Long fileIdSelected = result.getUserStateInfo().getFileIdSelected();
-				Long projectIdSelected = result.getUserStateInfo().getProjectIdSelected();
+				Long fileIdSelected = result.getUserStateInfo()
+						.getFileIdSelected();
+				Long projectIdSelected = result.getUserStateInfo()
+						.getProjectIdSelected();
 				FileItemInfo value = null;
-				for(Object key :  result.getUserStateInfo().getOpenedFiles().keySet()) {
+				for (Object key : result.getUserStateInfo().getOpenedFiles()
+						.keySet()) {
 					value = result.getUserStateInfo().getOpenedFiles().get(key);
 					if (fileIdSelected != key) {
-						presenter.requestForReadingFile(value.getAbsolutePath() + "\\" + value.getName(), value.getProjectId(),value.getFileId());
+						presenter.requestForReadingFile(value.getAbsolutePath()
+								+ "\\" + value.getName(), value.getProjectId(),
+								value.getFileId());
 					}
-				}	
-				value = result.getUserStateInfo().getOpenedFiles().get(fileIdSelected);
-				presenter.requestForReadingFile(value.getAbsolutePath() + "\\" + value.getName(), value.getProjectId(),value.getFileId());
-				
+				}
+				value = result.getUserStateInfo().getOpenedFiles()
+						.get(fileIdSelected);
+				presenter.requestForReadingFile(value.getAbsolutePath() + "\\"
+						+ value.getName(), value.getProjectId(),
+						value.getFileId());
+
 			}
 
 			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
 			this.presenter.fireEvent(serverLogEvent);
 		}
 	}
-	
 
-
-	
 	public void doImportFile(FileItemInfo fileItemInfo) {
 
-		Long projectId = projectManager.getProjectIdByProjectPath(getLoggedAsUser(),
-						fileItemInfo.getAbsolutePath());
-		String parentPath = Utils.extractJustPath(fileItemInfo.getAbsolutePath());
+		Long projectId = projectManager.getProjectIdByProjectPath(
+				getLoggedAsUser(), fileItemInfo.getAbsolutePath());
+		String parentPath = Utils.extractJustPath(fileItemInfo
+				.getAbsolutePath());
 
 		final FileOpenDialog box = new FileOpenDialog();
 		box.setEditLabelText("Select file to import");
 		box.setParentPath(parentPath);
 		box.setProjectId(projectId);
 
-		
 		box.addDialogHideHandler(new DialogHideHandler() {
 			@Override
 			public void onDialogHide(DialogHideEvent event) {
-				if(box.getLoadedFiles() > 0) {
-					requestForFileCreating(box.getParentPath(), box.getFileName(0), box.getProjectId(), 0L, box.getContent(0));
+				if (box.getLoadedFiles() > 0) {
+					requestForFileCreating(box.getParentPath(),
+							box.getFileName(0), box.getProjectId(), 0L,
+							box.getContent(0));
 				}
 			}
 		});
@@ -879,6 +882,127 @@ public class DevelopmentBoardPresenter extends Presenter {
 					projectId, fileId, content, cbk);
 		}
 	}
+
+	public void requestForFileSavingBeforeRenaming(String fileName,	Long projectId, Long fileId, String content) {
+		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
+				.getServiceImpl();
+
+		if (service != null) {
+			ServiceCallbackForFileOperation cbk = RemoteBrowserService.instance().buildCallbackForFileOperation();
+			cbk.setProcessedResult(new FileSaveResult());
+			service.saveFile(this.getLoggedAsUser(), fileName, projectId,fileId, content, cbk);
+		}
+	}
+
+	public class FileSaveResult extends
+			ProcessedResult<RequestFileOperationResult> {
+
+		public FileSaveResult() {
+
+		}
+
+		@Override
+		public void onFailure(Throwable caught) {
+			AlertMessageBox alertMessageBox = new AlertMessageBox("Error",
+					caught.getMessage());
+			alertMessageBox.show();
+		}
+
+		@Override
+		public void onSuccess(RequestFileOperationResult result) {
+			if (result.getRetCode().intValue() != 0) {
+				String messageAlert = "The operation '" + result.getOperation()
+						+ "' failed.\r\nResult'" + result.getResult() + "'";
+				AlertMessageBox alertMessageBox = new AlertMessageBox(
+						"Warning", messageAlert);
+				alertMessageBox.show();
+			} else {
+				requestForFileRenaming(	result.getFileName(), result.getFileId(), newFileName);
+			}
+
+			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
+			((DevelopmentBoard) view).projectPanel.requestForDirContent(null);
+			fireEvent(serverLogEvent);
+		}
+
+	}
+
+	
+	public void doRenameFile(FileItemInfo fileItemInfo) {
+
+		final ConfirmMessageBox saveConfirmBox = new ConfirmMessageBox("Confirm",
+				"SaveChanges?");
+		saveConfirmBox.addDialogHideHandler(new DialogHideHandler() {
+
+			@Override
+			public void onDialogHide(DialogHideEvent event) {
+				if (event.getHideButton().name().equalsIgnoreCase("YES")) {
+					requestForFileSavingBeforeRenaming((String) saveConfirmBox.getData("fullFileName"), 
+									(Long) saveConfirmBox.getData("projectId"), 
+									(Long) saveConfirmBox.getData("fileId"), 
+									(String) saveConfirmBox.getData("content"));
+				}
+			}
+		});
+
+		final PromptMessageBox saveBox = new PromptMessageBox("Name", 	"Please enter new file name:");
+			
+			saveBox.getTextField().setText(selectedItemInTheProjectTree.getName());
+			saveBox.addDialogHideHandler(new DialogHideHandler() {
+				
+				@Override
+				public void onDialogHide(DialogHideEvent event) {
+					if (event.getHideButton().name().equalsIgnoreCase("ok")) {
+						if (saveBox.getValue() != null) {
+							String justFilePath = Utils.extractJustPath(selectedItemInTheProjectTree.getAbsolutePath());
+							String fullNewFileName = justFilePath + "\\"+ saveBox.getValue();
+							newFileName = fullNewFileName;
+							Long fileId = selectedItemInTheProjectTree.getFileId();
+							
+							FileSheet currFileSheet = (FileSheet) projectManager.getAssociatedTabWidget(fileId);
+							
+							if (currFileSheet.getIsFileEdited()) {
+								
+								saveConfirmBox.setData("fullFileName", selectedItemInTheProjectTree.getAbsolutePath());
+								saveConfirmBox.setData("fullNewFileName", fullNewFileName);
+								saveConfirmBox.setData("projectId", selectedItemInTheProjectTree.getProjectId());
+								saveConfirmBox.setData("fileId", fileId);
+								saveConfirmBox.setData("content", currFileSheet.getAceEditor().getText());
+								saveConfirmBox.show();
+							} else {
+								if (!selectedItemInTheProjectTree.getAbsolutePath().equalsIgnoreCase(fullNewFileName)) {
+									requestForFileRenaming(
+											selectedItemInTheProjectTree.getAbsolutePath(),
+											selectedItemInTheProjectTree.getFileId(),
+											fullNewFileName);
+								}
+							}
+						}	
+					}
+				}		
+		});
+
+		saveBox.show();
+
+	}
+
+	public void requestForFileRenaming(String fileName, Long fileId, String fileNewName) {
+		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance().getServiceImpl();
+		if (service != null) {
+			ServiceCallbackForFileOperation cbk = RemoteBrowserService.instance().buildCallbackForFileOperation();
+			cbk.setProcessedResult(new FileOperationResult());
+			service.renameFile(this.getLoggedAsUser(), fileName, fileId,fileNewName, cbk);
+		}
+	}
+	
+	public void updateFileName(Long fileId, String oldFileName, String newFileName) {
+		projectManager.changeFileName(fileId, newFileName);
+		
+		FileSheet updatedFileSheet = (FileSheet) projectManager.getAssociatedTabWidget(fileId);
+		TabItemConfig conf = ((DevelopmentBoard) view).editor.getTabPanel().getConfig(updatedFileSheet);
+		conf.setText(Utils.extractJustFileName(newFileName));
+		((DevelopmentBoard) view).editor.getTabPanel().update(updatedFileSheet, conf);
+	};	
 	
 
 }
