@@ -931,7 +931,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public void doRenameFile(FileItemInfo fileItemInfo) {
 
 		final ConfirmMessageBox saveConfirmBox = new ConfirmMessageBox("Confirm",
-				"SaveChanges?");
+				"Save changes?");
 		saveConfirmBox.addDialogHideHandler(new DialogHideHandler() {
 
 			@Override

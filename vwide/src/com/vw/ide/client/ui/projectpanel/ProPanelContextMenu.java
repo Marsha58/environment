@@ -64,7 +64,7 @@ public class ProPanelContextMenu extends Menu{
 		renameFile = new MenuItem();
 		renameFile.setItemId(OperationTypes.RENAME_FILE.getName());
 		renameFile.setText("Renaming selected file");
-		renameFile.setIcon(Resources.IMAGES.delete_edit_en());
+		renameFile.setIcon(Resources.IMAGES.rename_file_en());
 		renameFile.addSelectionHandler(selectionHandler);
 		this.add(renameFile);
 		
