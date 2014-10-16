@@ -20,3 +20,4 @@ Take last sources from repository and perform following steps depending on compi
 	> run it by catalina.{bat sh} jpda start in case if you wish to debug or catalina.{bat sh} start on regular case
 
 Thats all.
+----------------
