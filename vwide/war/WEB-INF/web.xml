@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee">
+
+  <!-- Servlets -->
+  <servlet>
+    <servlet-name>remoteBrowserServlet</servlet-name>
+    <servlet-class>com.vw.ide.server.servlet.remotebrowser.RemoteDirectoryBrowserImpl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>remoteBrowserServlet</servlet-name>
+    <url-pattern>/vwide/dirbrowser</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>securityServlet</servlet-name> 
+    <servlet-class>com.vw.ide.server.servlet.security.SecurityImpl</servlet-class> 
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>securityServlet</servlet-name> 
+    <url-pattern>/vwide/security</url-pattern> 
+  </servlet-mapping>
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>Vwide.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>

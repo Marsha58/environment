@@ -1,0 +1,22 @@
+How to compile
+---------------
+Take last sources from repository and perform following steps depending on compilation's type
+1. Eclipse
+	> Check directory gwt-unitCache and if it contains files - remove them.
+	> Remove all files from 'target' directory.
+	> Run eclipse. Make sure that eclipse is run under jdk version >= 1.7
+	> Perform Clean project
+	> Run in debug mode (gwt-dev) mode
+2. Maven
+	> Check directory gwt-unitCache and if it contains files - remove them.
+	> Remove 'target' directory
+	> Check src/main/webapp directory on .js files. In case if .js files found there - they must be removed
+	> Run mvn clean package
+	> Following files 'target/vwide/vwide/vwide.devmode.js' and 'target/vwide/vwide/vwide.nocache.js' must have the same date
+	> In case if files mentioned above don't have the same date - perform following steps
+	> > mvn gwt:compile
+	> > mvn package
+	> Upload vwide.war to tomcat
+	> run it by catalina.{bat sh} jpda start in case if you wish to debug or catalina.{bat sh} start on regular case
+
+Thats all.
