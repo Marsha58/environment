@@ -108,5 +108,14 @@ public interface RemoteDirectoryBrowserAsync {
 	public void getUserState(String user, AsyncCallback<RequestUserStateResult> callback);
 
 	void closeFile(String user, String fileName, Long fileId, AsyncCallback<RequestFileOperationResult> callback);
+
+	/**
+	 * Save a file
+	 * @param user
+	 * @param fileName
+	 * @param fileId
+	 * @param fileNewName
+	 */
+	void renameFile(String user, String fileName, Long fileId, 	String fileNewName, AsyncCallback<RequestFileOperationResult> callback);
 	
 }

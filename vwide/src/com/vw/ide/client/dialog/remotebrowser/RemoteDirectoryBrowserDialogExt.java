@@ -366,7 +366,8 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		}
 
 		try {
-			arrPath = dirs.getParentPath().split("\\\\");
+			String delims = "[\\\\/]+";
+			arrPath = dirs.getParentPath().split(delims);
 			sOwnerFolderName = arrPath[arrPath.length - 1];
 		} catch (Exception e) {
 			System.out.println(e.toString());
@@ -417,8 +418,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 				String sRelPathFromAbsPath = absolutePath.substring(basePath
 						.length());
 				if (sRelPathFromAbsPath.length() > 2) {
-					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase(
-							"\\")) {
+					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) {
 						sRelPathFromAbsPath = sRelPathFromAbsPath.substring(1);
 					}
 				}
@@ -556,7 +556,8 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 
 	public String extractJustPath(String input) {
 		String output = "";
-		String[] arrPath = input.split("\\\\");
+		String delims = "[\\\\/]+";
+		String[] arrPath = input.split(delims);
 		String sLastItemName = arrPath[arrPath.length - 1];
 		if (sLastItemName.indexOf(".") == -1) {
 			return input;
@@ -571,7 +572,8 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 
 	public String extractJustFileName(String input) {
 		String output = "";
-		String[] arrPath = input.split("\\\\");
+		String delims = "[\\\\/]+";
+		String[] arrPath = input.split(delims);
 		String sLastItemName = arrPath[arrPath.length - 1];
 		if (sLastItemName.indexOf(".") != -1) {
 			output = arrPath[arrPath.length - 1];
@@ -619,7 +621,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			String p = null;
 			while (item != null && !item.getText().equals(getLoggedAsUser())) {
 				if (p != null) {
-					p = item.getText() + "/" + p;
+					p = item.getText() + "\\" + p;
 				} else {
 					p = item.getText();
 				}

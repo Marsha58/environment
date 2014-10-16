@@ -354,7 +354,7 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 			String p = null;
 			while(item != null && !item.getText().equals(getLoggedAsUser())) {
 				if (p != null) {
-					p = item.getText() + "/" + p;
+					p = item.getText() + "\\" + p;
 				}
 				else {
 					p = item.getText();

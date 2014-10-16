@@ -108,6 +108,7 @@ public class FileSheet extends Composite {
 
 	public FileSheet() {
 		initWidget(uiBinder.createAndBindUi(this));
+		setIsFileEdited(false);
 	}
 
 	public FileSheet(Presenter presenter, Long projectId, Long fileId, String fileFullPathWithName) {
@@ -117,6 +118,8 @@ public class FileSheet extends Composite {
 		this.fileId = fileId;
 		this.filePath = Utils.extractJustPath(fileFullPathWithName);
 		this.fileName = Utils.extractJustFileName(fileFullPathWithName);
+		setIsFileEdited(false);
+		
 	}	
 
 

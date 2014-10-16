@@ -7,8 +7,17 @@ import java.util.List;
 public class RequestFileOperationResult extends RequestResult implements Serializable {
 	private String fileName;
 	private Long fileId;
+	private String fileNewName;
 	
 	
+	public String getFileNewName() {
+		return fileNewName;
+	}
+
+	public void setFileNewName(String fileNewName) {
+		this.fileNewName = fileNewName;
+	}
+
 	public String getFileName() {
 		return fileName;
 	}
@@ -29,6 +38,6 @@ public class RequestFileOperationResult extends RequestResult implements Seriali
 	@Override
 	public String toString() {
 		return "RequestFileOperationResult [fileName=" + fileName + ", result="  + getResult() + 
-				", retCode="  + getRetCode() + ", operation=" + getOperation()  + "]";
+				", retCode="  + getRetCode() + ", operation=" + getOperation()  + ",fileNewName=" + fileName + "]";
 	}
 }

@@ -321,6 +321,22 @@ public class ProjectManagerImpl implements ProjectManager{
 		
 	}
 
+	@Override
+	public void changeFileName(Long fileId, String FileNewName) {
+		
+		if (filesFileInfoContext.get(fileId) != null) {
+			filesFileInfoContext.get(fileId).setAbsolutePath(FileNewName); 
+			filesFileInfoContext.get(fileId).setName(Utils.extractJustFileName(FileNewName)); 
+		}
+		
+		if (openedFilesContext.get(fileId) != null) {
+			openedFilesContext.get(fileId).setAbsolutePath(FileNewName); 
+			openedFilesContext.get(fileId).setName(Utils.extractJustFileName(FileNewName)); 
+		}
+		
+		
+	}
+
 	
 /*	@Override
 	public Long getFileIdByFilePath(String fileFullPath) {

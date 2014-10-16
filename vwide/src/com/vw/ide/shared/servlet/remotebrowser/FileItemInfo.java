@@ -3,6 +3,7 @@ package com.vw.ide.shared.servlet.remotebrowser;
 import java.io.Serializable;
 
 import com.vw.ide.client.projects.FilesTypesEnum;
+import com.vw.ide.client.utils.Utils;
 
 /**
  * Simple class which is used to pass inforemation about file
@@ -94,6 +95,7 @@ public class FileItemInfo implements Serializable {
 
 	public void setAbsolutePath(String path) {
 		this.absolutePath = path;
+
 	}
 	
 	public String getRelPath() {

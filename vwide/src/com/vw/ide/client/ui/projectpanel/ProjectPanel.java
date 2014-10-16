@@ -255,6 +255,7 @@ public class ProjectPanel extends Composite implements IsWidget,
 
 		String[] arrPath;
 		String sOwnerFolderName = "";
+		String delims = "[\\\\/]+";
 
 		if (root == null) {
 			root = makeFolder("Root", "", "");
@@ -267,7 +268,7 @@ public class ProjectPanel extends Composite implements IsWidget,
 		}
 
 		try {
-			arrPath = dirs.getParentPath().split("\\\\");
+			arrPath = dirs.getParentPath().split(delims);
 			sOwnerFolderName = arrPath[arrPath.length - 1];
 		} catch (Exception e) {
 			System.out.println(e.toString());
@@ -318,8 +319,7 @@ public class ProjectPanel extends Composite implements IsWidget,
 				String sRelPathFromAbsPath = absolutePath.substring(basePath
 						.length());
 				if (sRelPathFromAbsPath.length() > 2) {
-					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase(
-							"\\")) {
+					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) {
 						sRelPathFromAbsPath = sRelPathFromAbsPath.substring(1);
 					}
 				}
