@@ -22,7 +22,7 @@ import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
 import com.vw.ide.client.service.security.RemoteSecurityService;
 import com.vw.ide.client.service.security.RemoteSecurityService.ServiceCallbackForLogin;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;

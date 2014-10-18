@@ -1,5 +1,7 @@
 package com.vw.ide.client.dialog.remotebrowser;
 
+import java.io.File;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -354,7 +356,7 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 			String p = null;
 			while(item != null && !item.getText().equals(getLoggedAsUser())) {
 				if (p != null) {
-					p = item.getText() + "\\" + p;
+					p = item.getText() + Utils.FILE_SEPARATOR + p;
 				}
 				else {
 					p = item.getText();

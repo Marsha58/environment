@@ -15,6 +15,7 @@
  */
 package com.vw.ide.client.ui.projectpanel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,7 @@ import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForCompleteContent;
+import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
@@ -97,7 +99,6 @@ public class ProjectPanel extends Composite implements IsWidget,
 					+ item.getId().toString();
 		}
 	}
-	
 
 	@UiFactory
 	public ValueProvider<BaseDto, String> createValueProvider() {
@@ -147,24 +148,30 @@ public class ProjectPanel extends Composite implements IsWidget,
 
 		@Override
 		public void onSuccess(RequestedDirScanResult result) {
-			
+
 			dialog.makeTreeData(result);
-			
-			
-			((DevelopmentBoardPresenter) dialog.presenter).updateProjects(((DevelopmentBoardPresenter) dialog.presenter).searchProjects());
-//			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsTree(dialog.store);
-			((DevelopmentBoardPresenter) dialog.presenter).updateProjectsFiles(dialog.store);
-//			((DevelopmentBoardPresenter) dialog.presenter).checkStoreFiles(dialog.store);
-			
-			BaseDto rootItem = ((DevelopmentBoardPresenter) dialog.presenter).getProjectPanel().store.getRootItems().get(0);					
-			((DevelopmentBoardPresenter) dialog.presenter).getProjectPanel().projectsDirsField.getSelectionModel().select(rootItem, true);
-			((DevelopmentBoardPresenter) dialog.presenter).getProjectPanel().projectsDirsField.setExpanded(rootItem, true);
-			
+
+			((DevelopmentBoardPresenter) dialog.presenter)
+					.updateProjects(((DevelopmentBoardPresenter) dialog.presenter)
+							.searchProjects());
+			// ((DevelopmentBoardPresenter)
+			// dialog.presenter).updateProjectsTree(dialog.store);
+			((DevelopmentBoardPresenter) dialog.presenter)
+					.updateProjectsFiles(dialog.store);
+			// ((DevelopmentBoardPresenter)
+			// dialog.presenter).checkStoreFiles(dialog.store);
+
+			BaseDto rootItem = ((DevelopmentBoardPresenter) dialog.presenter)
+					.getProjectPanel().store.getRootItems().get(0);
+			((DevelopmentBoardPresenter) dialog.presenter).getProjectPanel().projectsDirsField
+					.getSelectionModel().select(rootItem, true);
+			((DevelopmentBoardPresenter) dialog.presenter).getProjectPanel().projectsDirsField
+					.setExpanded(rootItem, true);
+
 			ServerLogEvent serverLogEvent = new ServerLogEvent(result);
 			dialog.getAssociatedPresenter().fireEvent(serverLogEvent);
 		}
 	}
-
 
 	/**
 	 * Constructs a new shortcuts widget using the specified images.
@@ -185,9 +192,9 @@ public class ProjectPanel extends Composite implements IsWidget,
 		widget.addStyleName("margin-10");
 		// tree.getStyle().setLeafIcon(ExampleImages.INSTANCE.music());
 
-		projectsDirsField.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		
-		
+		projectsDirsField.getSelectionModel().setSelectionMode(
+				SelectionMode.SINGLE);
+
 		projectsDirsField.getSelectionModel().addSelectionHandler(
 				new SelectionHandler<BaseDto>() {
 
@@ -195,11 +202,15 @@ public class ProjectPanel extends Composite implements IsWidget,
 						treeSelectedItem = event.getSelectedItem();
 						FileItemInfo fileItemInfo = new FileItemInfo();
 						fileItemInfo.setName(treeSelectedItem.getName());
-						fileItemInfo.setAbsolutePath(treeSelectedItem.getAbsolutePath());
+						fileItemInfo.setAbsolutePath(treeSelectedItem
+								.getAbsolutePath());
 						if (treeSelectedItem.getType() == "file") {
 							fileItemInfo.setDir(false);
-							fileItemInfo.setProjectId(((FileDto) treeSelectedItem).getProjectId());
-							fileItemInfo.setFileId(((FileDto) treeSelectedItem).getFileId());
+							fileItemInfo
+									.setProjectId(((FileDto) treeSelectedItem)
+											.getProjectId());
+							fileItemInfo.setFileId(((FileDto) treeSelectedItem)
+									.getFileId());
 							if (presenter != null) {
 								presenter.fireEvent(new SelectFileEvent(
 										fileItemInfo));
@@ -207,7 +218,7 @@ public class ProjectPanel extends Composite implements IsWidget,
 						} else {
 							fileItemInfo.setDir(true);
 						}
-						selectedItem4ContextMenu = fileItemInfo; 
+						selectedItem4ContextMenu = fileItemInfo;
 					}
 				});
 
@@ -215,24 +226,23 @@ public class ProjectPanel extends Composite implements IsWidget,
 	}
 
 	public void prepare() {
-//		requestForDirContent(null);
+		// requestForDirContent(null);
 		buildContextMenu();
 	}
 
 	public void buildContextMenu() {
 
-		contextMenu = new ProPanelContextMenu(); 
+		contextMenu = new ProPanelContextMenu();
 		contextMenu.setWidth(160);
 
-		contextMenu.addBeforeShowHandler(new BeforeShowHandler(){
+		contextMenu.addBeforeShowHandler(new BeforeShowHandler() {
 			@Override
 			public void onBeforeShow(BeforeShowEvent event) {
 				contextMenu.associatePresenter(getAssociatedPresenter());
 				contextMenu.checkEnabling(selectedItem4ContextMenu);
-			}	
+			}
 		});
-		
-		
+
 		projectsDirsField.setContextMenu(contextMenu);
 	}
 
@@ -267,33 +277,35 @@ public class ProjectPanel extends Composite implements IsWidget,
 			root.setChildren(children);
 		}
 
-		try {
-			arrPath = dirs.getParentPath().split(delims);
-			sOwnerFolderName = arrPath[arrPath.length - 1];
-		} catch (Exception e) {
-			System.out.println(e.toString());
-		}
+		arrPath = dirs.getParentPath().split(delims);
+		sOwnerFolderName = arrPath[arrPath.length - 1];
 
-		FolderDto owner = findOwnerElement(root, sOwnerFolderName,
-				dirs.getParentPath(), false);
 
-		FolderDto folder = null;
-		String sNewPath = "";
+		FolderDto owner = findOwnerElement(root, sOwnerFolderName,	dirs.getParentPath(), false);
+		if (owner != null) {
+			FolderDto folder = null;
+			String sNewPath = "";
 
-		for (FileItemInfo fi : dirs.getFiles()) {
-			if (fi.isDir()) {
-				if (owner.getRelPath().trim().length() > 0) {
-					sNewPath = owner.getRelPath() + "\\" + fi.getName();
+			for (FileItemInfo fi : dirs.getFiles()) {
+				if (fi.isDir()) {
+					if (owner.getRelPath().trim().length() > 0) {
+						sNewPath = owner.getRelPath() + Utils.FILE_SEPARATOR
+								+ fi.getName();
+					} else {
+						sNewPath = fi.getName();
+					}
+					System.out.println("sNewPath:" + sNewPath);
+					folder = makeFolder(fi.getName(), sNewPath,
+							fi.getAbsolutePath());
+					owner.addOrReplaceChild(folder);
+					requestForDirContent(folder.getRelPath());
+
 				} else {
-					sNewPath = fi.getName();
+					owner.addOrReplaceChild(makeFileItem(fi.getName(), owner,
+							owner.getRelPath(), fi.getAbsolutePath()));
 				}
-				folder = makeFolder(fi.getName(), sNewPath, fi.getAbsolutePath());
-				owner.addOrReplaceChild(folder);
-				requestForDirContent(folder.getRelPath());
-			} else {
-				owner.addOrReplaceChild(makeFileItem(fi.getName(), owner,
-						owner.getRelPath(), fi.getAbsolutePath()));
 			}
+
 		}
 
 		return root;
@@ -314,20 +326,18 @@ public class ProjectPanel extends Composite implements IsWidget,
 	private FolderDto findOwnerElement(FolderDto ownerFolder,
 			String sFolderName, String absolutePath, boolean IsCatched) {
 		FolderDto res = null;
+		absolutePath = absolutePath.replaceAll("[\\\\]", "/"); 
 		for (BaseDto el : ownerFolder.getChildren()) {
 			if (el.getType() == "dir") {
 				String sRelPathFromAbsPath = absolutePath.substring(basePath
 						.length());
 				if (sRelPathFromAbsPath.length() > 2) {
-					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) {
+					if ((sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\"))|| (sRelPathFromAbsPath.substring(0, 1)	.equalsIgnoreCase("/"))) {
 						sRelPathFromAbsPath = sRelPathFromAbsPath.substring(1);
 					}
 				}
 
-/*				System.out.println("el.getName(): " + el.getName()
-						+ "; sFolderName: " + sFolderName);*/
-				if (el.getRelPath().trim()
-						.equalsIgnoreCase(sRelPathFromAbsPath.trim())) {
+				if (el.getRelPath().trim().equalsIgnoreCase(sRelPathFromAbsPath.trim())) {
 					IsCatched = true;
 					res = (FolderDto) el;
 					break;
@@ -371,7 +381,7 @@ public class ProjectPanel extends Composite implements IsWidget,
 			String relPath, String absolutePath) {
 		return new FileDto(++autoId, fileName, folder, relPath, absolutePath);
 	}
-	
+
 	public TreeStore<BaseDto> getStore() {
 		return store;
 	}

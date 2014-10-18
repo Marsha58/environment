@@ -1,5 +1,7 @@
 package com.vw.ide.client.dialog.newvwmlproj;
 
+import java.io.File;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -20,6 +22,7 @@ import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForCompleteContent;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForProjectCreation;
+import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.sencha.gxt.widget.core.client.Window;
@@ -92,7 +95,7 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 			public void onBlur(BlurEvent event) {
 				String sName = tfVWMLProjectName.getText();
 				tfJavaPackageName.setText(makePackageName(sName));
-				tfVWMLProjectPath.setText(path4project + "\\" + sName);
+				tfVWMLProjectPath.setText(path4project + Utils.FILE_SEPARATOR + sName);
 			}
 		});
 

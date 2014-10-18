@@ -129,7 +129,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 
 	public RequestDirOperationResult createDir(String user, String parent, String dir) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
-		String fullPath = parent + "\\" + dir;
+		String fullPath = parent + Utils.FILE_SEPARATOR + dir;
 		res.setPath(fullPath);
 		res.setRetCode(0);
 		res.setOperation("create directory");
@@ -185,7 +185,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	}
 	
 	private String constructUserHomePath(String user) {
-		return s_defRootDir + "\\" + user;
+		return s_defRootDir + Utils.FILE_SEPARATOR + user;
 	}
 	
 	private void purgeDirectory(File dir) {
@@ -332,10 +332,10 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		
 		String sUserBasePath = constructUserHomePath(userName);
 		String sFullProjectPath = "";
-		if((projectPath.length()>0)&&(!projectPath.startsWith("\\"))) {
+		if((projectPath.length()>0)&&(!projectPath.startsWith("\\"))&&(!projectPath.startsWith("/"))) {
 			sFullProjectPath = projectPath; 
 		} else {
-			sFullProjectPath = sUserBasePath + "\\" + projectName; 
+			sFullProjectPath = sUserBasePath + Utils.FILE_SEPARATOR + projectName; 
 		}
 		try {
 			
@@ -344,14 +344,14 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 				dir.mkdirs();
 			};
 
-			File dirJavaSrc = new File(sFullProjectPath + "\\" + javaSrcPath);
+			File dirJavaSrc = new File(sFullProjectPath + Utils.FILE_SEPARATOR + javaSrcPath);
 			if (!dirJavaSrc.exists()) {
 				dirJavaSrc.mkdirs();
 			};			
 			
 			String sProjectMainFileName = makeMainProjectFileName(projectName);
 			
-			File fMainVWML = new File(sFullProjectPath + "\\" + sProjectMainFileName );
+			File fMainVWML = new File(sFullProjectPath + Utils.FILE_SEPARATOR + sProjectMainFileName );
 			if (!fMainVWML.exists()) {
 				fMainVWML.createNewFile();
 				FileWriter writer = new FileWriter(fMainVWML); 
@@ -361,11 +361,11 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			}
 
 			
-			String projectConfFileFullName = sFullProjectPath + "\\" + makeProjectConfigFileName(sProjectMainFileName);
+			String projectConfFileFullName = sFullProjectPath + Utils.FILE_SEPARATOR + makeProjectConfigFileName(sProjectMainFileName);
 			
 			makeProjectConfigFile(projectConfFileFullName, projectName, packageName, javaSrcPath, author, descr);
 /*			
-			File fProjectConf = new File(sFullProjectPath + "\\" + makeProjectConfigFileName(sProjectMainFileName));
+			File fProjectConf = new File(sFullProjectPath + Utils.FILE_SEPARATOR + makeProjectConfigFileName(sProjectMainFileName));
 			if (!fProjectConf.exists()) {
 				fProjectConf.createNewFile();
 				FileWriter writerPC = new FileWriter(fProjectConf); 
@@ -429,7 +429,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 //		res.setProjectPath(projectPath);
 		res.setProjectId(projectId);
 		res.setRetCode(0);
-		String sFullProjectPath = parent + "\\" + fileName; 
+		String sFullProjectPath = parent + Utils.FILE_SEPARATOR + fileName; 
 		try {
 			
 			File parentPath = new File(Utils.extractJustPath(sFullProjectPath));
@@ -520,6 +520,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		RequestFileOperationResult res = new RequestFileOperationResult();
 		res.setFileName(fileName);
 		res.setFileId(fileId);
+		res.setOperationType(OperationTypes.SAVE_FILE);
 		res.setOperation("saving file");
 		res.setRetCode(0);
 		
@@ -568,7 +569,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			FileItemInfo value = null;
 			for(Object key :  userStateInfo.getOpenedFiles().keySet()) {
 				value = userStateInfo.getOpenedFiles().get(key);
-				String sFullName = value.getAbsolutePath() + "\\" + value.getName();  
+				String sFullName = value.getAbsolutePath() + Utils.FILE_SEPARATOR + value.getName();  
 				if (sFullName.equalsIgnoreCase(fileName)) {
 					userStateInfo.getOpenedFiles().remove(key);
 					break;

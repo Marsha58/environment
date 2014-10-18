@@ -1,6 +1,8 @@
 package com.vw.ide.client.utils;
 
 
+import java.io.File;
+
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -15,6 +17,8 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
  */
 public class Utils {
 
+	final public static String FILE_SEPARATOR = "/";  
+	
 	public static class DialogBoxRegularClickHandler implements SelectHandler {
 
 		private TextButton toDisable;
@@ -119,6 +123,8 @@ public class Utils {
 			dialogBox.hide();
 		}
 	}
+
+	
 	
 	public static String extractJustPath(String input) {
 		String output = "";
@@ -130,7 +136,7 @@ public class Utils {
 				return input;
 			} else {
 				for (int i = 0; i < arrPath.length - 2; i++) {
-					output += arrPath[i] + "\\";
+					output += arrPath[i] + FILE_SEPARATOR;
 				}
 				output += arrPath[arrPath.length - 2];
 			}

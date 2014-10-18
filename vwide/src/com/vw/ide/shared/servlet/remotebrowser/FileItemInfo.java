@@ -30,18 +30,35 @@ public class FileItemInfo implements Serializable {
 	public FileItemInfo(String name, String absolutePath, boolean isDir) {
 		super();
 		this.name = name;
-		this.absolutePath = absolutePath;
+		this.absolutePath = absolutePath.replaceAll("[\\\\]", "/");
 		this.isDir = isDir;
 	}
 
-	public FileItemInfo(String name, String absolutePath, String relPath, boolean isDir) {
+	public static String makeRelPathFromAbsolute(String userName, String absolutePath) {
+		String[] arrPath = absolutePath.split(userName);
+		String relPath = ""; 
+		if(arrPath.length == 2) {
+			String[] arrTmp = arrPath[1].split("/");
+			for(int i = 0; i< arrTmp.length; i++) {
+				if (arrTmp[i].indexOf(".") == -1) {
+					relPath += Utils.FILE_SEPARATOR + arrTmp[i];
+				}			
+			}
+		  if(relPath.startsWith("//")) {
+			  relPath = relPath.substring(2, relPath.length());
+		  }
+		}
+		return relPath ;
+	}
+	
+/*	public FileItemInfo(String name, String absolutePath, String relPath, boolean isDir) {
 		super();
 		this.name = name;
-		this.absolutePath = absolutePath;
+		this.absolutePath = absolutePath.replaceAll("[\\\\]", "/");
 		this.relPath = relPath;
 		this.isDir = isDir;
 	}
-	
+*/	
 	public static FilesTypesEnum getFileType(String fileName) {
 		if (fileName.indexOf(".") != -1) {
 			String sSuffix = fileName.substring(fileName.indexOf(".") + 1);
@@ -94,7 +111,8 @@ public class FileItemInfo implements Serializable {
 	}
 
 	public void setAbsolutePath(String path) {
-		this.absolutePath = path;
+		String replaced =  path.replaceAll("[\\\\]", "/");
+		this.absolutePath = replaced;
 
 	}
 	

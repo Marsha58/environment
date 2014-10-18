@@ -9,13 +9,14 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Composite;
+import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
-import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 public class EditorPanel extends Composite {
 
@@ -51,7 +52,8 @@ public class EditorPanel extends Composite {
 			@Override
 			public void onBeforeSelection(BeforeSelectionEvent<Widget> event) {
 				FileSheet curFileSheet = (FileSheet) event.getItem();
-				((DevelopmentBoardPresenter)presenter).getEditorContentPanel().setHeadingText(curFileSheet.getFilePath() + "\\" + curFileSheet.getFileName());
+				String relPath = FileItemInfo.makeRelPathFromAbsolute(presenter.getLoggedAsUser(), curFileSheet.getFilePath());
+				((DevelopmentBoardPresenter)presenter).getEditorContentPanel().setHeadingText(relPath + Utils.FILE_SEPARATOR + curFileSheet.getFileName());
 			}
 		});
 		
@@ -102,17 +104,24 @@ public class EditorPanel extends Composite {
 	
 	
 	public void setFileEditedState(Widget associatedTabWidget, Boolean isEdited) {
-		String sTitle = tabPanel.getConfig(associatedTabWidget).getText();
+		TabItemConfig conf = tabPanel.getConfig(associatedTabWidget);
+		String sTitle = conf.getText();
 		if (sTitle.length()>1) {
 			if((sTitle.charAt(0) != '*')&&isEdited) {
 				sTitle = "*" + sTitle;
 			} else if((sTitle.charAt(0) == '*')&&(!isEdited)) {
 				sTitle = sTitle.substring(1);
 			}
-			tabPanel.getConfig(associatedTabWidget).setText(sTitle);
+			conf.setText(sTitle);
+			tabPanel.update(associatedTabWidget, conf);
+//			((DevelopmentBoardPresenter)presenter).getEditorContentPanel().setHeadingText(fileItemInfo.getRelPath() + Utils.FILE_SEPARATOR + sTitle);		
 			((FileSheet) associatedTabWidget).setIsFileEdited(isEdited);
 		}
 	}
+	
+	
+	
+	
 	
 
 }

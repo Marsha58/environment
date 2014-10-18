@@ -63,14 +63,14 @@ public class ProPanelContextMenu extends Menu{
 
 		renameFile = new MenuItem();
 		renameFile.setItemId(OperationTypes.RENAME_FILE.getName());
-		renameFile.setText("Renaming selected file");
+		renameFile.setText("Rename file");
 		renameFile.setIcon(Resources.IMAGES.rename_file_en());
 		renameFile.addSelectionHandler(selectionHandler);
 		this.add(renameFile);
 		
 		delFile = new MenuItem();
 		delFile.setItemId(OperationTypes.DELETE_FILE.getName());
-		delFile.setText("Delete selected file");
+		delFile.setText("Delete file");
 		delFile.setIcon(Resources.IMAGES.delete_edit_en());
 		delFile.addSelectionHandler(selectionHandler);
 		this.add(delFile);		
@@ -96,7 +96,7 @@ public class ProPanelContextMenu extends Menu{
 		
 		delProject = new MenuItem();
 		delProject.setItemId(OperationTypes.DELETE_PROJECT.getName());
-		delProject.setText("Delete selected project");
+		delProject.setText("Delete project");
 		delProject.setIcon(Resources.IMAGES.delete_edit_en());
 		delProject.addSelectionHandler(selectionHandler);
 		this.add(delProject);

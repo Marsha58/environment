@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
