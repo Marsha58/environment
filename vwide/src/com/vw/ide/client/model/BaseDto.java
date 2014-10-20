@@ -13,6 +13,7 @@ import java.util.List;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.TreeStore.TreeNode;
 
+@SuppressWarnings("serial")
 public class BaseDto implements Serializable, TreeStore.TreeNode<BaseDto> {
 
   private Integer id;

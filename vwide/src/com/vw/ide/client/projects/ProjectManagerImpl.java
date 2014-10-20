@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
@@ -64,8 +63,6 @@ public class ProjectManagerImpl implements ProjectManager{
 				FileItemInfo value = filesFileInfoContext.get(key);
 				if(value.getProjectId() == projectId) {
 					fileId = (Long) key;
-					Widget widget2delete = getAssociatedTabWidget(fileId);
-//					((DevelopmentBoard) view).editor.getTabPanel().remove(widget2delete);
 					openedFilesContext.remove(fileId);
 					filesFileInfoContext.remove(fileId);
 				}
@@ -94,7 +91,6 @@ public class ProjectManagerImpl implements ProjectManager{
 
 	@Override
 	public Long getProjectIdByProjectPath(String user, String projectPath) {
-		boolean isProjectFound = false;
 		Long lRes = -1L;
 		String[] arrRelPath = projectPath.split(user+"\\\\");
 		if(arrRelPath.length == 2) {
@@ -104,13 +100,11 @@ public class ProjectManagerImpl implements ProjectManager{
 				String sProjectName = value.getProjectName(); 
 				if(sProjectName.equalsIgnoreCase(projectName) ) {
 					lRes = (Long) key;
-					isProjectFound = true;
 					break;
 				}
 			}			
 			
 		}
-		
 		return lRes;
 	}
 
@@ -129,14 +123,10 @@ public class ProjectManagerImpl implements ProjectManager{
 	@Override
 	public boolean checkFile(String fullFileNameWithPath) {
 		boolean bRes = false;
-		boolean isSuchProjectExists = false;
 		String sPath = Utils.extractJustPath(fullFileNameWithPath);
-		String sName = Utils.extractJustFileName(fullFileNameWithPath);
-		
 		for(Object key : projectsContext.keySet()) {
 			ProjectItem value = projectsContext.get(key);
 			if(value.getProjectPath().equalsIgnoreCase(sPath)) {
-				isSuchProjectExists = true;
 				break;
 			}
 		}

@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
-import com.vw.ide.client.devboardext.DevelopmentBoard;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -19,8 +18,7 @@ import com.vw.ide.client.ui.toppanel.FileSheet;
 
 public class EditorPanel extends Composite {
 
-	private static EditorPanelUiBinder uiBinder = GWT
-			.create(EditorPanelUiBinder.class);
+	private static EditorPanelUiBinder uiBinder = GWT.create(EditorPanelUiBinder.class);
 
 	interface EditorPanelUiBinder extends UiBinder<Widget, EditorPanel> {
 	}
@@ -32,37 +30,28 @@ public class EditorPanel extends Composite {
 	@UiField
 	TabPanel tabPanel;
 
-
 	public EditorPanel() {
 		if (widget == null) {
 			widget = constructUi();
 		}
 		initWidget(widget);
-
-		
-		
 		tabPanel.setTabScroll(true);
 		tabPanel.setAnimScroll(true);
 		tabPanel.setCloseContextMenu(true);
-		
-		
 		tabPanel.addBeforeSelectionHandler(new BeforeSelectionHandler<Widget>() {
-			
 			@Override
 			public void onBeforeSelection(BeforeSelectionEvent<Widget> event) {
 				FileSheet curFileSheet = (FileSheet) event.getItem();
-				((DevelopmentBoardPresenter)presenter).getEditorContentPanel().setHeadingText(curFileSheet.getFilePath() + "\\" + curFileSheet.getFileName());
+				((DevelopmentBoardPresenter)presenter).getView().setTextForEditorContentPanel(curFileSheet.getFilePath() + "\\" + curFileSheet.getFileName());
 			}
 		});
 		
 		tabPanel.addBeforeCloseHandler(new BeforeCloseEvent.BeforeCloseHandler<Widget> () {
-
 			@Override
 			public void onBeforeClose(BeforeCloseEvent<Widget> event) {
 				System.out.println("BeforeCloseEvent: " + event.toString());
 				presenter.fireEvent(new EditorTabClosedEvent(event));
 			}
-			
 		});
 		
 		tabPanel.addResizeHandler(new ResizeHandler() {
@@ -77,30 +66,12 @@ public class EditorPanel extends Composite {
 				 }
 			}
 		});		
-		
-
 	}
-	
 	
 	public void associatePresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
 
-	protected Presenter getAssociatedPresenter() {
-		return this.presenter;
-	}
-
-	public TabPanel getTabPanel() {
-	   return tabPanel;
-	}	
-	
-	private Widget constructUi() {
-		widget = uiBinder.createAndBindUi(this);
-		widget.addStyleName("margin-10");
-		return widget;
-	}
-	
-	
 	public void setFileEditedState(Widget associatedTabWidget, Boolean isEdited) {
 		String sTitle = tabPanel.getConfig(associatedTabWidget).getText();
 		if (sTitle.length()>1) {
@@ -114,5 +85,17 @@ public class EditorPanel extends Composite {
 		}
 	}
 	
+	protected Presenter getAssociatedPresenter() {
+		return this.presenter;
+	}
 
+	public TabPanel getTabPanel() {
+	   return tabPanel;
+	}	
+	
+	private Widget constructUi() {
+		widget = uiBinder.createAndBindUi(this);
+		widget.addStyleName("margin-10");
+		return widget;
+	}
 }

@@ -1,14 +1,9 @@
 package com.vw.ide.client.event.uiflow;
 
-import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
-import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
-import com.vw.ide.client.event.handler.LoginHandler;
-
-import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 
 /**
  * Fired when user closes tab in the Ace editor

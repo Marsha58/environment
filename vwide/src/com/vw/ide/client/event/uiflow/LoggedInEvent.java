@@ -12,6 +12,10 @@ public class LoggedInEvent extends GwtEvent<LoggedInHandler> {
 
 	private String userName;
 	public static Type<LoggedInHandler> TYPE = new Type<LoggedInHandler>();
+
+	public LoggedInEvent() {
+		super();
+	}
 	
 	public LoggedInEvent(String userName) {
 		super();

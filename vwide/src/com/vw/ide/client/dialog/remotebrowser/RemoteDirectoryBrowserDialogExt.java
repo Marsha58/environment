@@ -11,8 +11,6 @@ import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Label;
-//import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
@@ -39,8 +37,8 @@ import com.vw.ide.client.utils.Utils.YesNoMsgBoxSelctionCallback;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
+//import com.google.gwt.user.client.ui.Tree;
 
 /**
  * Selects file/directory on remote side
@@ -289,7 +287,6 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 								.getAbsolutePath());
 						if (treeSelectedItem.getType() == "dir") {
 							selectedFolder = (FolderDto) treeSelectedItem;
-							String s = selectedFolder.getName();
 							// requestForDirContent(selectedFolder.getRelPath());
 							((TextButton) getButtonBar().getItemByItemId(
 									SELECT_ID)).enable();
@@ -615,21 +612,4 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			}
 		}
 	}
-
-	private String buildRelPath(TreeItem item) {
-		if (item.getText() != null && !item.getText().equals(getLoggedAsUser())) {
-			String p = null;
-			while (item != null && !item.getText().equals(getLoggedAsUser())) {
-				if (p != null) {
-					p = item.getText() + "\\" + p;
-				} else {
-					p = item.getText();
-				}
-				item = item.getParentItem();
-			}
-			return p;
-		}
-		return null;
-	}
-
 }

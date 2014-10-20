@@ -27,14 +27,7 @@ public class RemoteSecurityService implements BusConnectivity, VwIdeClientServic
 	 *
 	 */
 	public static class ServiceCallbackForLogin extends ServiceCallback<RequestLoginResult>  {
-
-		private RemoteSecurityService service;
-		
-		public ServiceCallbackForLogin(RemoteSecurityService service) {
-			this.service = service;
-		}
 	}
-	
 	
 	private RemoteSecurityService() {
 		
@@ -68,9 +61,7 @@ public class RemoteSecurityService implements BusConnectivity, VwIdeClientServic
 		}
 	}
 	
-	
 	public ServiceCallbackForLogin buildCallbackForLogin() {
-		return new ServiceCallbackForLogin(this);
+		return new ServiceCallbackForLogin();
 	}	
-	
 }

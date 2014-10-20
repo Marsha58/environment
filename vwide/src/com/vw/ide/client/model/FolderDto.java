@@ -39,9 +39,7 @@ public class FolderDto extends BaseDto {
   
   public void addOrReplaceChild(BaseDto child) {
 	  List<BaseDto> lst = getChildren();
-	  BaseDto currItem; 
 	    for(int i = 0; i < lst.size(); i++) {
-	    	currItem = lst.get(i); 
 	    	if ((lst.get(i).getName().equalsIgnoreCase(child.getName()))&&
 	    			(lst.get(i).getRelPath().equalsIgnoreCase(child.getRelPath()))) {
 	    		lst.remove(i);

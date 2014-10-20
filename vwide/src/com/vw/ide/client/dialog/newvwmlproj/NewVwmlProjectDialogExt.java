@@ -1,38 +1,28 @@
 package com.vw.ide.client.dialog.newvwmlproj;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.vw.ide.client.devboardext.DevelopmentBoard;
+import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
+import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.event.BlurEvent;
+import com.sencha.gxt.widget.core.client.event.BlurEvent.BlurHandler;
+import com.sencha.gxt.widget.core.client.event.FocusEvent.FocusHandler;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.form.TextArea;
+import com.sencha.gxt.widget.core.client.form.TextField;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.dialog.VwmlDialogExt;
-import com.vw.ide.client.dialog.remotebrowser.RemoteDirectoryBrowserDialog;
 import com.vw.ide.client.dialog.remotebrowser.RemoteDirectoryBrowserDialogExt;
-import com.vw.ide.client.dialog.remotebrowser.RemoteDirectoryBrowserDialogExt.DirContentResult;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForCompleteContent;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForProjectCreation;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
-import com.sencha.gxt.widget.core.client.Window;
-import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
-import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
-import com.sencha.gxt.widget.core.client.button.TextButton;
-import com.sencha.gxt.widget.core.client.event.BlurEvent.BlurHandler;
-import com.sencha.gxt.widget.core.client.event.FocusEvent.FocusHandler;
-import com.sencha.gxt.widget.core.client.event.BlurEvent;
-import com.sencha.gxt.widget.core.client.event.HideEvent;
-import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import com.sencha.gxt.widget.core.client.form.TextArea;
-import com.sencha.gxt.widget.core.client.form.TextField;
 
 /**
  * New VWML project dialog
@@ -153,10 +143,9 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 	}
 
 	public String capitalizeFirstLetter(String input) {
-		String sWord = "";
 		String firstLetter = input.substring(0, 1).toUpperCase();
 		String restLetters = input.substring(1, input.length());
-		return sWord = firstLetter + restLetters;
+		return firstLetter + restLetters;
 	}
 
 	public String makePackageName(String projectName) {
