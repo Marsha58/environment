@@ -8,14 +8,12 @@ import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.vw.ide.client.Resources;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
-import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 public class ProPanelContextMenu extends Menu{
-	
 	private MenuItem importFile; 
 	private MenuItem newFile; 
 	private MenuItem renameFile; 
@@ -24,10 +22,7 @@ public class ProPanelContextMenu extends Menu{
 	private MenuItem importProject;
 	private MenuItem delProject;
 	private MenuItem newFolder;
-	
 	public Presenter presenter;
-	private FileItemInfo selectedItemInTheTree;
-
 	
 	public SelectionHandler<Item> selectionHandler = new SelectionHandler<Item>() {
 		@Override
@@ -126,9 +121,6 @@ public class ProPanelContextMenu extends Menu{
 	  Boolean isDelProjectEnabled = true;	
 		
 	  if(fileItemInfo != null) {
-		  
-		  selectedItemInTheTree = fileItemInfo;
-		  
 		  if(fileItemInfo.getFileType() == FilesTypesEnum.XML) {
 			  isDelFileEnabled = !checkIsFileProXml(fileItemInfo);
 		  } else {

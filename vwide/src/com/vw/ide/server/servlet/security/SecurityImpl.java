@@ -4,16 +4,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.apache.xerces.parsers.DOMParser;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.shared.servlet.security.RemoteSecurity;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;
-import com.vw.ide.server.servlet.security.UsersManager;
 
 
 /**
@@ -47,13 +41,6 @@ public class SecurityImpl extends RemoteServiceServlet implements RemoteSecurity
 		}
 	}
 	
-
-	
-	private boolean checkUserNameAndPassword(String userName, String password){
-		Boolean bIsLogged = false;
-		return bIsLogged;
-	}
-
 	@Override
 	public RequestLoginResult login(String userName, String password) {
 		RequestLoginResult res = new RequestLoginResult();
@@ -68,6 +55,4 @@ public class SecurityImpl extends RemoteServiceServlet implements RemoteSecurity
 		}
 		return res;
 	}
-
-	
 }

@@ -2,7 +2,6 @@ package com.vw.ide.client.event.uiflow;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
  * Fired when user pressed 'SelectFile'

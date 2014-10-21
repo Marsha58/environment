@@ -43,46 +43,43 @@ import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 import com.vw.ide.shared.servlet.remotebrowser.UserStateInfo;
 
-
 /**
  * Implementation of remote directory browser
+ * 
  * @author Oleg
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements RemoteDirectoryBrowser {
 
 	private Logger logger = Logger.getLogger(RemoteDirectoryBrowserImpl.class);
 	private static String s_defRootDir = "/var/projects";
-	private  Map<String, UserStateInfo> usersStates = new HashMap <String, UserStateInfo>(); 
-	
+	private Map<String, UserStateInfo> usersStates = new HashMap<String, UserStateInfo>();
+
 	public RemoteDirectoryBrowserImpl() {
 		super();
 		if (logger.isInfoEnabled()) {
 			logger.info("RemoteDirectoryBrowserImpl constructed");
 		}
 	}
-	
-	
+
 	private void loadProperties(ServletContext context) {
-		
+
 		Properties prop = new Properties();
 		try {
-		    //load a properties file from class path, inside static method
+			// load a properties file from class path, inside static method
 			InputStream isPropertiesFile = context.getResourceAsStream("/WEB-INF/classes/config.properties");
-			if(isPropertiesFile != null) {
+			if (isPropertiesFile != null) {
 				prop.load(isPropertiesFile);
 				if (prop.getProperty("root_dir") != null) {
 					s_defRootDir = prop.getProperty("root_dir");
 				}
 			}
-		} 
-		catch (IOException ex) {
-		    ex.printStackTrace();
-		}		
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 	}
-	
-	
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
@@ -91,7 +88,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			logger.info("RemoteDirectoryBrowserImpl started and initialized");
 		}
 	}
-	
+
 	/**
 	 * Returns list of subdirs inside the given dir
 	 */
@@ -99,7 +96,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		List<String> dirsInfo = new ArrayList<String>();
 		if (user != null) {
 			RequestedDirScanResult r = getDirScan(user, dir);
-			for(FileItemInfo fi : r.getFiles()) {
+			for (FileItemInfo fi : r.getFiles()) {
 				if (fi.isDir()) {
 					dirsInfo.add(fi.getName());
 				}
@@ -112,7 +109,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	 * Returns full directory content
 	 */
 	public RequestedDirScanResult getDirScan(String user, String dir) {
-		String path  = constructUserHomePath(user) + ((dir != null) ? ("/" + dir) : "");
+		String path = constructUserHomePath(user) + ((dir != null) ? ("/" + dir) : "");
 		RequestedDirScanResult r = new RequestedDirScanResult();
 		r.setParentPath(new File(path).getAbsolutePath());
 		if (user != null) {
@@ -120,8 +117,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 				logger.debug("Asking for dirs list for user '" + user + "'; dir '" + dir + "'; full path '" + path + "'");
 			}
 			r.setFiles(getListOfFileItems(path));
-		}
-		else {
+		} else {
 			r.setFiles(new ArrayList<FileItemInfo>());
 		}
 		return r;
@@ -141,8 +137,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			if (!f.exists()) {
 				f.mkdirs();
 			}
-		}
-		catch(Exception ex) {
+		} catch (Exception ex) {
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
 		}
@@ -156,66 +151,62 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		res.setOperation("remove directory");
 		try {
 			purgeDirectory(new File(dir));
-		}
-		catch(Exception ex) {
+		} catch (Exception ex) {
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
 		}
 		return res;
 	}
-	
+
 	private List<FileItemInfo> getListOfFileItems(String dir) {
 		List<FileItemInfo> filesInfo = new ArrayList<FileItemInfo>();
 		File directory = new File(dir);
-	    // get all the files from a directory
-	    File[] fList = directory.listFiles();
-	    if (fList != null) {
-		    for (File file : fList) {
-		    	FileItemInfo fi = new FileItemInfo();
-		    	fi.setName(file.getName());
-		    	fi.setAbsolutePath(file.getAbsolutePath());
-		        fi.setDir(true);
-		    	if (file.isFile()) {
-		        	fi.setDir(false);
-		        }
-		    	filesInfo.add(fi);
-		    }
-	    }
-	    return filesInfo;
+		// get all the files from a directory
+		File[] fList = directory.listFiles();
+		if (fList != null) {
+			for (File file : fList) {
+				FileItemInfo fi = new FileItemInfo();
+				fi.setName(file.getName());
+				fi.setAbsolutePath(file.getAbsolutePath());
+				fi.setDir(true);
+				if (file.isFile()) {
+					fi.setDir(false);
+				}
+				filesInfo.add(fi);
+			}
+		}
+		return filesInfo;
 	}
-	
+
 	private String constructUserHomePath(String user) {
 		return s_defRootDir + Utils.FILE_SEPARATOR + user;
 	}
-	
+
 	private void purgeDirectory(File dir) {
-	    for (File file: dir.listFiles()) {
-	        if (file.isDirectory()) purgeDirectory(file);
-	        file.delete();
-	    }
-	    dir.delete();
+		for (File file : dir.listFiles()) {
+			if (file.isDirectory())
+				purgeDirectory(file);
+			file.delete();
+		}
+		dir.delete();
 	}
-	
 
-	
-	
 	private String openFile(String fileName) throws IOException {
-	    BufferedReader br = new BufferedReader(new FileReader(fileName));
-	    try {
-	        StringBuilder sb = new StringBuilder();
-	        String line = br.readLine();
+		BufferedReader br = new BufferedReader(new FileReader(fileName));
+		try {
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
 
-	        while (line != null) {
-	            sb.append(line);
-	            sb.append("\n");
-	            line = br.readLine();
-	        }
-	        return sb.toString();
-	    } finally {
-	        br.close();
-	    }
+			while (line != null) {
+				sb.append(line);
+				sb.append("\n");
+				line = br.readLine();
+			}
+			return sb.toString();
+		} finally {
+			br.close();
+		}
 	}
-
 
 	private String makeMainProjectFileName(String projectName) {
 		StringBuffer sPackageFileName = new StringBuffer();
@@ -223,20 +214,19 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		for (String curWord : arrProjectFileName) {
 			sPackageFileName.append(curWord);
 		}
-		sPackageFileName.append(".vwml");		
+		sPackageFileName.append(".vwml");
 		return sPackageFileName.toString().toLowerCase();
 	}
-	
+
 	private String makeProjectConfigFileName(String projectMainFileName) {
 		StringBuffer sProjectConfigFileName = new StringBuffer();
 		if (projectMainFileName.indexOf(".") != -1) {
-			sProjectConfigFileName.append(projectMainFileName.substring(0,projectMainFileName.indexOf(".")));
-			sProjectConfigFileName.append(".xml");		
+			sProjectConfigFileName.append(projectMainFileName.substring(0, projectMainFileName.indexOf(".")));
+			sProjectConfigFileName.append(".xml");
 		}
 		return sProjectConfigFileName.toString().toLowerCase();
-	}	
-	
-	
+	}
+
 	private static String format(final String format, final String... args) {
 		String[] split = format.split("%s");
 		final StringBuffer msg = new StringBuffer();
@@ -246,163 +236,145 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		}
 		msg.append(split[split.length - 1]);
 		return msg.toString();
-	}	
-	
-	private String makeProjectFileHeaderPattern(String projectName, String packageName, String javaSrcPath,
-			String author, String descr) {
-		String pattern = format("options {\n" + 
-				"\tlanguage=_java_ {\n" +
-				"\t\tpackage = \"%s\"\n" + 
-				"\t\tpath = \"%s\"\n" +
-				"\t\tauthor = \"%s\"\n" + 
-				"\t\tproject_name = \"%s\"\n" +
-				"\t\tdescription = \"%s\"\n" + 
-				"\t\tbeyond {\n" + 
-				"\t\t}\n" + 
-				"\t}\n" +
-				"\tconflictring {\n" + 
-				"\t}\n" + 
-				"}\n" +
-				"module %s {\n" +
-				"}",
-				packageName, javaSrcPath, author, projectName,	descr, packageName.toLowerCase());		
+	}
+
+	private String makeProjectFileHeaderPattern(String projectName, String packageName, String javaSrcPath, String author, String descr) {
+		String pattern = format("options {\n" + "\tlanguage=_java_ {\n" + "\t\tpackage = \"%s\"\n" + "\t\tpath = \"%s\"\n" + "\t\tauthor = \"%s\"\n"
+				+ "\t\tproject_name = \"%s\"\n" + "\t\tdescription = \"%s\"\n" + "\t\tbeyond {\n" + "\t\t}\n" + "\t}\n" + "\tconflictring {\n"
+				+ "\t}\n" + "}\n" + "module %s {\n" + "}", packageName, javaSrcPath, author, projectName, descr, packageName.toLowerCase());
 		return pattern;
 	}
-	
-	private void makeProjectConfigFile(String projectConfFileFullName, String projectName, String packageName, String javaSrcPath,
-			String author, String descr) {
-		
-		 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	     DocumentBuilder dBuilder;
-		
-	     try {
-	            dBuilder = dbFactory.newDocumentBuilder();
-	            Document doc = dBuilder.newDocument();
-	            Element rootElement = doc.createElementNS("http://www.win-interactive.com/" + packageName.toLowerCase(), "project");
-	            doc.appendChild(rootElement);
 
-	            Element nodePackage = doc.createElement("package");
-	    		nodePackage.appendChild(doc.createTextNode(packageName));
-	    		rootElement.appendChild(nodePackage);
+	private void makeProjectConfigFile(String projectConfFileFullName, String projectName, String packageName, String javaSrcPath, String author,
+			String descr) {
 
-	    		Element nodeJavaSrcPath = doc.createElement("path");
-	    		nodeJavaSrcPath.appendChild(doc.createTextNode(javaSrcPath));
-	    		rootElement.appendChild(nodeJavaSrcPath);
-	    		 
-	    		Element nodeAuthor = doc.createElement("author");
-	    		nodeAuthor.appendChild(doc.createTextNode(author));
-	    		rootElement.appendChild(nodeAuthor);
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
 
-	    		Element nodeProjectName = doc.createElement("projectName");
-	    		nodeProjectName.appendChild(doc.createTextNode(projectName));
-	    		rootElement.appendChild(nodeProjectName);	    		 
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.newDocument();
+			Element rootElement = doc.createElementNS("http://www.win-interactive.com/" + packageName.toLowerCase(), "project");
+			doc.appendChild(rootElement);
 
-	    		Element nodeDescr = doc.createElement("descr");
-	    		nodeDescr.appendChild(doc.createTextNode(descr));
-	    		rootElement.appendChild(nodeDescr);	
-	    		 
-	            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	            Transformer transformer = transformerFactory.newTransformer();
-	            //for pretty print
-	            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-	            DOMSource source = new DOMSource(doc);
-	 
-	            //write to console or file
-//	            StreamResult console = new StreamResult(System.out);
-	            StreamResult file = new StreamResult(new File(projectConfFileFullName));
-	 
-	            //write data
-//	            transformer.transform(source, console);
-	            transformer.transform(source, file);
-	 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	}	
-	
+			Element nodePackage = doc.createElement("package");
+			nodePackage.appendChild(doc.createTextNode(packageName));
+			rootElement.appendChild(nodePackage);
+
+			Element nodeJavaSrcPath = doc.createElement("path");
+			nodeJavaSrcPath.appendChild(doc.createTextNode(javaSrcPath));
+			rootElement.appendChild(nodeJavaSrcPath);
+
+			Element nodeAuthor = doc.createElement("author");
+			nodeAuthor.appendChild(doc.createTextNode(author));
+			rootElement.appendChild(nodeAuthor);
+
+			Element nodeProjectName = doc.createElement("projectName");
+			nodeProjectName.appendChild(doc.createTextNode(projectName));
+			rootElement.appendChild(nodeProjectName);
+
+			Element nodeDescr = doc.createElement("descr");
+			nodeDescr.appendChild(doc.createTextNode(descr));
+			rootElement.appendChild(nodeDescr);
+
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			// for pretty print
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			DOMSource source = new DOMSource(doc);
+
+			// write to console or file
+			// StreamResult console = new StreamResult(System.out);
+			StreamResult file = new StreamResult(new File(projectConfFileFullName));
+
+			// write data
+			// transformer.transform(source, console);
+			transformer.transform(source, file);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
-	public RequestProjectCreationResult createProject(String userName,
-			String projectName, String projectPath, String packageName, String javaSrcPath,
-			String author, String descr) {
+	public RequestProjectCreationResult createProject(String userName, String projectName, String projectPath, String packageName,
+			String javaSrcPath, String author, String descr) {
 		RequestProjectCreationResult res = new RequestProjectCreationResult();
 		res.setOperation("project creating");
-//		res.setProjectPath(projectPath);
+		// res.setProjectPath(projectPath);
 		res.setProjectName(projectName);
 		res.setRetCode(0);
-		
+
 		String sUserBasePath = constructUserHomePath(userName);
 		String sFullProjectPath = "";
-		if((projectPath.length()>0)&&(!projectPath.startsWith("\\"))&&(!projectPath.startsWith("/"))) {
-			sFullProjectPath = projectPath; 
+		if ((projectPath.length() > 0) && (!projectPath.startsWith("\\")) && (!projectPath.startsWith("/"))) {
+			sFullProjectPath = projectPath;
 		} else {
-			sFullProjectPath = sUserBasePath + Utils.FILE_SEPARATOR + projectName; 
+			sFullProjectPath = sUserBasePath + Utils.FILE_SEPARATOR + projectName;
 		}
 		try {
-			
+
 			File dir = new File(sFullProjectPath);
 			if (!dir.exists()) {
 				dir.mkdirs();
-			};
+			}
+			;
 
 			File dirJavaSrc = new File(sFullProjectPath + Utils.FILE_SEPARATOR + javaSrcPath);
 			if (!dirJavaSrc.exists()) {
 				dirJavaSrc.mkdirs();
-			};			
-			
+			}
+			;
+
 			String sProjectMainFileName = makeMainProjectFileName(projectName);
-			
-			File fMainVWML = new File(sFullProjectPath + Utils.FILE_SEPARATOR + sProjectMainFileName );
+
+			File fMainVWML = new File(sFullProjectPath + Utils.FILE_SEPARATOR + sProjectMainFileName);
 			if (!fMainVWML.exists()) {
 				fMainVWML.createNewFile();
-				FileWriter writer = new FileWriter(fMainVWML); 
+				FileWriter writer = new FileWriter(fMainVWML);
 				writer.write(makeProjectFileHeaderPattern(projectName, packageName, javaSrcPath, author, descr));
 				writer.flush();
 				writer.close();
 			}
 
-			
 			String projectConfFileFullName = sFullProjectPath + Utils.FILE_SEPARATOR + makeProjectConfigFileName(sProjectMainFileName);
-			
+
 			makeProjectConfigFile(projectConfFileFullName, projectName, packageName, javaSrcPath, author, descr);
-/*			
-			File fProjectConf = new File(sFullProjectPath + Utils.FILE_SEPARATOR + makeProjectConfigFileName(sProjectMainFileName));
-			if (!fProjectConf.exists()) {
-				fProjectConf.createNewFile();
-				FileWriter writerPC = new FileWriter(fProjectConf); 
-				writerPC.write(makeProjectConfigFile(projectName, packageName, javaSrcPath, author, descr));
-				writerPC.flush();
-				writerPC.close();
-			}
-*/			
-			
-		}
-		catch(Exception ex) {
+			/*
+			 * File fProjectConf = new File(sFullProjectPath +
+			 * Utils.FILE_SEPARATOR +
+			 * makeProjectConfigFileName(sProjectMainFileName)); if
+			 * (!fProjectConf.exists()) { fProjectConf.createNewFile();
+			 * FileWriter writerPC = new FileWriter(fProjectConf);
+			 * writerPC.write(makeProjectConfigFile(projectName, packageName,
+			 * javaSrcPath, author, descr)); writerPC.flush(); writerPC.close();
+			 * }
+			 */
+
+		} catch (Exception ex) {
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
-		}		
-		
+		}
+
 		return res;
 	}
 
-
 	public void deleteFolder(File folder) {
-	    File[] files = folder.listFiles();
-	    if(files!=null) { //some JVMs return null for empty dirs
-	        for(File f: files) {
-	            if(f.isDirectory()) {
-	                deleteFolder(f);
-	            } else {
-	                f.delete();
-	            }
-	        }
-	    }
-	    folder.delete();
+		File[] files = folder.listFiles();
+		if (files != null) { // some JVMs return null for empty dirs
+			for (File f : files) {
+				if (f.isDirectory()) {
+					deleteFolder(f);
+				} else {
+					f.delete();
+				}
+			}
+		}
+		folder.delete();
 	}
-	
-	
+
 	@Override
-	public RequestDirOperationResult deleteProject(String userName,
-			String projectName, Long projectId) {
+	public RequestDirOperationResult deleteProject(String userName, String projectName, Long projectId) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setProjectId(projectId);
 		res.setOperation("deleting project");
@@ -411,32 +383,29 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		try {
 			File fileTemp = new File(projectName);
 			deleteFolder(fileTemp);
-  
-		}
-		catch(Exception ex) {
+
+		} catch (Exception ex) {
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
 		}
 		return res;
 	}
 
-
 	@Override
-	public RequestDirOperationResult addFile(String user, String parent,
-			String fileName, Long projectId, Long fileId, String content) {
+	public RequestDirOperationResult addFile(String user, String parent, String fileName, Long projectId, Long fileId, String content) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setOperation("file creating");
-//		res.setProjectPath(projectPath);
+		// res.setProjectPath(projectPath);
 		res.setProjectId(projectId);
 		res.setRetCode(0);
-		String sFullProjectPath = parent + Utils.FILE_SEPARATOR + fileName; 
+		String sFullProjectPath = parent + Utils.FILE_SEPARATOR + fileName;
 		try {
-			
+
 			File parentPath = new File(Utils.extractJustPath(sFullProjectPath));
 			if (!parentPath.exists()) {
 				parentPath.mkdirs();
 			}
-			
+
 			File fNewFile = new File(sFullProjectPath);
 			if (!fNewFile.exists()) {
 				fNewFile.createNewFile();
@@ -449,55 +418,51 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 				writer.flush();
 				writer.close();
 			}
-		}
-		catch(Exception ex) {
+		} catch (Exception ex) {
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
-		}		
-		
+		}
+
 		return res;
 	}
 
-
 	@Override
-	public RequestFileOperationResult deleteFile(String user, String fileName,
-			Long fileId) {
+	public RequestFileOperationResult deleteFile(String user, String fileName, Long fileId) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
 		res.setFileId(fileId);
 		res.setOperation("deleting file");
 		res.setFileName(fileName);
 		res.setRetCode(0);
-		try{
-	        File fileTemp = new File(fileName);
-	          if (fileTemp.exists()){
-	             fileTemp.delete();
-	          }   
-	      }catch(Exception ex){
-				res.setResult(ex.getMessage());
-				res.setRetCode(-1);
-	      }
+		try {
+			File fileTemp = new File(fileName);
+			if (fileTemp.exists()) {
+				fileTemp.delete();
+			}
+		} catch (Exception ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(-1);
+		}
 		return res;
 	}
 
 	@Override
-	public RequestDirOperationResult readFile(String user, String parent,
-			String fileName, Long projectId, Long fileId) {
+	public RequestDirOperationResult readFile(String user, String parent, String fileName, Long projectId, Long fileId) {
 		UserStateInfo userStateInfo;
-		
+
 		if (usersStates.get(user) == null) {
 			userStateInfo = new UserStateInfo();
 		} else {
 			userStateInfo = usersStates.get(user);
 		}
-		FileItemInfo fileItemInfo = new FileItemInfo(Utils.extractJustFileName(fileName),Utils.extractJustPath(fileName),false);
+		FileItemInfo fileItemInfo = new FileItemInfo(Utils.extractJustFileName(fileName), Utils.extractJustPath(fileName), false);
 		fileItemInfo.setFileId(fileId);
 		fileItemInfo.setProjectId(projectId);
-		
+
 		userStateInfo.addFile2OpenedFiles(fileId, fileItemInfo);
 		userStateInfo.setProjectIdSelected(projectId);
 		userStateInfo.setFileIdSelected(fileId);
-		usersStates.put(user,userStateInfo);
-		
+		usersStates.put(user, userStateInfo);
+
 		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setProjectId(projectId);
 		res.setFileId(fileId);
@@ -506,8 +471,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		res.setRetCode(0);
 		try {
 			res.setTextFile(openFile(fileName));
-		}
-		catch(Exception ex) {
+		} catch (Exception ex) {
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
 		}
@@ -515,35 +479,32 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	}
 
 	@Override
-	public RequestFileOperationResult saveFile(String user, 
-			String fileName, Long projectId, Long fileId, String content) {
+	public RequestFileOperationResult saveFile(String user, String fileName, Long projectId, Long fileId, String content) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
 		res.setFileName(fileName);
 		res.setFileId(fileId);
 		res.setOperationType(OperationTypes.SAVE_FILE);
 		res.setOperation("saving file");
 		res.setRetCode(0);
-		
+
 		Writer writer = null;
-		
+
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(
-			          new FileOutputStream(fileName), "utf-8"));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "utf-8"));
 			writer.write(content);
-		}
-		catch(IOException ex) {
+		} catch (IOException ex) {
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
 		} finally {
-		   try {writer.close();}
-		   catch (Exception ex) {
+			try {
+				writer.close();
+			} catch (Exception ex) {
 				res.setResult(ex.getMessage());
 				res.setRetCode(-1);
-		   }
+			}
 		}
 		return res;
 	}
-
 
 	@Override
 	public RequestUserStateResult getUserState(String user) {
@@ -560,24 +521,23 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		return res;
 	}
 
-
 	@Override
 	public RequestFileOperationResult closeFile(String user, String fileName, Long fileId) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
-		UserStateInfo	userStateInfo = usersStates.get(user);
+		UserStateInfo userStateInfo = usersStates.get(user);
 		if (userStateInfo != null) {
 			FileItemInfo value = null;
-			for(Object key :  userStateInfo.getOpenedFiles().keySet()) {
+			for (Object key : userStateInfo.getOpenedFiles().keySet()) {
 				value = userStateInfo.getOpenedFiles().get(key);
-				String sFullName = value.getAbsolutePath() + Utils.FILE_SEPARATOR + value.getName();  
+				String sFullName = value.getAbsolutePath() + Utils.FILE_SEPARATOR + value.getName();
 				if (sFullName.equalsIgnoreCase(fileName)) {
 					userStateInfo.getOpenedFiles().remove(key);
 					break;
 				}
-			}			
+			}
 			usersStates.remove(user);
-			usersStates.put(user,userStateInfo);
-			
+			usersStates.put(user, userStateInfo);
+
 			res.setFileId(fileId);
 			res.setOperation("closing file");
 			res.setFileName(fileName);
@@ -585,41 +545,39 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		} else {
 			res.setResult("user not found");
 			res.setRetCode(-1);
-        }
+		}
 		return res;
 	}
 
-
 	private void changeFileNameInUserStateInfo(String user, Long fileId, String fileNewName) {
-		if(usersStates.get(user) != null) {
+		if (usersStates.get(user) != null) {
 			if (usersStates.get(user).getOpenedFiles().get(fileId) != null) {
 				usersStates.get(user).getOpenedFiles().get(fileId).setAbsolutePath(fileNewName);
 				usersStates.get(user).getOpenedFiles().get(fileId).setName(Utils.extractJustFileName(fileNewName));
 			}
-		}	
+		}
 	}
-	
-	
+
 	@Override
-	public RequestFileOperationResult renameFile(String user, String fileName, 	Long fileId, String fileNewName) {
+	public RequestFileOperationResult renameFile(String user, String fileName, Long fileId, String fileNewName) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
 		res.setFileId(fileId);
-//		res.setOperation("renaming file");
+		// res.setOperation("renaming file");
 		res.setOperationType(OperationTypes.RENAME_FILE);
 		res.setFileName(fileName);
 		res.setFileNewName(fileNewName);
-	    File oldFile = new File(fileName);
-	    File newFile = new File(fileNewName);
-	    if(!newFile.exists()) {
-	    	if (oldFile.renameTo(newFile)) {
-	    		
-	    		changeFileNameInUserStateInfo(user, fileId, fileNewName);
+		File oldFile = new File(fileName);
+		File newFile = new File(fileNewName);
+		if (!newFile.exists()) {
+			if (oldFile.renameTo(newFile)) {
+
+				changeFileNameInUserStateInfo(user, fileId, fileNewName);
 				res.setResult("File has been renamed");
 				res.setRetCode(0);
-	    	} else {
+			} else {
 				res.setResult("Error while renaming");
 				res.setRetCode(-1);
-	    	}
+			}
 		} else {
 			res.setResult("File with such name exists");
 			res.setRetCode(-2);
@@ -627,6 +585,4 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		return res;
 	}
 
-	
-	
 }

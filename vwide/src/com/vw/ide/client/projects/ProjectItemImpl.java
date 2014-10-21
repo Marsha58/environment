@@ -1,10 +1,5 @@
 package com.vw.ide.client.projects;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.google.gwt.user.client.ui.Widget;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
  * Simple class which is used to pass information about file

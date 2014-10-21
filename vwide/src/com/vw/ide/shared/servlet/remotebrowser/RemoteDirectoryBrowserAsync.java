@@ -3,7 +3,6 @@ package com.vw.ide.shared.servlet.remotebrowser;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForFileOperation;
 
 public interface RemoteDirectoryBrowserAsync {
 	/**

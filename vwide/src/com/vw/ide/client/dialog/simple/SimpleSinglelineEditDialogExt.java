@@ -9,7 +9,6 @@ import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.vw.ide.client.dialog.VwmlDialogExt;
-import com.vw.ide.client.model.BaseDto;
 
 /**
  * Allows to edit single line text

@@ -3,7 +3,6 @@ package com.vw.ide.client.event.uiflow;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.shared.GwtEvent;
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
-import com.vw.ide.client.event.handler.LoginHandler;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 

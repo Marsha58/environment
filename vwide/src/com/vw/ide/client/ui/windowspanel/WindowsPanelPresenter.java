@@ -36,4 +36,16 @@ public class WindowsPanelPresenter extends Presenter {
 	@Override
 	public void handleEvent(GwtEvent<?> event) {
 	}
+
+	@Override
+	public void registerOnEventBus(HandlerManager eventBus) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterOnEventBus(HandlerManager eventBus) {
+		// TODO Auto-generated method stub
+		
+	}
 }

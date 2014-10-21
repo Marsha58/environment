@@ -8,7 +8,6 @@ import com.vw.ide.client.service.BusConnectivity;
 import com.vw.ide.client.service.ServiceCallback;
 import com.vw.ide.client.service.VwIdeClientService;
 import com.vw.ide.client.service.factory.ServicesStubFactory;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
@@ -35,77 +34,28 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 	 */
 	public static class ServiceCallbackForDirList extends ServiceCallback<List<String>>  {
 
-		private RemoteBrowserService service;
-		
-		public ServiceCallbackForDirList(RemoteBrowserService service) {
-			this.service = service;
-		}
 	}
 	
 	public static class ServiceCallbackForReadingFile extends ServiceCallback<List<String>>  {
-
-		private RemoteBrowserService service;
-		
-		public ServiceCallbackForReadingFile(RemoteBrowserService service) {
-			this.service = service;
-		}
 	}	
 
 	public static class ServiceCallbackForCompleteContent extends ServiceCallback<RequestedDirScanResult> {
-
-		private RemoteBrowserService service;
-		
-		public ServiceCallbackForCompleteContent(RemoteBrowserService service) {
-			this.service = service;
-		}
 	}
 
 	public static class ServiceCallbackForAnyOperation extends ServiceCallback<RequestDirOperationResult> {
-
-		private RemoteBrowserService service;
-		
-		public ServiceCallbackForAnyOperation(RemoteBrowserService service) {
-			this.service = service;
-		}
 	}
 	
 	public static class ServiceCallbackForUserState extends ServiceCallback<RequestUserStateResult> {
-
-		private RemoteBrowserService service;
-		
-		public ServiceCallbackForUserState(RemoteBrowserService service) {
-			this.service = service;
-		}
 	}	
 	
 	public static class ServiceCallbackForProjectCreation extends ServiceCallback<RequestProjectCreationResult> {
-
-		private RemoteBrowserService service;
-		
-		public ServiceCallbackForProjectCreation(RemoteBrowserService service) {
-			this.service = service;
-		}
 	}
 
 	public static class ServiceCallbackForDirOperation extends ServiceCallback<RequestDirOperationResult> {
-
-		private RemoteBrowserService service;
-		
-		public ServiceCallbackForDirOperation(RemoteBrowserService service) {
-			this.service = service;
-		}
 	}
 	
 	public static class ServiceCallbackForFileOperation extends ServiceCallback<RequestFileOperationResult> {
-
-		private RemoteBrowserService service;
-		
-		public ServiceCallbackForFileOperation(RemoteBrowserService service) {
-			this.service = service;
-		}
 	}
-	
-		
 	
 	private RemoteBrowserService() {
 		
@@ -140,31 +90,31 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 	}
 	
 	public ServiceCallbackForCompleteContent buildCallbackForCompleteContent() {
-		return new ServiceCallbackForCompleteContent(this);
+		return new ServiceCallbackForCompleteContent();
 	}
 	
 	public ServiceCallbackForDirList buildCallbackForDirListOnly() {
-		return new ServiceCallbackForDirList(this);
+		return new ServiceCallbackForDirList();
 	}
 	
 	public ServiceCallbackForAnyOperation buildCallbackForAnyOperation() {
-		return new ServiceCallbackForAnyOperation(this);
+		return new ServiceCallbackForAnyOperation();
 	}
 	
 	public ServiceCallbackForUserState buildCallbackForUserState() {
-		return new ServiceCallbackForUserState(this);
+		return new ServiceCallbackForUserState();
 	}
 	
 	
 	public ServiceCallbackForProjectCreation buildCallbackForProjectCreation() {
-		return new ServiceCallbackForProjectCreation(this);
+		return new ServiceCallbackForProjectCreation();
 	}		
 	
 	public ServiceCallbackForDirOperation buildCallbackForDirOperation() {
-		return new ServiceCallbackForDirOperation(this);
+		return new ServiceCallbackForDirOperation();
 	}
 	
 	public ServiceCallbackForFileOperation buildCallbackForFileOperation() {
-		return new ServiceCallbackForFileOperation(this);
+		return new ServiceCallbackForFileOperation();
 	}
 }

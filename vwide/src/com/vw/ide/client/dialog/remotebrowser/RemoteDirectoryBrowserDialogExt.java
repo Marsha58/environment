@@ -1,11 +1,9 @@
 package com.vw.ide.client.dialog.remotebrowser;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dev.jjs.ast.HasName.Util;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -13,8 +11,6 @@ import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Label;
-//import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
@@ -37,13 +33,12 @@ import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForCompleteContent;
-import com.vw.ide.client.utils.Utils;
 import com.vw.ide.client.utils.Utils.YesNoMsgBoxSelctionCallback;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
+//import com.google.gwt.user.client.ui.Tree;
 
 /**
  * Selects file/directory on remote side
@@ -292,7 +287,6 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 								.getAbsolutePath());
 						if (treeSelectedItem.getType() == "dir") {
 							selectedFolder = (FolderDto) treeSelectedItem;
-							String s = selectedFolder.getName();
 							// requestForDirContent(selectedFolder.getRelPath());
 							((TextButton) getButtonBar().getItemByItemId(
 									SELECT_ID)).enable();
@@ -385,7 +379,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		for (FileItemInfo fi : dirs.getFiles()) {
 			if (fi.isDir()) {
 				if (owner.getRelPath().trim().length() > 0) {
-					sNewPath = owner.getRelPath() + Utils.FILE_SEPARATOR + fi.getName();
+					sNewPath = owner.getRelPath() + "\\" + fi.getName();
 				} else {
 					sNewPath = fi.getName();
 				}
@@ -420,9 +414,8 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			if (el.getType() == "dir") {
 				String sRelPathFromAbsPath = absolutePath.substring(basePath
 						.length());
-				if (sRelPathFromAbsPath.length() > 2) {  
-					if ((sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\"))||
-						(sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("/"))) {
+				if (sRelPathFromAbsPath.length() > 2) {
+					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) {
 						sRelPathFromAbsPath = sRelPathFromAbsPath.substring(1);
 					}
 				}
@@ -567,7 +560,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			return input;
 		} else {
 			for (int i = 0; i < arrPath.length - 2; i++) {
-				output += arrPath[i] + Utils.FILE_SEPARATOR;
+				output += arrPath[i] + "\\";
 			}
 			output += arrPath[arrPath.length - 2];
 		}
@@ -619,21 +612,4 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			}
 		}
 	}
-
-	private String buildRelPath(TreeItem item) {
-		if (item.getText() != null && !item.getText().equals(getLoggedAsUser())) {
-			String p = null;
-			while (item != null && !item.getText().equals(getLoggedAsUser())) {
-				if (p != null) {
-					p = item.getText() + Utils.FILE_SEPARATOR + p;
-				} else {
-					p = item.getText();
-				}
-				item = item.getParentItem();
-			}
-			return p;
-		}
-		return null;
-	}
-
 }

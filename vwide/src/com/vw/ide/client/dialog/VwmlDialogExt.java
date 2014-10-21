@@ -5,9 +5,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.Style.Anchor;
 import com.sencha.gxt.core.client.Style.AnchorAlignment;
 import com.sencha.gxt.core.client.util.Point;
-import com.sencha.gxt.widget.core.client.box.MessageBox;
-import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import com.google.gwt.user.client.Window;
 import com.sencha.gxt.widget.core.client.Dialog;
 
 /**

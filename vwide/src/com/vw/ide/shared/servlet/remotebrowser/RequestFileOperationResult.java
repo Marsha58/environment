@@ -1,7 +1,6 @@
 package com.vw.ide.shared.servlet.remotebrowser;
 
 import java.io.Serializable;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class RequestFileOperationResult extends RequestResult implements Serializable {

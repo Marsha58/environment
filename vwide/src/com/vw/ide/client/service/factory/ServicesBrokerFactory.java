@@ -4,6 +4,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.vw.ide.client.service.BusConnectivity;
 import com.vw.ide.client.service.VwIdeClientService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
+import com.vw.ide.client.service.security.RemoteSecurityService;
 
 /**
  * Creates instances of concrete client side services
@@ -16,7 +17,8 @@ public class ServicesBrokerFactory {
 	 */
 	public static void instantiateAllServices(HandlerManager eventBus) {
 		VwIdeClientService services[] = {
-											RemoteBrowserService.instance()
+											RemoteBrowserService.instance(),
+											RemoteSecurityService.instance()
 										};
 		for(VwIdeClientService s : services) {
 			if (s != null && s instanceof BusConnectivity) {
