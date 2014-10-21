@@ -33,6 +33,7 @@ import com.vw.ide.client.service.ProcessedResult;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForCompleteContent;
+import com.vw.ide.client.utils.Utils;
 import com.vw.ide.client.utils.Utils.YesNoMsgBoxSelctionCallback;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
@@ -379,7 +380,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		for (FileItemInfo fi : dirs.getFiles()) {
 			if (fi.isDir()) {
 				if (owner.getRelPath().trim().length() > 0) {
-					sNewPath = owner.getRelPath() + "\\" + fi.getName();
+					sNewPath = owner.getRelPath() + Utils.FILE_SEPARATOR + fi.getName();
 				} else {
 					sNewPath = fi.getName();
 				}
@@ -415,7 +416,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 				String sRelPathFromAbsPath = absolutePath.substring(basePath
 						.length());
 				if (sRelPathFromAbsPath.length() > 2) {
-					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) {
+					if ((sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\"))|| (sRelPathFromAbsPath.substring(0, 1)	.equalsIgnoreCase("/"))) {
 						sRelPathFromAbsPath = sRelPathFromAbsPath.substring(1);
 					}
 				}
@@ -560,7 +561,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			return input;
 		} else {
 			for (int i = 0; i < arrPath.length - 2; i++) {
-				output += arrPath[i] + "\\";
+				output += arrPath[i] + Utils.FILE_SEPARATOR;
 			}
 			output += arrPath[arrPath.length - 2];
 		}

@@ -9,6 +9,7 @@ import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
 import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.utils.Utils;
 
 public class SaveFileEventHandler extends Presenter.PresenterEventHandler implements SaveFileHandler {
 	@Override
@@ -25,7 +26,7 @@ public class SaveFileEventHandler extends Presenter.PresenterEventHandler implem
 	
 	protected void process(DevelopmentBoardPresenter presenter, SaveFileEvent event) {
 		FileSheet currentWidget = presenter.getView().getActiveFileSheetWidget();
-		String sFullName = currentWidget.getFilePath() + "/" + currentWidget.getFileName();
+		String sFullName = currentWidget.getFilePath() + Utils.FILE_SEPARATOR + currentWidget.getFileName();
 		RemoteBrowserServiceBroker.requestForFileSaving(FlowController.getLoggedAsUser(),
 														sFullName, currentWidget.getProjectId(),
 														currentWidget.getFileId(), currentWidget.getAceEditor().getText(),

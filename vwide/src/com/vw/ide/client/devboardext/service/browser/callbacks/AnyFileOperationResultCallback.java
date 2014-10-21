@@ -2,6 +2,7 @@ package com.vw.ide.client.devboardext.service.browser.callbacks;
 
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
+import com.vw.ide.client.event.uiflow.FileStateChangedEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
@@ -36,6 +37,8 @@ public class AnyFileOperationResultCallback extends RemoteBrowserServiceBroker.R
 			if (result.getOperationType() == OperationTypes.SAVE_FILE) {
 				FileSheet savedFileSheet = (FileSheet)owner.getProjectManager().getAssociatedTabWidget(result.getFileId());
 				savedFileSheet.setIsFileEdited(false);
+				FileStateChangedEvent evt = new FileStateChangedEvent(result.getFileId(),false);
+				owner.fireEvent(evt);
 			}
 		}
 		if (requestForUpdateDirContent) {

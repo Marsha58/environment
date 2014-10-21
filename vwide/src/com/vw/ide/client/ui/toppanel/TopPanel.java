@@ -61,6 +61,8 @@ import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
+import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
@@ -233,7 +235,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 					assert false : "Unsupported theme enum";
 				}
 
-				((DevelopmentBoardPresenter) getAssociatedPresenter()).getProjectPanel().requestForDirContent(null);
+				((DevelopmentBoardPresenter) getAssociatedPresenter()).getProjectPanel().requestDirContent(null);
 			}
 
 		});
@@ -246,7 +248,8 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 			public void onBeforeSelection(BeforeSelectionEvent<Item> event) {
 				if (event.getItem().getData("fileId") != null) {
 					Long fileId = event.getItem().getData("fileId");
-					((DevelopmentBoardPresenter) presenter).scrollToTab(fileId, true);
+					FileSheet currentTab = (FileSheet) ((DevelopmentBoardPresenter) presenter).getProjectManager().getAssociatedTabWidget(fileId);
+					((DevelopmentBoardPresenter) presenter).scrollToTab(currentTab, true);
 				}
 
 			}
@@ -323,7 +326,10 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 	}
 
 	public void addItemToScrollMenu(String sFullFileName, Long fileId) {
-		MenuItem mi = new MenuItem(sFullFileName);
+		String sFileNameWithRelativePath = FileItemInfo.makeRelPathFromAbsolute(presenter.getLoggedAsUser(), sFullFileName) + 
+										   Utils.FILE_SEPARATOR +
+										   Utils.extractJustFileName(sFullFileName);
+		MenuItem mi = new MenuItem(sFileNameWithRelativePath);
 		mi.setData("fileId", fileId);
 		scrollMenu.add(mi);
 	}

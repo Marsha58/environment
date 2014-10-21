@@ -7,9 +7,10 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.vw.ide.client.devboardext.event.handler.AceColorThemeChangedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.EditorTabClosedEventHandler;
-import com.vw.ide.client.devboardext.event.handler.FileEditedEventHandler;
+import com.vw.ide.client.devboardext.event.handler.FileStateChangedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.GetDirContentEventHandler;
 import com.vw.ide.client.devboardext.event.handler.LogoutEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ProjectMenuEventHandler;
@@ -19,7 +20,7 @@ import com.vw.ide.client.devboardext.event.handler.ServerLogEventHandler;
 import com.vw.ide.client.devboardext.service.browser.callbacks.GettingUserStateResultCallback;
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
-import com.vw.ide.client.event.handler.FileEditedHandler;
+import com.vw.ide.client.event.handler.FileStateChangedHandler;
 import com.vw.ide.client.event.handler.GetDirContentHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
@@ -28,7 +29,7 @@ import com.vw.ide.client.event.handler.SelectFileHandler;
 import com.vw.ide.client.event.handler.ServerLogHandler;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
-import com.vw.ide.client.event.uiflow.FileEditedEvent;
+import com.vw.ide.client.event.uiflow.FileStateChangedEvent;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
@@ -40,6 +41,9 @@ import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.projects.ProjectManagerImpl;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.ui.editorpanel.EditorPanel;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel;
+import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
@@ -62,7 +66,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		{
 			put(SelectFileEvent.TYPE, new SelectFileEventHandler());
 			put(SaveFileEvent.TYPE, new SaveFileEventHandler());
-			put(FileEditedEvent.TYPE, new FileEditedEventHandler());
+			put(FileStateChangedEvent.TYPE, new FileStateChangedEventHandler());
 			put(AceColorThemeChangedEvent.TYPE, new AceColorThemeChangedEventHandler());
 			put(EditorTabClosedEvent.TYPE, new EditorTabClosedEventHandler());
 			put(GetDirContentEvent.TYPE, new GetDirContentEventHandler());
@@ -71,6 +75,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 			put(ServerLogEvent.TYPE, new ServerLogEventHandler());
 		}
 	};
+	
 	
 	public DevelopmentBoardPresenter(HandlerManager eventBus, PresenterViewerLink view) {
 		this.eventBus = eventBus;
@@ -108,7 +113,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		}
 		eventBus.addHandler(SelectFileEvent.TYPE, (SelectFileHandler)dispatcher.get(SelectFileEvent.TYPE));
 		eventBus.addHandler(SaveFileEvent.TYPE, (SaveFileHandler)dispatcher.get(SaveFileEvent.TYPE));
-		eventBus.addHandler(FileEditedEvent.TYPE, (FileEditedHandler)dispatcher.get(FileEditedEvent.TYPE));
+		eventBus.addHandler(FileStateChangedEvent.TYPE, (FileStateChangedHandler)dispatcher.get(FileStateChangedEvent.TYPE));
 		eventBus.addHandler(AceColorThemeChangedEvent.TYPE, (AceColorThemeChangedHandler)dispatcher.get(AceColorThemeChangedEvent.TYPE));
 		eventBus.addHandler(EditorTabClosedEvent.TYPE, (EditorTabClosedHandler)dispatcher.get(EditorTabClosedEvent.TYPE));
 		eventBus.addHandler(GetDirContentEvent.TYPE, (GetDirContentHandler)dispatcher.get(GetDirContentEvent.TYPE));
@@ -121,7 +126,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public void unregisterOnEventBus(HandlerManager eventBus) {
 		eventBus.removeHandler(SelectFileEvent.TYPE, (SelectFileHandler)dispatcher.get(SelectFileEvent.TYPE));
 		eventBus.removeHandler(SaveFileEvent.TYPE, (SaveFileHandler)dispatcher.get(SaveFileEvent.TYPE));
-		eventBus.removeHandler(FileEditedEvent.TYPE, (FileEditedHandler)dispatcher.get(FileEditedEvent.TYPE));
+		eventBus.removeHandler(FileStateChangedEvent.TYPE, (FileStateChangedHandler)dispatcher.get(FileStateChangedEvent.TYPE));
 		eventBus.removeHandler(AceColorThemeChangedEvent.TYPE, (AceColorThemeChangedHandler)dispatcher.get(AceColorThemeChangedEvent.TYPE));
 		eventBus.removeHandler(EditorTabClosedEvent.TYPE, (EditorTabClosedHandler)dispatcher.get(EditorTabClosedEvent.TYPE));
 		eventBus.removeHandler(GetDirContentEvent.TYPE, (GetDirContentHandler)dispatcher.get(GetDirContentEvent.TYPE));
@@ -129,6 +134,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.removeHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 	}
+
 	
 	public TopPanel getTopPanel() {
 		return ((DevelopmentBoard) view).topPanel;
@@ -175,4 +181,22 @@ public class DevelopmentBoardPresenter extends Presenter {
 	protected boolean isValidFileName(String fileName) {
 		return true;
 	}
+	
+	public ProjectPanel getProjectPanel() {
+		return ((DevelopmentBoard) view).getProjectPanel();
+	}
+
+	public EditorPanel getEditorPanel() {
+		return ((DevelopmentBoard) view).getEditorPanel();
+	}
+	
+	public ContentPanel getEditorContentPanel() {
+		return ((DevelopmentBoard) view).editorContentPanel;
+	}	
+	
+	public void scrollToTab(FileSheet curFileSheet, boolean animate) {
+		((DevelopmentBoard) view).scrollToTab(curFileSheet, animate);
+	}	
+	
+	
 }

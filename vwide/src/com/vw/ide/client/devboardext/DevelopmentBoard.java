@@ -255,6 +255,14 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		return projectPanel;
 	}
 	
+	public EditorPanel getEditorPanel() {
+		return editor;
+	}
+	
+	public ContentPanel getEditorContentPanel() {
+		return editorContentPanel;
+	}		
+	
 	public void scrollToTab(FileSheet curFileSheet, boolean animate) {
 		editor.getTabPanel().setActiveWidget(curFileSheet);
 		editor.getTabPanel().scrollToTab(curFileSheet, animate);

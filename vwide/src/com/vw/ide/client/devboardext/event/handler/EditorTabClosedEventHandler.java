@@ -12,6 +12,7 @@ import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
 import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.utils.Utils;
 
 public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler implements EditorTabClosedHandler {
 	@Override
@@ -37,7 +38,7 @@ public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler
 		presenter.getView().deleteFileItemId(fileId);
 		String fileFullName = ((FileSheet) event.getEvent().getItem())
 				.getFilePath()
-				+ "\\"
+				+ Utils.FILE_SEPARATOR
 				+ ((FileSheet) event.getEvent().getItem()).getFileName();
 		RemoteBrowserServiceBroker.requestForFileClosing(FlowController.getLoggedAsUser(),
 														fileFullName,

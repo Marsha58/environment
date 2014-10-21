@@ -20,7 +20,7 @@ public class FileDto extends BaseDto {
 
 	public FileDto(Integer id, String fileName, String folder, String relPath,
 			String absolutePath) {
-		super(id, fileName);
+		super(id, fileName);		
 		setType("file");
 		this.folder = folder;
 		setRelPath(relPath);

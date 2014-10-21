@@ -35,6 +35,7 @@ import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
 import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.vw.ide.client.FlowController;
+import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.images.ExampleImages;
@@ -66,11 +67,11 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	private static class DirContentResultCallback extends RemoteBrowserServiceBroker.ResultCallback<RequestedDirScanResult> {
 
 		private ProjectPanel owner;
-		
+
 		public DirContentResultCallback(ProjectPanel owner) {
 			this.owner = owner;
 		}
-		
+
 		@Override
 		public void handle(RequestedDirScanResult result) {
 			owner.makeTreeData(result);
@@ -87,7 +88,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	Tree<BaseDto, String> projectsDirsField;
 	@UiField
 	ExampleImages images;
-	
+
 	private Presenter presenter = null;
 	private static int autoId = 0;
 	private Widget widget;
@@ -101,7 +102,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 
 	public static final String SELECT_ID = "SELECT_ID";
 	private static final Binder uiBinder = GWT.create(Binder.class);
-	
+
 	class KeyProvider implements ModelKeyProvider<BaseDto> {
 		@Override
 		public String getKey(BaseDto item) {
@@ -177,10 +178,14 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 
 	protected void updateProjects(ArrayList<ProjectItem> projectsList) {
 		for (ProjectItem curPI : projectsList) {
-			Long projectId = projectManager.getProjectIdByProjectInfo(curPI);
+			if (projectManager == null) {
+				projectManager = ((DevelopmentBoardPresenter) presenter).getProjectManager();
+			}
+			Long projectId = this.projectManager.getProjectIdByProjectInfo(curPI);
 			if (projectId == -1L) {
 				projectManager.addProject(curPI);
 			}
+
 		}
 	}
 
@@ -191,55 +196,55 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 				if (b instanceof FileDto) {
 					FileDto curItemInStore = (FileDto) b;
 					Long fileId = -1l;
-					Long projectId = projectManager.getProjectIdByRelPath(curItemInStore.getRelPath());
-					projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
-					if (!projectManager.checkIfFileExists(curItemInStore
-							.getAbsolutePath())) {
+					if (this.projectManager == null) {
+						projectManager = ((DevelopmentBoardPresenter) presenter).getProjectManager();						
+					}
+					Long projectId = this.projectManager.getProjectIdByRelPath(curItemInStore.getRelPath());
+					this.projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
+					if (!this.projectManager.checkIfFileExists(curItemInStore.getAbsolutePath())) {
 						FileItemInfo newFileItemInfo = new FileItemInfo();
 						newFileItemInfo.setAbsolutePath(curItemInStore.getAbsolutePath());
 						newFileItemInfo.setRelPath(curItemInStore.getRelPath());
 						newFileItemInfo.setName(Utils.extractJustFileName(curItemInStore.getAbsolutePath()));
 						newFileItemInfo.setDir(false);
 						newFileItemInfo.setProjectId(projectId);
-						fileId = projectManager.addFile(newFileItemInfo);
-					}
-					else {
-						fileId = projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
+						fileId = this.projectManager.addFile(newFileItemInfo);
+					} else {
+						fileId = this.projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
 					}
 					curItemInStore.setProjectId(projectId);
 					curItemInStore.setFileId(fileId);
 				}
 			} catch (Exception e) {
-				// TODO: handle exception
+				System.out.println(e.getLocalizedMessage());
+
 			}
 		}
 	}
-	
+
 	private Widget constructUi() {
 		widget = uiBinder.createAndBindUi(this);
 		widget.addStyleName("margin-10");
 		projectsDirsField.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		projectsDirsField.getSelectionModel().addSelectionHandler(
-				new SelectionHandler<BaseDto>() {
-					public void onSelection(SelectionEvent<BaseDto> event) {
-						treeSelectedItem = event.getSelectedItem();
-						FileItemInfo fileItemInfo = new FileItemInfo();
-						fileItemInfo.setName(treeSelectedItem.getName());
-						fileItemInfo.setAbsolutePath(treeSelectedItem.getAbsolutePath());
-						if (treeSelectedItem.getType() == "file") {
-							fileItemInfo.setDir(false);
-							fileItemInfo.setProjectId(((FileDto) treeSelectedItem).getProjectId());
-							fileItemInfo.setFileId(((FileDto) treeSelectedItem).getFileId());
-							if (presenter != null) {
-								presenter.fireEvent(new SelectFileEvent(
-										fileItemInfo));
-							}
-						} else {
-							fileItemInfo.setDir(true);
-						}
-						selectedItem4ContextMenu = fileItemInfo; 
+		projectsDirsField.getSelectionModel().addSelectionHandler(new SelectionHandler<BaseDto>() {
+			public void onSelection(SelectionEvent<BaseDto> event) {
+				treeSelectedItem = event.getSelectedItem();
+				FileItemInfo fileItemInfo = new FileItemInfo();
+				fileItemInfo.setName(treeSelectedItem.getName());
+				fileItemInfo.setAbsolutePath(treeSelectedItem.getAbsolutePath());
+				if (treeSelectedItem.getType() == "file") {
+					fileItemInfo.setDir(false);
+					fileItemInfo.setProjectId(((FileDto) treeSelectedItem).getProjectId());
+					fileItemInfo.setFileId(((FileDto) treeSelectedItem).getFileId());
+					if (presenter != null) {
+						presenter.fireEvent(new SelectFileEvent(fileItemInfo));
 					}
-				});
+				} else {
+					fileItemInfo.setDir(true);
+				}
+				selectedItem4ContextMenu = fileItemInfo;
+			}
+		});
 
 		return widget;
 	}
@@ -249,14 +254,14 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	}
 
 	public void buildContextMenu() {
-		contextMenu = new ProPanelContextMenu(); 
-		contextMenu.setWidth(160);
-		contextMenu.addBeforeShowHandler(new BeforeShowHandler(){
+		contextMenu = new ProPanelContextMenu();
+		contextMenu.setWidth(130);
+		contextMenu.addBeforeShowHandler(new BeforeShowHandler() {
 			@Override
 			public void onBeforeShow(BeforeShowEvent event) {
 				contextMenu.associatePresenter(getAssociatedPresenter());
 				contextMenu.checkEnabling(selectedItem4ContextMenu);
-			}	
+			}
 		});
 		projectsDirsField.setContextMenu(contextMenu);
 	}
@@ -295,21 +300,25 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		for (FileItemInfo fi : dirs.getFiles()) {
 			if (fi.isDir()) {
 				if (owner.getRelPath().trim().length() > 0) {
-					sNewPath = owner.getRelPath() + "\\" + fi.getName();
+					sNewPath = owner.getRelPath() + Utils.FILE_SEPARATOR + fi.getName();
 				} else {
 					sNewPath = fi.getName();
 				}
 				folder = makeFolder(fi.getName(), sNewPath, fi.getAbsolutePath());
-				owner.addOrReplaceChild(folder);
+				
+				if(owner != null) {
+					owner.addOrReplaceChild(folder);
+				} 			
 				requestDirContent(folder.getRelPath());
-			}
-			else {
-				owner.addOrReplaceChild(makeFileItem(fi.getName(), owner, owner.getRelPath(), fi.getAbsolutePath()));
+			} else {
+				if(owner != null) {
+					owner.addOrReplaceChild(makeFileItem(fi.getName(), owner, owner.getRelPath(), fi.getAbsolutePath()));
+				} 
 			}
 		}
 		return root;
 	}
-	
+
 	private void makeTreeData(RequestedDirScanResult dirs) {
 		FolderDto root = makeTree(dirs);
 		for (BaseDto base : root.getChildren()) {
@@ -323,24 +332,22 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 
 	private FolderDto findOwnerElement(FolderDto ownerFolder, String sFolderName, String absolutePath, boolean IsCatched) {
 		FolderDto res = null;
+		absolutePath = absolutePath.replaceAll("[\\\\]", "/");
 		for (BaseDto el : ownerFolder.getChildren()) {
 			if (el.getType() == "dir") {
-				String sRelPathFromAbsPath = absolutePath.substring(basePath
-						.length());
+				String sRelPathFromAbsPath = absolutePath.substring(basePath.length());
 				if (sRelPathFromAbsPath.length() > 2) {
-					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) {
+					if ((sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) || (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("/"))) {
 						sRelPathFromAbsPath = sRelPathFromAbsPath.substring(1);
 					}
 				}
-				if (el.getRelPath().trim()
-						.equalsIgnoreCase(sRelPathFromAbsPath.trim())) {
+				if (el.getRelPath().trim().equalsIgnoreCase(sRelPathFromAbsPath.trim())) {
 					IsCatched = true;
 					res = (FolderDto) el;
 					break;
 				} else {
 					if (!IsCatched) {
-						res = findOwnerElement((FolderDto) el, sFolderName,
-								absolutePath, IsCatched);
+						res = findOwnerElement((FolderDto) el, sFolderName, absolutePath, IsCatched);
 					}
 					if (res != null) {
 						return res;
@@ -372,26 +379,28 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	}
 
 	private static FileDto makeFileItem(String fileName, String folder, String relPath, String absolutePath) {
+		if((fileName == null) || (folder == null)|| (relPath == null)){
+			System.out.println("fileName : "+fileName + ",folder : "+folder+ ",relPath :" + relPath);
+		}
 		return new FileDto(++autoId, fileName, folder, relPath, absolutePath);
 	}
-	
+
 	private TreeStore<BaseDto> getStore() {
 		return store;
 	}
 
 	private String selectProjectName(String sPath) {
 		String sRes = sPath;
-		String delims = "[\\\\/]+"; // / parse such string as
-									// "\\aaaa\\bbbb\\\\cccc\\\\dddd/eeee//ffff/gggg"
+		String delims = "[\\\\/]+";
 		if (sPath.length() > 0) {
 			String[] arrSpl = sPath.split(delims);
 			sRes = arrSpl[arrSpl.length - 1];
 		}
 		return sRes;
 	}
-	
+
 	private void updateProjectsDirField(BaseDto rootItem) {
 		projectsDirsField.getSelectionModel().select(rootItem, true);
 		projectsDirsField.setExpanded(rootItem, true);
 	}
-} 
+}

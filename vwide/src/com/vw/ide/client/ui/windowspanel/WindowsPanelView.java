@@ -7,10 +7,14 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Composite;
+import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
+import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
+import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
 import com.vw.ide.client.presenters.Presenter;
+import com.vw.ide.client.ui.editorpanel.EditorPanelContextMenu;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditor;
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorMode;
@@ -39,12 +43,13 @@ public class WindowsPanelView extends Composite {
 	@UiField(provided = true)
 	BorderLayoutData southData = new BorderLayoutData(80);
 	
+	@UiField
+	TabPanel windowsTabPanel;
+	
 	
 	private Presenter presenter = null;
-	
-	
 	private Widget widget;	
-	
+	private WindowsPanelContextMenu contextMenu;	
 	
 	
 	public WindowsPanelView() {
@@ -52,6 +57,7 @@ public class WindowsPanelView extends Composite {
 	        widget = constructUi();
 	      }		
 		initWidget(widget);
+		buildContextMenu();
 	}
 
 	public void associatePresenter(Presenter presenter) {
@@ -73,8 +79,7 @@ public class WindowsPanelView extends Composite {
 	   logAceEditor = new AceEditor();
 	   logAceEditor.setWidth("100%");
 	   logAceEditor.setHeight("100%");
-	   logAceEditor.startEditor(); // must be called before calling
-									// setTheme/setMode/etc.
+	   logAceEditor.startEditor(); // must be called before calling setTheme/setMode/etc.
 	   logAceEditor.setTheme(AceEditorTheme.CHROME);
 	   logAceEditor.setText("");
 	   logAceEditor.setMode(AceEditorMode.JSON);	
@@ -86,6 +91,21 @@ public class WindowsPanelView extends Composite {
 	   String sTmp = logAceEditor.getText();
 	   sTmp += logContent;
 	   logAceEditor.setText(sTmp);
-   }   
+   }
+   
+    
+   
+	public void buildContextMenu() {
+		contextMenu = new WindowsPanelContextMenu();
+		contextMenu.setWidth(130);
+		contextMenu.addBeforeShowHandler(new BeforeShowHandler() {
+			@Override
+			public void onBeforeShow(BeforeShowEvent event) {
+				contextMenu.associatePresenter(getAssociatedPresenter());
+			}
+		});
+		windowsTabPanel.setContextMenu(contextMenu);
+	}	
+   
 
 }

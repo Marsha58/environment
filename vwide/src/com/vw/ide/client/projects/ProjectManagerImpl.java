@@ -92,7 +92,7 @@ public class ProjectManagerImpl implements ProjectManager{
 	@Override
 	public Long getProjectIdByProjectPath(String user, String projectPath) {
 		Long lRes = -1L;
-		String[] arrRelPath = projectPath.split(user+"\\\\");
+		String[] arrRelPath = projectPath.split(user+ Utils.FILE_SEPARATOR);
 		if(arrRelPath.length == 2) {
 			String projectName = arrRelPath[1]; 
 			for(Object key : projectsContext.keySet()) {

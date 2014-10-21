@@ -13,7 +13,7 @@ import com.sencha.gxt.widget.core.client.Status.StatusAppearance;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
-import com.vw.ide.client.event.uiflow.FileEditedEvent;
+import com.vw.ide.client.event.uiflow.FileStateChangedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.client.utils.Utils;
@@ -229,16 +229,13 @@ public class FileSheet extends Composite {
 		aceEditor.addOnChangeHandler(new AceEditorCallback() {
 			@Override
 			public void invokeAceCallback(JavaScriptObject obj) {
-				FileItemInfo fileItemInfo = new FileItemInfo(); 
-				fileItemInfo.setAbsolutePath(getFilePath() + "\\" +getFileName());
-				fileItemInfo.setProjectId(projectId);
-				fileItemInfo.setFileId(fileId);
-				FileEditedEvent event= new FileEditedEvent(fileItemInfo); 
+				FileStateChangedEvent event= new FileStateChangedEvent(fileId,true); 
 				presenter.fireEvent(event);
-				System.out.println("invokeAceCallback: ");
 			}
 			
 		});
+		
+		aceEditor.setAutocompleteEnabled(true);
 		
 		
 		// add some annotations

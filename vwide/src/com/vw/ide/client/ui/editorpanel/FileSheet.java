@@ -164,22 +164,19 @@ public class FileSheet extends Composite {
 		aceEditor.setHeight("100%");
 		
 		try {
-			AceEditor.addCompletionProvider(new MyCompletionProvider()); 
+			 AceEditor.addCompletionProvider(new MyCompletionProvider()); 
 		} catch (Exception e) {
-			// TODO: handle exception
+			System.out.println(e.getLocalizedMessage());
 		}
 
-		// Try out custom code completer
-		// AceEditor.addCompletionProvider(new MyCompletionProvider());
 
 		// start the first editor and set its theme and mode
 		aceEditor.startEditor(); // must be called before calling
 								// setTheme/setMode/etc.
 		aceEditor.setTheme(((DevelopmentBoardPresenter) presenter).getTopPanel().comboATh.getCurrentValue());
-
-		
 		aceEditor.setText(textFile);
 		
+		aceEditor.setAutocompleteEnabled(true);		
 		
 		// use cursor position change events to keep a label updated
 		// with the current row/col
