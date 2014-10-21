@@ -11,30 +11,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
 
-public interface ExampleImages extends ClientBundle {
+public interface IdeImages extends ClientBundle {
 
-  public ExampleImages INSTANCE = GWT.create(ExampleImages.class);
-
-  @Source("add16.gif")
-  ImageResource add16();
-
-  @Source("add24.gif")
-  ImageResource add24();
-
-  @Source("add32.gif")
-  ImageResource add32();
-  
-  @Source("table.png")
-  ImageResource table();
-
-  @Source("application_side_list.png")
-  ImageResource side_list();
-  
-  @Source("enabled//list.gif")
-  ImageResource list_en();
-
-  @Source("application_form.png")
-  ImageResource form();
+  public IdeImages INSTANCE = GWT.create(IdeImages.class);
 
   @Source("connect.png")
   ImageResource connect();
@@ -45,45 +24,17 @@ public interface ExampleImages extends ClientBundle {
   @Source("user_delete.png")
   ImageResource user_delete();
 
-  @Source("accordion.gif")
-  ImageResource accordion();
-
   @Source("add.gif")
   ImageResource add();
 
   @Source("delete.gif")
   ImageResource delete();
 
-  @Source("calendar.gif")
-  ImageResource calendar();
-
-  @Source("menu-show.gif")
-  ImageResource menu_show();
-
-  @Source("list-items.gif")
-  ImageResource list_items();
-
-  @Source("album.gif")
-  ImageResource album();
-
   @Source("text.png")
   ImageResource text();
 
   @Source("plugin.png")
   ImageResource plugin();
-  
-  @Source("music.png")
-  ImageResource music();
-  
-  
-  @Source("user.png")
-  ImageResource user();
-  
-  @Source("user_kid.png")
-  ImageResource userKid();
-  
-  @Source("user_female.png")
-  ImageResource userFemale();
   
   @Source("css.png")
   ImageResource css();
@@ -93,13 +44,7 @@ public interface ExampleImages extends ClientBundle {
   
   @Source("text.png")
   ImageResource json();
-  
-  @Source("html.png")
-  ImageResource html();
-  
-  @Source("xml.png")
-  ImageResource xml();
-  
+
   @Source("folder.png")
   ImageResource folder();
   
@@ -109,9 +54,6 @@ public interface ExampleImages extends ClientBundle {
   @Source("disabled//save_edit.gif")
   ImageResource save_edit_dis();  
   
-  @Source("enabled//saveas_edit.gif")
-  ImageResource saveas_edit_en();
-
   @Source("enabled//saveall_edit.gif")
   ImageResource saveall_edit_en();
 
@@ -126,28 +68,28 @@ public interface ExampleImages extends ClientBundle {
   
   @Source("prj_obj.gif")
   ImageResource prj_obj();
+
+  @Source("file_obj.gif")
+  ImageResource open_en();
+
+  @Source("file_obj.gif")
+  ImageResource open_dis();
   
-  @Source("enabled//debug_persp.gif")
-  ImageResource debug_persp_en();    
-
-  @Source("enabled//skip_brkp.gif")
-  ImageResource skip_brkp_en();    
-
   @Source("enabled//search.gif")
   ImageResource search_en();
   
   @Source("enabled//terminate_obj.gif")
   ImageResource terminate_obj_en();
+
+  @Source("disabled//terminate_co.gif")
+  ImageResource terminate_obj_dis();
   
   @Source("enabled//suspend_en.gif")
   ImageResource suspend_en();
 
-  @Source("enabled//print_edit.gif")
-  ImageResource print_edit_en();
+  @Source("disabled//suspend_co_dis.gif")
+  ImageResource suspend_dis();
 
-  @Source("disabled//print_edit.gif")
-  ImageResource print_edit_dis();
-  
   @Source("enabled//new_con.gif")
   ImageResource new_con_en();
 
@@ -166,12 +108,18 @@ public interface ExampleImages extends ClientBundle {
   @Source("java-facet.gif")
   ImageResource java_facet();
 
-  @Source("git\\elcl16\\continue.gif")
-  ImageResource continue_exec();    
+  @Source("enabled//execution_obj.gif")
+  ImageResource exec_en();    
+
+  @Source("disabled//run_exc.gif")
+  ImageResource exec_dis();    
   
   @Source("enabled//delete_edit.gif")
   ImageResource delete_edit_en();
 
+  @Source("disabled//delete_edit.gif")
+  ImageResource delete_edit_dis();
+  
   @Source("enabled//signed-off.png")
   ImageResource rename_file_en();  
   

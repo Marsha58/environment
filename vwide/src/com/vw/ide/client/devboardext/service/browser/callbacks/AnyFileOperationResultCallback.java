@@ -4,12 +4,12 @@ import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.projects.ProjectManager;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
 
-public class AnyFileOperationResultCallback extends RemoteBrowserServiceBroker.ResultCallback<RequestFileOperationResult> {
+public class AnyFileOperationResultCallback extends ResultCallback<RequestFileOperationResult> {
 
 	private DevelopmentBoardPresenter owner = null;
 	private boolean requestForUpdateDirContent = true;

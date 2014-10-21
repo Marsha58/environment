@@ -1,56 +1,17 @@
-package com.vw.ide.client.service.remotebrowser;
+package com.vw.ide.client.service.remote.browser;
 
-import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
-import com.vw.ide.client.service.ProcessedResult;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForAnyOperation;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForCompleteContent;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForDirOperation;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForFileOperation;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForUserState;
+import com.vw.ide.client.service.remote.Result;
+import com.vw.ide.client.service.remote.ResultCallback;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForAnyOperation;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForCompleteContent;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForDirOperation;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForFileOperation;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 public class RemoteBrowserServiceBroker {
-
-	public static abstract class ResultCallback<R> {
-		public abstract void handle(R result);
-	}
-
-	protected static class Result<R> extends ProcessedResult<R> {
-
-		private ResultCallback<R> callback;
-		
-		public Result() {
-		}
-		
-		public Result(ResultCallback<R> callback) {
-			setCallback(callback);
-		}
-
-		public ResultCallback<R> getCallback() {
-			return callback;
-		}
-
-		public void setCallback(ResultCallback<R> callback) {
-			this.callback = callback;
-		}
-
-		@Override
-		public void onFailure(Throwable caught) {
-			AlertMessageBox alertMessageBox = new AlertMessageBox("Error", caught.getMessage());
-			alertMessageBox.show();
-		}
-
-		@Override
-		public void onSuccess(R result) {
-			if (callback != null) {
-				callback.handle(result);
-			}
-		}
-	}
 	
 	/**
 	 * Requests for content of a remote directory
@@ -182,19 +143,6 @@ public class RemoteBrowserServiceBroker {
 		}
 	}
 	
-	/**
-	 * Requests for user's state
-	 * @param user
-	 */
-	public static void requestForGettingUserState(String user, ResultCallback<RequestUserStateResult> resultCallback) {
-		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance().getServiceImpl();
-		if (service != null) {
-			ServiceCallbackForUserState cbk = RemoteBrowserService.instance().buildCallbackForUserState();
-			cbk.setProcessedResult(new Result<RequestUserStateResult>(resultCallback));
-			service.getUserState(user, cbk);
-		}
-	}
-
 	/**
 	 * Requests for renaming of file
 	 * @param user

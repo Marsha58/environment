@@ -19,8 +19,8 @@ import com.vw.ide.client.dialog.remotebrowser.RemoteDirectoryBrowserDialogExt;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.ProcessedResult;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserService.ServiceCallbackForProjectCreation;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserService;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForProjectCreation;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 

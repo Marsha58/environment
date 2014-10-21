@@ -26,7 +26,6 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
@@ -52,6 +51,7 @@ import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.dialog.about.AboutDialogExt;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
+import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -64,7 +64,7 @@ import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 /**
  * The top panel, which contains the 'welcome' message and various links.
  */
-public class TopPanel extends Composite implements	PresenterViewerLink {
+public class TopPanel extends Composite implements PresenterViewerLink {
 
   interface Binder extends UiBinder<Widget, TopPanel> { }
   private static final Binder binder = GWT.create(Binder.class);
@@ -75,16 +75,13 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 
 	public ComboBox<AceEditorTheme> comboATh;
 	
-//	 @UiField MenuItem logoutField;
 	 @UiField MenuItem newVwmlProjField;
 	 @UiField TextButton bnNewVwmlProjField;
-	 @UiField TextButton bnSaveSelectedFile;
+	 @UiField TextButton bnSaveFileField;
 	 @UiField MenuItem miHelpAboutField;
-//	 @UiField FlowPanel panelEditor;
 	 @UiField SimpleContainer comboAceEditorPlaceCont;
 	 @UiField SimpleContainer userNamePlaceCont;
 	 @UiField SimpleContainer comboPlaceCont;
-//	 @UiField SimpleContainer outer;
 	 @UiField Label userName;
 	 @UiField TextButton userLogout;
 	 @UiField Menu scrollMenu;
@@ -239,13 +236,13 @@ public class TopPanel extends Composite implements	PresenterViewerLink {
 	    }
 	}
 
-	@UiHandler({"userLogout", "bnNewVwmlProjField", "bnSaveSelectedFile"})
+	@UiHandler({"userLogout", "bnNewVwmlProjField", "bnSaveFileField"})
 	public void onToolBarrButtonClick(SelectEvent event) {
 	    Info.display("Click", ((TextButton) event.getSource()).getText() + " clicked");
 	    String sItemId = ((TextButton)event.getSource()).getItemId(); 
 	    switch (sItemId) {
 		case "idUserLogout":
-			History.newItem("loginGxt");
+			presenter.fireEvent(new LogoutEvent());
 			break;
 		case "idNewVwmlProjField":
 			presenter.fireEvent(new ProjectMenuEvent("idNewProject"));

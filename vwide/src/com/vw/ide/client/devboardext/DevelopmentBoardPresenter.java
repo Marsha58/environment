@@ -39,7 +39,7 @@ import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.projects.ProjectManagerImpl;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.userstate.RemoteUserStateServiceBroker;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
@@ -85,7 +85,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 	public void go(HasWidgets container) {
 		container.clear();
 		container.add(view.asWidget());
-		RemoteBrowserServiceBroker.requestForGettingUserState(getLoggedAsUser(), new GettingUserStateResultCallback(this));
+		RemoteUserStateServiceBroker.requestForGettingUserState(getLoggedAsUser(), new GettingUserStateResultCallback(this));
 	}
 
 	@Override

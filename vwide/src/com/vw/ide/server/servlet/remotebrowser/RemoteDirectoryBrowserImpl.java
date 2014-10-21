@@ -11,9 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletConfig;
@@ -33,15 +31,18 @@ import org.w3c.dom.Element;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.server.servlet.IService;
+import com.vw.ide.server.servlet.locator.ServiceLocator;
+import com.vw.ide.server.servlet.userstate.UserStateServiceImpl;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
-import com.vw.ide.shared.servlet.remotebrowser.UserStateInfo;
+import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
 
 /**
@@ -50,11 +51,12 @@ import com.vw.ide.shared.servlet.remotebrowser.UserStateInfo;
  *
  */
 @SuppressWarnings("serial")
-public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements RemoteDirectoryBrowser {
+public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements RemoteDirectoryBrowser, IService {
 
 	private Logger logger = Logger.getLogger(RemoteDirectoryBrowserImpl.class);
 	private static String s_defRootDir = "/var/projects";
-	private  Map<String, UserStateInfo> usersStates = new HashMap <String, UserStateInfo>(); 
+
+	public static final int ID = 1024;
 	
 	public RemoteDirectoryBrowserImpl() {
 		super();
@@ -62,7 +64,6 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 			logger.info("RemoteDirectoryBrowserImpl constructed");
 		}
 	}
-	
 	
 	private void loadProperties(ServletContext context) {
 		
@@ -82,14 +83,24 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		}		
 	}
 	
-	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		loadProperties(config.getServletContext());
+		ServiceLocator.instance().register(this);
 		if (logger.isInfoEnabled()) {
 			logger.info("RemoteDirectoryBrowserImpl started and initialized");
 		}
+	}
+	
+	@Override
+	public int getId() {
+		return ID;
+	}
+
+	@Override
+	public String getName() {
+		return getClass().getName();
 	}
 	
 	/**
@@ -480,14 +491,14 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	}
 
 	@Override
-	public RequestDirOperationResult readFile(String user, String parent,
-			String fileName, Long projectId, Long fileId) {
+	public RequestDirOperationResult readFile(String user, String parent, String fileName, Long projectId, Long fileId) {
 		UserStateInfo userStateInfo;
+		RequestDirOperationResult res = new RequestDirOperationResult();
 		
-		if (usersStates.get(user) == null) {
-			userStateInfo = new UserStateInfo();
-		} else {
-			userStateInfo = usersStates.get(user);
+		userStateInfo = locateUserStateService().getUserStateInfo(user);
+		if (userStateInfo == null) {
+			userNotFoundReport(res, user, "read_file");
+			return res;
 		}
 		FileItemInfo fileItemInfo = new FileItemInfo(Utils.extractJustFileName(fileName),Utils.extractJustPath(fileName),false);
 		fileItemInfo.setFileId(fileId);
@@ -496,9 +507,8 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		userStateInfo.addFile2OpenedFiles(fileId, fileItemInfo);
 		userStateInfo.setProjectIdSelected(projectId);
 		userStateInfo.setFileIdSelected(fileId);
-		usersStates.put(user,userStateInfo);
+		locateUserStateService().updateUserStateInfo(user,userStateInfo);
 		
-		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setProjectId(projectId);
 		res.setFileId(fileId);
 		res.setOperation("reading file");
@@ -515,8 +525,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	}
 
 	@Override
-	public RequestFileOperationResult saveFile(String user, 
-			String fileName, Long projectId, Long fileId, String content) {
+	public RequestFileOperationResult saveFile(String user, String fileName, Long projectId, Long fileId, String content) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
 		res.setFileName(fileName);
 		res.setFileId(fileId);
@@ -526,8 +535,7 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		Writer writer = null;
 		
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(
-			          new FileOutputStream(fileName), "utf-8"));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "utf-8"));
 			writer.write(content);
 		}
 		catch(IOException ex) {
@@ -543,67 +551,40 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		return res;
 	}
 
-
-	@Override
-	public RequestUserStateResult getUserState(String user) {
-		RequestUserStateResult res = new RequestUserStateResult();
-		res.setOperation("getting user state info");
-		res.setRetCode(0);
-		if (usersStates.get(user) != null) {
-			UserStateInfo userStateInfo = usersStates.get(user);
-			res.setUserStateInfo(userStateInfo);
-		} else {
-			res.setResult("user not found");
-			res.setRetCode(-1);
-		}
-		return res;
-	}
-
-
 	@Override
 	public RequestFileOperationResult closeFile(String user, String fileName, Long fileId) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
-		UserStateInfo	userStateInfo = usersStates.get(user);
-		if (userStateInfo != null) {
-			FileItemInfo value = null;
-			for(Object key :  userStateInfo.getOpenedFiles().keySet()) {
-				value = userStateInfo.getOpenedFiles().get(key);
-				String sFullName = value.getAbsolutePath() + "\\" + value.getName();  
-				if (sFullName.equalsIgnoreCase(fileName)) {
-					userStateInfo.getOpenedFiles().remove(key);
-					break;
-				}
-			}			
-			usersStates.remove(user);
-			usersStates.put(user,userStateInfo);
-			
-			res.setFileId(fileId);
-			res.setOperation("closing file");
-			res.setFileName(fileName);
-			res.setRetCode(0);
-		} else {
-			res.setResult("user not found");
-			res.setRetCode(-1);
-        }
+		UserStateInfo userStateInfo = locateUserStateService().getUserStateInfo(user);
+		if (userStateInfo == null) {
+			userNotFoundReport(res, user, "close_file");
+			return res;
+		}
+		FileItemInfo value = null;
+		for(Object key :  userStateInfo.getOpenedFiles().keySet()) {
+			value = userStateInfo.getOpenedFiles().get(key);
+			String sFullName = value.getAbsolutePath() + "/" + value.getName();  
+			if (sFullName.equalsIgnoreCase(fileName)) {
+				userStateInfo.getOpenedFiles().remove(key);
+				break;
+			}
+		}			
+		locateUserStateService().updateUserStateInfo(user, userStateInfo);
+		res.setFileId(fileId);
+		res.setOperation("closing file");
+		res.setFileName(fileName);
+		res.setRetCode(0);
 		return res;
 	}
 
-
-	private void changeFileNameInUserStateInfo(String user, Long fileId, String fileNewName) {
-		if(usersStates.get(user) != null) {
-			if (usersStates.get(user).getOpenedFiles().get(fileId) != null) {
-				usersStates.get(user).getOpenedFiles().get(fileId).setAbsolutePath(fileNewName);
-				usersStates.get(user).getOpenedFiles().get(fileId).setName(Utils.extractJustFileName(fileNewName));
-			}
-		}	
-	}
-	
-	
 	@Override
 	public RequestFileOperationResult renameFile(String user, String fileName, 	Long fileId, String fileNewName) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
+		UserStateInfo userStateInfo = locateUserStateService().getUserStateInfo(user);
+		if (userStateInfo == null) {
+			userNotFoundReport(res, user, "rename_file");
+			return res;
+		}
 		res.setFileId(fileId);
-//		res.setOperation("renaming file");
 		res.setOperationType(OperationTypes.RENAME_FILE);
 		res.setFileName(fileName);
 		res.setFileNewName(fileNewName);
@@ -611,8 +592,10 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 	    File newFile = new File(fileNewName);
 	    if(!newFile.exists()) {
 	    	if (oldFile.renameTo(newFile)) {
-	    		
-	    		changeFileNameInUserStateInfo(user, fileId, fileNewName);
+				if (userStateInfo.getOpenedFiles().get(fileId) != null) {
+					userStateInfo.getOpenedFiles().get(fileId).setAbsolutePath(fileNewName);
+					userStateInfo.getOpenedFiles().get(fileId).setName(Utils.extractJustFileName(fileNewName));
+				}
 				res.setResult("File has been renamed");
 				res.setRetCode(0);
 	    	} else {
@@ -626,6 +609,13 @@ public class RemoteDirectoryBrowserImpl extends RemoteServiceServlet implements 
 		return res;
 	}
 
+	private UserStateServiceImpl locateUserStateService() {
+		return (UserStateServiceImpl)ServiceLocator.instance().locate(UserStateServiceImpl.ID);
+	}
 	
-	
+	private void userNotFoundReport(RequestResult res, String user, String operation) {
+		res.setOperation(operation);
+		res.setResult("user '" + user + "' not found or wasn't registered");
+		res.setRetCode(-2);
+	}
 }

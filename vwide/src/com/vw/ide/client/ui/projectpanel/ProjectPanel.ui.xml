@@ -38,7 +38,7 @@
 	<ui:image field='gradient' src='../../images/gradient_bg_dark.png'
 		repeatStyle='Horizontal' />
 
-	<ui:with type="com.vw.ide.client.images.ExampleImages" field="images" />
+	<ui:with type="com.vw.ide.client.images.IdeImages" field="images" />
 
 	<ui:with type="com.sencha.gxt.widget.core.client.TabItemConfig"
 		field="shortTextTabConfig">

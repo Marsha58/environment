@@ -10,7 +10,7 @@ import com.vw.ide.client.event.handler.EditorTabClosedHandler;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.ProjectManager;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 
 public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler implements EditorTabClosedHandler {

@@ -4,13 +4,13 @@ import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 
-public class DirOperationFileReadingResultCallback extends RemoteBrowserServiceBroker.ResultCallback<RequestDirOperationResult> {
+public class DirOperationFileReadingResultCallback extends ResultCallback<RequestDirOperationResult> {
 
 	private DevelopmentBoardPresenter owner = null;
 	

@@ -5,6 +5,8 @@ import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.security.RemoteSecurity;
 import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;
+import com.vw.ide.shared.servlet.userstate.UserStateService;
+import com.vw.ide.shared.servlet.userstate.UserStateServiceAsync;
 
 /**
  * Factory of internal services (stubs)
@@ -28,5 +30,11 @@ public class ServicesStubFactory {
 		return GWT.create(RemoteSecurity.class);
 	}	
 	
-	
+	/**
+	 * Instantiates remote user state service
+	 * @return
+	 */
+	public static UserStateServiceAsync createRemoteUserStateAsync() {
+		return GWT.create(UserStateService.class);
+	}	
 }

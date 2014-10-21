@@ -18,10 +18,8 @@ import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
-import com.vw.ide.client.service.ProcessedResult;
-import com.vw.ide.client.service.security.RemoteSecurityService;
-import com.vw.ide.client.service.security.RemoteSecurityService.ServiceCallbackForLogin;
-import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;
+import com.vw.ide.client.service.remote.ResultCallback;
+import com.vw.ide.client.service.remote.security.RemoteSecurityServiceBroker;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;
 
 /**
@@ -32,7 +30,7 @@ import com.vw.ide.shared.servlet.security.RequestLoginResult;
  */
 public class LoginGxtPresenter extends Presenter {
 
-	public static class LoginResult extends ProcessedResult<RequestLoginResult> {
+	public static class LoginResult extends ResultCallback<RequestLoginResult> {
 
 		private LoginGxtPresenter presenter;
 
@@ -44,13 +42,7 @@ public class LoginGxtPresenter extends Presenter {
 		}
 
 		@Override
-		public void onFailure(Throwable caught) {
-			AlertMessageBox alertMessageBox = new AlertMessageBox("Error", caught.getMessage());
-			alertMessageBox.show();
-		}
-
-		@Override
-		public void onSuccess(RequestLoginResult result) {
+		public void handle(RequestLoginResult result) {
 			String messageAlert;
 			if (result.getRetCode().intValue() != 0) {
 				messageAlert = "The login operation '" 
@@ -81,13 +73,15 @@ public class LoginGxtPresenter extends Presenter {
 			}
 		}
 	}
-	
+
 	private static class LoginEventHandler extends Presenter.PresenterEventHandler implements LoginHandler {
 		
 		@Override
 		public void handler(Presenter presenter, GwtEvent<?> event) {
-			LoginEvent loginEvent = (LoginEvent)event;  
-			((LoginGxtPresenter)presenter).requestForLogin(loginEvent.getLoggedAsUser(), loginEvent.getLoggedWithPassword());
+			LoginEvent loginEvent = (LoginEvent)event;
+			RemoteSecurityServiceBroker.requestForLogin(loginEvent.getLoggedAsUser(),
+														loginEvent.getLoggedWithPassword(),
+														new LoginResult((LoginGxtPresenter)presenter));
 		}
 		
 		@Override
@@ -190,33 +184,8 @@ public class LoginGxtPresenter extends Presenter {
 		eventBus.removeHandler(LogoutEvent.TYPE, (LogoutEventHandler)dispatcher.get(LogoutEvent.TYPE));
 	}
 	
-	public String calculateCheckSum(String md5) {
-		try {
-	        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-	        byte[] array = md.digest(md5.getBytes());
-	        StringBuffer sb = new StringBuffer();
-	        for (int i = 0; i < array.length; ++i) {
-	        	sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-	        }
-	        return sb.toString();
-		} 
-		catch (java.security.NoSuchAlgorithmException e) {
-		}
-		return null;
-	}	
-	
 	protected void onSuccessLogin(String userName) {
 		fireEvent(new LoggedInEvent(userName));
-	}
-	
-	protected void requestForLogin(String userName, String password) {
-		String sPasswordMD5 = calculateCheckSum(password.trim());
-		RemoteSecurityAsync service = RemoteSecurityService.instance().getServiceImpl();
-		if (service != null) {
-			ServiceCallbackForLogin cbk = RemoteSecurityService.instance().buildCallbackForLogin();
-			cbk.setProcessedResult(new LoginResult(this));
-			service.login(userName, sPasswordMD5, cbk);
-		}
 	}
 	
 	private String formDevBoardLoginString(String user) {

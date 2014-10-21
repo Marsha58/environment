@@ -7,6 +7,9 @@ import com.vw.ide.shared.OperationTypes;
 @SuppressWarnings("serial")
 public class RequestResult implements Serializable {
 
+	public static final int GENERAL_OK   = 0;
+	public static final int GENERAL_FAIL = -1;
+	
 	private String result;
 	private String operation;
 	private Integer retCode;	

@@ -9,7 +9,7 @@ import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.service.browser.callbacks.AnyDirOperationResultCallback;
 import com.vw.ide.client.devboardext.service.browser.callbacks.AnyFileOperationResultCallback;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 

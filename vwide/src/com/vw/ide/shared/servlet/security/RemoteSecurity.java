@@ -10,13 +10,20 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("security")
 public interface RemoteSecurity extends RemoteService {
+
 	/**
-	 * Returns list of directories, for given user, from the parent 'dir'
+	 * Login user
 	 * @param user
-	 * @param dir
+	 * @param password
 	 * @return
 	 */
 	public RequestLoginResult login(String userName, String password);
 	
+	/**
+	 * Logout user
+	 * @param user
+	 * @return
+	 */
+	public RequestLoginResult logout(String userName);
 	
 }

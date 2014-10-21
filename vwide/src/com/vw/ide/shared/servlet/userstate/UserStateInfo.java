@@ -1,11 +1,13 @@
-package com.vw.ide.shared.servlet.remotebrowser;
+package com.vw.ide.shared.servlet.userstate;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+
 @SuppressWarnings("serial")
-public class UserStateInfo implements Serializable{
+public class UserStateInfo implements Serializable {
 	private Long projectIdSelected;
 	private Long fileIdSelected;
 	private Map<Long, FileItemInfo> openedFiles; 
@@ -41,7 +43,12 @@ public class UserStateInfo implements Serializable{
 
 	public void addFile2OpenedFiles(Long fileId, FileItemInfo openedFile) {
 		openedFiles.put(fileId, openedFile);
+	}
+
+	@Override
+	public String toString() {
+		return "UserStateInfo [projectIdSelected=" + projectIdSelected
+				+ ", fileIdSelected=" + fileIdSelected + ", openedFiles="
+				+ openedFiles + "]";
 	}	
-	
-	
 }

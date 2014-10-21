@@ -2,6 +2,8 @@ package com.vw.ide.shared.servlet.remotebrowser;
 
 import java.io.Serializable;
 
+import com.vw.ide.shared.servlet.userstate.UserStateInfo;
+
 @SuppressWarnings("serial")
 public class RequestUserStateResult  extends RequestResult implements Serializable {
 	private UserStateInfo userStateInfo;

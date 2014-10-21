@@ -4,11 +4,12 @@ import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.ResultCallback;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
 
-public class GettingUserStateResultCallback extends RemoteBrowserServiceBroker.ResultCallback<RequestUserStateResult> {
+public class GettingUserStateResultCallback extends ResultCallback<RequestUserStateResult> {
 
 	private DevelopmentBoardPresenter owner;
 
@@ -25,11 +26,23 @@ public class GettingUserStateResultCallback extends RemoteBrowserServiceBroker.R
 			alertMessageBox.show();
 		}
 		else {
-			Long fileIdSelected = result.getUserStateInfo().getFileIdSelected();
-			FileItemInfo value = null;
-			for (Object key : result.getUserStateInfo().getOpenedFiles().keySet()) {
-				value = result.getUserStateInfo().getOpenedFiles().get(key);
-				if (fileIdSelected != key) {
+			if (result.getUserStateInfo().getOpenedFiles() != null) {
+				Long fileIdSelected = result.getUserStateInfo().getFileIdSelected();
+				FileItemInfo value = null;
+				
+				for (Object key : result.getUserStateInfo().getOpenedFiles().keySet()) {
+					value = result.getUserStateInfo().getOpenedFiles().get(key);
+					if (fileIdSelected != key) {
+						RemoteBrowserServiceBroker.requestForReadingFile(
+								FlowController.getLoggedAsUser(),
+								value.getAbsolutePath()+ "/" + value.getName(),
+								value.getProjectId(),
+								value.getFileId(),
+								new DirOperationFileReadingResultCallback(owner));
+					}
+				}
+				if (fileIdSelected != null) {
+					value = result.getUserStateInfo().getOpenedFiles().get(fileIdSelected);
 					RemoteBrowserServiceBroker.requestForReadingFile(
 							FlowController.getLoggedAsUser(),
 							value.getAbsolutePath()+ "/" + value.getName(),
@@ -38,13 +51,6 @@ public class GettingUserStateResultCallback extends RemoteBrowserServiceBroker.R
 							new DirOperationFileReadingResultCallback(owner));
 				}
 			}
-			value = result.getUserStateInfo().getOpenedFiles().get(fileIdSelected);
-			RemoteBrowserServiceBroker.requestForReadingFile(
-					FlowController.getLoggedAsUser(),
-					value.getAbsolutePath()+ "/" + value.getName(),
-					value.getProjectId(),
-					value.getFileId(),
-					new DirOperationFileReadingResultCallback(owner));
 		}
 		owner.fireEvent(new ServerLogEvent(result));
 	}

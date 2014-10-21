@@ -5,6 +5,8 @@ import com.vw.ide.shared.servlet.security.RequestLoginResult;
 
 public interface RemoteSecurityAsync {
 
-	void login(String userName, String password, AsyncCallback<RequestLoginResult> callback);
+	public void login(String userName, String password, AsyncCallback<RequestLoginResult> callback);
+
+	public void logout(String userName, AsyncCallback<RequestLoginResult> callback);
 
 }

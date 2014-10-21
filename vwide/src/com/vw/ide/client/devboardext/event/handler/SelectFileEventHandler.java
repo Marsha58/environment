@@ -7,7 +7,7 @@ import com.vw.ide.client.devboardext.service.browser.callbacks.DirOperationFileR
 import com.vw.ide.client.event.handler.SelectFileHandler;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
-import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
 
 public class SelectFileEventHandler extends Presenter.PresenterEventHandler implements SelectFileHandler {
 	@Override

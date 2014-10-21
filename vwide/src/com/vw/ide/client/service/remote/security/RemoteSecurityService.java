@@ -1,4 +1,4 @@
-package com.vw.ide.client.service.security;
+package com.vw.ide.client.service.remote.security;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;

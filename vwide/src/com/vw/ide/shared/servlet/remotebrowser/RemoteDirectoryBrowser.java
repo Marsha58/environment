@@ -90,21 +90,45 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 * @param projectId
 	 * @param fileId
 	 */
-	public RequestDirOperationResult readFile(String user, String parent,
-			String fileName, Long projectId, Long fileId);
+	public RequestDirOperationResult readFile(String user, String parent, String fileName, Long projectId, Long fileId);
 	
-	
+	/**
+	 * Delete file
+	 * @param user
+	 * @param fileName
+	 * @param fileId
+	 * @return
+	 */
 	RequestFileOperationResult deleteFile(String user, String fileName,	Long fileId);
 
-	
+	/**
+	 * Save file
+	 * @param user
+	 * @param fileName
+	 * @param projectId
+	 * @param fileId
+	 * @param content
+	 * @return
+	 */
 	RequestFileOperationResult saveFile(String user, String fileName,	Long projectId, Long fileId, String content);
 
+	/**
+	 * Closes file
+	 * @param user
+	 * @param fileName
+	 * @param fileId
+	 * @return
+	 */
 	RequestFileOperationResult closeFile(String user, String fileName,	Long fileId);
 
+	/**
+	 * Renames file
+	 * @param user
+	 * @param fileName
+	 * @param fileId
+	 * @param fileNewName
+	 * @return
+	 */
 	RequestFileOperationResult renameFile(String user, String fileName,	Long fileId, String fileNewName);
-	
-	RequestUserStateResult getUserState(String user);
-
-	
 	
 }

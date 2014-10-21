@@ -11,6 +11,7 @@ public enum OperationTypes {
    SAVE_FILE("save_file"),
    DELETE_FILE("delete_file"),
    RENAME_FILE("rename_file"),
+   READ_FILE("read_file"),
    SAVE_ALL_FILES("save_all_files");
    
 	private final String name;

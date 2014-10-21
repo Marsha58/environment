@@ -66,7 +66,7 @@
 	</ui:with>
 
 
-	<ui:with type="com.vw.ide.client.images.ExampleImages" field="images" />
+	<ui:with type="com.vw.ide.client.images.IdeImages" field="images" />
 
 	<ui:with
 		type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData"
@@ -89,16 +89,9 @@
 							<menu:Menu>
 								<menu:MenuItem text="New" icon="{images.new_con_en}" />
 								<menu:MenuItem text="Open File">
-									<menu:submenu>
-										<menu:Menu>
-											<menu:MenuItem text="readme.txt" />
-											<menu:MenuItem text="helloworld.txt" />
-										</menu:Menu>
-									</menu:submenu>
 								</menu:MenuItem>
-								<menu:MenuItem text="Save" icon="{images.save_edit_en}" />
-								<menu:MenuItem text="Save as..." icon="{images.saveas_edit_en}" />
-								<menu:MenuItem text="Save all" icon="{images.saveall_edit_en}" />
+								<menu:MenuItem text="Save" icon="{images.save_edit_dis}" />
+								<menu:MenuItem text="Save all" icon="{images.saveall_edit_dis}" />
 								<menu:MenuItem text="Close" icon="{images.close}" />
 								<menu:SeparatorMenuItem />
 								<menu:MenuItem text="Settings" />
@@ -111,12 +104,6 @@
 								<menu:MenuItem text="New" icon="{images.new_wiz_en}"
 									ui:field="newVwmlProjField" />
 								<menu:MenuItem text="Open File" icon="{images.prj_obj}">
-									<menu:submenu>
-										<menu:Menu>
-											<menu:MenuItem text="readme.txt" />
-											<menu:MenuItem text="helloworld.txt" />
-										</menu:Menu>
-									</menu:submenu>
 								</menu:MenuItem>
 								<menu:MenuItem text="Save" />
 								<menu:MenuItem text="Close" />
@@ -178,27 +165,21 @@
 				<toolbar:ToolBar borders="false">
 					<button:TextButton icon="{images.new_con_en}"
 						toolTip="New file" />
+					<button:TextButton icon="{images.open_en}"
+						toolTip="Open file" />
 					<button:TextButton icon="{images.new_wiz_en}"
 						itemId="idNewVwmlProjField" ui:field="bnNewVwmlProjField" toolTip="New project" />
 					<toolbar:SeparatorToolItem />
-					<button:TextButton icon="{images.save_edit_en}"
-						itemId="idSaveSelectedFile" ui:field="bnSaveSelectedFile" toolTip="Save selected file" />
-					<button:TextButton icon="{images.saveas_edit_en}"
-						toolTip="Save as..." />
-					<button:TextButton icon="{images.saveall_edit_en}"
+					<button:TextButton icon="{images.save_edit_dis}" ui:field="bnSaveFileField"  toolTip="Save" />
+					<button:TextButton icon="{images.saveall_edit_dis}"
 						toolTip="Save all" />
 					<toolbar:SeparatorToolItem />
-					<button:TextButton icon="{images.continue_exec}"
+					<button:TextButton icon="{images.exec_dis}"
 						toolTip="Continue execution" />
-					<button:TextButton icon="{images.suspend_en}"
+					<button:TextButton icon="{images.suspend_dis}"
 						toolTip="Suspend" />
-					<button:TextButton icon="{images.terminate_obj_en}"
+					<button:TextButton icon="{images.terminate_obj_dis}"
 						toolTip="Terminate" />
-					<toolbar:SeparatorToolItem />
-					<button:TextButton icon="{images.skip_brkp_en}"
-						toolTip="Skip breakpoints" />
-					<button:TextButton icon="{images.debug_persp_en}"
-						toolTip="Debug" />
 					<toolbar:SeparatorToolItem />
 					<button:TextButton icon="{images.search_en}"
 						toolTip="Search" />
