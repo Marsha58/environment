@@ -7,12 +7,12 @@ import com.vw.ide.client.devboardext.service.browser.callbacks.DirOperationFileR
 import com.vw.ide.client.event.handler.SelectFileHandler;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
 
 public class SelectFileEventHandler extends Presenter.PresenterEventHandler implements SelectFileHandler {
 	@Override
 	public void handler(Presenter presenter, GwtEvent<?> event) {
-		RemoteBrowserServiceBroker.requestForReadingFile(
+		DirBrowserServiceBroker.requestForReadingFile(
 				FlowController.getLoggedAsUser(),
 				((SelectFileEvent)event).getFileItemInfo().getAbsolutePath(),
 				((SelectFileEvent)event).getFileItemInfo().getProjectId(),

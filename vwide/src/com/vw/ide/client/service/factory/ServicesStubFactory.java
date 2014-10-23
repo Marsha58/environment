@@ -1,13 +1,15 @@
 package com.vw.ide.client.service.factory;
 
 import com.google.gwt.core.shared.GWT;
+
+import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerService;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.security.RemoteSecurity;
 import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;
 import com.vw.ide.shared.servlet.userstate.UserStateService;
 import com.vw.ide.shared.servlet.userstate.UserStateServiceAsync;
-
+import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerServiceAsync;
 /**
  * Factory of internal services (stubs)
  * @author Oleg
@@ -37,4 +39,12 @@ public class ServicesStubFactory {
 	public static UserStateServiceAsync createRemoteUserStateAsync() {
 		return GWT.create(UserStateService.class);
 	}	
+	
+	/**
+	 * Instantiates remote project manager service stub
+	 * @return
+	 */
+	public static RemoteProjectManagerServiceAsync createRemoteProjectManagerServiceAsync() {
+		return GWT.create(RemoteProjectManagerService.class);
+	}
 }

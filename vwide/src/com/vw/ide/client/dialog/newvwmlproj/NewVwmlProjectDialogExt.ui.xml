@@ -4,25 +4,56 @@
 	xmlns:w="urn:import:com.google.gwt.widget.client"
 	xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client" 
 	xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:tabs="urn:import:com.sencha.gxt.widget.core.client"
 	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
 	xmlns:f="urn:import:com.sencha.gxt.widget.core.client.form"
 	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button">
 	<ui:style>
-	.important {
-		font-weight: bold;
+		.important {
+			font-weight: bold;
+		}
+		.panel {
+			background-color: none;
+		}	
 	}
 	
 	</ui:style>
+	
+	<ui:with type="com.sencha.gxt.data.shared.LabelProvider" field="interpreterLabelProvider" />
+    <ui:with type="com.sencha.gxt.data.shared.ListStore" field="interpretersAsListStore" />
+
+	<ui:with type="com.sencha.gxt.data.shared.LabelProvider" field="compilationModeLabelProvider" />
+    <ui:with type="com.sencha.gxt.data.shared.ListStore" field="compilationModesAsListStore" />
 
 	<ui:with type="com.sencha.gxt.core.client.util.Padding" field="padding5">
 		<ui:attributes top="5" right="5" bottom="5" left="5" />
 	</ui:with>
 
-	<container:VBoxLayoutContainer padding="{padding5}" vBoxLayoutAlign="STRETCH">
-		<container:child>
-			<form:FieldSet ui:field="fieldSetVWMLsettings"
-				headingText="VWML settings" collapsible="true">
-				<container:VerticalLayoutContainer>
+	<ui:with type="com.sencha.gxt.core.client.util.Padding" field="padding105510">
+		<ui:attributes top="10" right="5" bottom="10" left="5" />
+	</ui:with>
+
+	<ui:with type="com.vw.ide.client.images.IdeImages" field="images" />
+
+	<ui:with type="com.sencha.gxt.widget.core.client.TabItemConfig"
+		field="VwmlTabConfig">
+		<ui:attributes text="VWML general settings" icon="{images.vwml}"/>
+	</ui:with>
+
+	<ui:with type="com.sencha.gxt.widget.core.client.TabItemConfig"
+		field="VwmlCompilerTabConfig">
+		<ui:attributes text="VWML compiler settings" icon="{images.vwml}"/>
+	</ui:with>
+
+	<ui:with type="com.sencha.gxt.widget.core.client.TabItemConfig"
+		field="JavaTabConfig">
+		<ui:attributes text="Java project settings" icon="{images.java_facet}"/>
+	</ui:with>
+
+	<container:VBoxLayoutContainer padding="{padding105510}" vBoxLayoutAlign="STRETCH">
+		<tabs:TabPanel borders="false">
+			<tabs:child config="{VwmlTabConfig}">
+				<container:VerticalLayoutContainer styleName="{style.panel}">
 					<container:child>
 						<form:FieldLabel text="Project Name">
 							<form:widget>
@@ -35,10 +66,10 @@
 							<form:widget>
 								<container:HBoxLayoutContainer  hBoxLayoutAlign="MIDDLE">						    
 									<container:child>
-										<form:TextField ui:field="tfVWMLProjectPath" allowBlank="false" width="280px" enabled="false"/>
+										<form:TextField ui:field="tfVWMLProjectPath" allowBlank="false" width="280px" />
 									</container:child>
 									<container:child>
-										<button:TextButton ui:field="browseVwmlProjPath" text="Browse" enabled="false"/>
+										<button:TextButton ui:field="browseVwmlProjPath" text="Browse" />
 									</container:child>
 								</container:HBoxLayoutContainer>		
 							</form:widget>
@@ -47,7 +78,14 @@
 					<container:child>
 						<form:FieldLabel text="Main module">
 							<form:widget>
-								<form:TextField ui:field="tfVWMLMainModule" allowBlank="false" width="280px"/>
+								<form:TextField ui:field="tfVWMLMainModule" allowBlank="false" width="280px" enabled="false"/>
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel text="Description">
+							<form:widget>
+								<f:TextArea ui:field="tfVWMLDescr" allowBlank="true" width="325px" height="50px"/>
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
@@ -59,19 +97,69 @@
 						</form:FieldLabel>
 					</container:child>
 					<container:child>
-						<form:FieldLabel text="Description">
+						<form:FieldLabel text="Interpreter">
+							<ui:attribute key='cbVWMLAvailableInterpreters' name='text' />
 							<form:widget>
-								<f:TextArea ui:field="tfVWMLDescr" allowBlank="true" width="325px" height="60px"/>
+								<form:ComboBox ui:field="cbVWMLAvailableInterpreters" store="{interpretersAsListStore}" labelProvider="{interpreterLabelProvider}" width="280px"/>
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
+					<container:child>
+						<form:FieldLabel>
+							<form:widget>
+								<g:HorizontalPanel>
+									<form:FieldSet ui:field="fieldSetInterpreterSettings" headingText="Interpreter's settings" collapsible="true" enabled="false">
+										<container:VerticalLayoutContainer ui:field = "fieldInterpreterSettingsArea" enabled="false">
+										</container:VerticalLayoutContainer>							
+									</form:FieldSet>
+								</g:HorizontalPanel>
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>				
 				</container:VerticalLayoutContainer>
-			</form:FieldSet>
-		</container:child>
-		<container:child>
-			<form:FieldSet ui:field="fieldSetJavasettings"
-				headingText="Java settings" collapsible="true">
-				<container:VerticalLayoutContainer>
+			</tabs:child>
+			<tabs:child config="{VwmlCompilerTabConfig}">
+				<container:VerticalLayoutContainer styleName="{style.panel}">
+					<container:child>
+						<form:FieldLabel text="Preprocessor directives (comma separated)">
+							<form:widget>
+								<form:TextField ui:field="tfVWMLPreprocessor" width="320px" />
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel text="Include debug information">
+							<form:widget>
+								<g:HorizontalPanel>
+									<form:CheckBox ui:field="bnDebugInfoTrigger" value="false" />
+								</g:HorizontalPanel>
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel text="How to compile (mode)">
+							<ui:attribute key='cbVWMLAvailableModes' name='text' />
+							<form:widget>
+								<form:ComboBox ui:field="cbVWMLAvailableModes" store="{compilationModesAsListStore}" labelProvider="{compilationModeLabelProvider}" width="320px"/>
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+					<container:child>
+						<form:FieldLabel>
+							<form:widget>
+								<g:HorizontalPanel>
+									<form:FieldSet ui:field="fieldSetCompileModeSettings" headingText="Compiler additional settings" collapsible="true" enabled="false">
+										<container:VerticalLayoutContainer ui:field = "fieldSetCompileModeSettingsArea" enabled="false">
+										</container:VerticalLayoutContainer>							
+									</form:FieldSet>
+								</g:HorizontalPanel>
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>				
+				</container:VerticalLayoutContainer>
+			</tabs:child>
+			<tabs:child config="{JavaTabConfig}">
+				<container:VerticalLayoutContainer styleName="{style.panel}">
 					<container:child>
 						<form:FieldLabel text="Package" >
 							<form:widget>
@@ -87,17 +175,15 @@
 										<form:TextField ui:field="tfJavaSourcePath" allowBlank="false" width="280px"/>
 									</container:child>
 									<container:child>
-										<button:TextButton text="Browse" />
+										<button:TextButton text="Browse" ui:field="browseJavaProjPath" enabled="false" />
 									</container:child>
 								</container:HBoxLayoutContainer>		
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
 				</container:VerticalLayoutContainer>
-			</form:FieldSet>
-
-		</container:child>
+			</tabs:child>
+		</tabs:TabPanel>
 	</container:VBoxLayoutContainer>
-
 
 </ui:UiBinder> 

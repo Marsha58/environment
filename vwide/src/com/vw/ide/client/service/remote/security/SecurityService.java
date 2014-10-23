@@ -14,12 +14,12 @@ import com.vw.ide.shared.servlet.security.RequestLoginResult;
  * @author OMelnyk
  *
  */
-public class RemoteSecurityService implements BusConnectivity, VwIdeClientService {
+public class SecurityService implements BusConnectivity, VwIdeClientService {
 	private HandlerManager bus;
 	// concrete service's instance
-	private RemoteSecurityAsync securityServiceImpl = ServicesStubFactory. createRemoteSecurityAsync();
+	private RemoteSecurityAsync securityServiceImpl = ServicesStubFactory.createRemoteSecurityAsync();
 	
-	private static RemoteSecurityService s_instance = null;
+	private static SecurityService s_instance = null;
 	
 	/**
 	 * Callbacks implementation
@@ -29,7 +29,7 @@ public class RemoteSecurityService implements BusConnectivity, VwIdeClientServic
 	public static class ServiceCallbackForLogin extends ServiceCallback<RequestLoginResult>  {
 	}
 	
-	private RemoteSecurityService() {
+	private SecurityService() {
 		
 	}
 	
@@ -37,11 +37,11 @@ public class RemoteSecurityService implements BusConnectivity, VwIdeClientServic
 	 * Simple singleton implementation
 	 * @return
 	 */
-	public static synchronized RemoteSecurityService instance() {
+	public static synchronized SecurityService instance() {
 		if (s_instance != null) {
 			return s_instance;
 		}
-		s_instance = new RemoteSecurityService();
+		s_instance = new SecurityService();
 		return s_instance;
 	}
 

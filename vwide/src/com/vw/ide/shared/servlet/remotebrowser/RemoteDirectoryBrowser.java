@@ -44,31 +44,6 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 */
 	public RequestDirOperationResult removeDir(String user, String parent, String dir);
 	
-	
-	/**
-	 * Creates new project
-	 * @param userName
-	 * @param projectName
-	 * @param projectPath 
-	 * @param packageName
-	 * @param javaSrcPath
-	 * @param author
-	 * @param descr
-	 */
-	public RequestProjectCreationResult createProject(String userName,
-			String projectName, String projectPath, String packageName, String javaSrcPath,
-			String author, String descr);
-
-	/**
-	 * Deletes project
-	 * @param userName
-	 * @param projectName
-	 * @param projectId
-	 */
-	public RequestDirOperationResult deleteProject(String userName,
-			String projectName, Long projectId);
-
-	
 	/**
 	 * Adds file
 	 * @param user

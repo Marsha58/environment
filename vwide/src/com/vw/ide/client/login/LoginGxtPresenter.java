@@ -19,7 +19,7 @@ import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.client.service.remote.security.RemoteSecurityServiceBroker;
+import com.vw.ide.client.service.remote.security.SecurityServiceBroker;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;
 
 /**
@@ -79,7 +79,7 @@ public class LoginGxtPresenter extends Presenter {
 		@Override
 		public void handler(Presenter presenter, GwtEvent<?> event) {
 			LoginEvent loginEvent = (LoginEvent)event;
-			RemoteSecurityServiceBroker.requestForLogin(loginEvent.getLoggedAsUser(),
+			SecurityServiceBroker.requestForLogin(loginEvent.getLoggedAsUser(),
 														loginEvent.getLoggedWithPassword(),
 														new LoginResult((LoginGxtPresenter)presenter));
 		}

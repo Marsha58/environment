@@ -5,7 +5,7 @@ import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
 
@@ -33,7 +33,7 @@ public class GettingUserStateResultCallback extends ResultCallback<RequestUserSt
 				for (Object key : result.getUserStateInfo().getOpenedFiles().keySet()) {
 					value = result.getUserStateInfo().getOpenedFiles().get(key);
 					if (fileIdSelected != key) {
-						RemoteBrowserServiceBroker.requestForReadingFile(
+						DirBrowserServiceBroker.requestForReadingFile(
 								FlowController.getLoggedAsUser(),
 								value.getAbsolutePath()+ "/" + value.getName(),
 								value.getProjectId(),
@@ -43,7 +43,7 @@ public class GettingUserStateResultCallback extends ResultCallback<RequestUserSt
 				}
 				if (fileIdSelected != null) {
 					value = result.getUserStateInfo().getOpenedFiles().get(fileIdSelected);
-					RemoteBrowserServiceBroker.requestForReadingFile(
+					DirBrowserServiceBroker.requestForReadingFile(
 							FlowController.getLoggedAsUser(),
 							value.getAbsolutePath()+ "/" + value.getName(),
 							value.getProjectId(),

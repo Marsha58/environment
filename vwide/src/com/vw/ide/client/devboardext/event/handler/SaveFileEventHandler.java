@@ -7,7 +7,7 @@ import com.vw.ide.client.devboardext.service.browser.callbacks.AnyFileOperationR
 import com.vw.ide.client.event.handler.SaveFileHandler;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 
 public class SaveFileEventHandler extends Presenter.PresenterEventHandler implements SaveFileHandler {
@@ -26,7 +26,7 @@ public class SaveFileEventHandler extends Presenter.PresenterEventHandler implem
 	protected void process(DevelopmentBoardPresenter presenter, SaveFileEvent event) {
 		FileSheet currentWidget = presenter.getView().getActiveFileSheetWidget();
 		String sFullName = currentWidget.getFilePath() + "/" + currentWidget.getFileName();
-		RemoteBrowserServiceBroker.requestForFileSaving(FlowController.getLoggedAsUser(),
+		DirBrowserServiceBroker.requestForFileSaving(FlowController.getLoggedAsUser(),
 														sFullName, currentWidget.getProjectId(),
 														currentWidget.getFileId(), currentWidget.getAceEditor().getText(),
 														new AnyFileOperationResultCallback(presenter, true));

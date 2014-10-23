@@ -15,9 +15,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.vw.ide.client.dialog.VwmlDialog;
 import com.vw.ide.client.dialog.simple.SimpleSinglelineEditDialog;
 import com.vw.ide.client.service.ProcessedResult;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForAnyOperation;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForCompleteContent;
+import com.vw.ide.client.service.remote.browser.DirBrowserService;
+import com.vw.ide.client.service.remote.browser.DirBrowserService.ServiceCallbackForAnyOperation;
+import com.vw.ide.client.service.remote.browser.DirBrowserService.ServiceCallbackForCompleteContent;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.client.utils.Utils.YesNoMsgBoxSelctionCallback;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
@@ -237,9 +237,9 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 	}
 	
 	protected void requestForDirContent(String parent) {
-		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance().getServiceImpl();
+		RemoteDirectoryBrowserAsync service = DirBrowserService.instance().getServiceImpl();
 		if (service != null) {
-			ServiceCallbackForCompleteContent cbk = RemoteBrowserService.instance().buildCallbackForCompleteContent();
+			ServiceCallbackForCompleteContent cbk = DirBrowserService.instance().buildCallbackForCompleteContent();
 			cbk.setProcessedResult(new DirContentResult(this));
 			service.getDirScan(getLoggedAsUser(), parent, cbk);
 		}
@@ -323,9 +323,9 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 	
 	protected void onCreateDirectory(String dir) {
 		if (dirsField.getSelectedItem() != null) {
-			RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance().getServiceImpl();
+			RemoteDirectoryBrowserAsync service = DirBrowserService.instance().getServiceImpl();
 			if (service != null) {
-				ServiceCallbackForAnyOperation cbk = RemoteBrowserService.instance().buildCallbackForAnyOperation();
+				ServiceCallbackForAnyOperation cbk = DirBrowserService.instance().buildCallbackForAnyOperation();
 				cbk.setProcessedResult(new DirOperationCreateResult(this));
 				ItemResource resource = (ItemResource)dirsField.getSelectedItem().getUserObject();
 				if (resource != null) {
@@ -337,9 +337,9 @@ public class RemoteDirectoryBrowserDialog extends VwmlDialog {
 	
 	protected void onRemoveDirectory() {
 		if (dirsField.getSelectedItem() != null) {
-			RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance().getServiceImpl();
+			RemoteDirectoryBrowserAsync service = DirBrowserService.instance().getServiceImpl();
 			if (service != null) {
-				ServiceCallbackForAnyOperation cbk = RemoteBrowserService.instance().buildCallbackForAnyOperation();
+				ServiceCallbackForAnyOperation cbk = DirBrowserService.instance().buildCallbackForAnyOperation();
 				cbk.setProcessedResult(new DirOperationRemoveResult(this));
 				ItemResource resource = (ItemResource)dirsField.getSelectedItem().getUserObject();
 				if (resource != null) {

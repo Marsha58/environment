@@ -47,7 +47,7 @@ import com.vw.ide.client.projects.ProjectItem;
 import com.vw.ide.client.projects.ProjectItemImpl;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
@@ -263,7 +263,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	}
 
 	public void requestDirContent(String root) {
-		RemoteBrowserServiceBroker.requestForDirContent(FlowController.getLoggedAsUser(), root, dirContentResultCbk);
+		DirBrowserServiceBroker.requestForDirContent(FlowController.getLoggedAsUser(), root, dirContentResultCbk);
 	}
 
 	public FileItemInfo getSelectedItem4ContextMenu() {

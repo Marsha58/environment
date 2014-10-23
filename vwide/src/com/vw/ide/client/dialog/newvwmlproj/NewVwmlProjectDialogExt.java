@@ -1,28 +1,48 @@
 package com.vw.ide.client.dialog.newvwmlproj;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.cell.core.client.form.ComboBoxCell.TriggerAction;
+import com.sencha.gxt.core.client.util.ToggleGroup;
+import com.sencha.gxt.data.shared.LabelProvider;
+import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.BlurEvent;
 import com.sencha.gxt.widget.core.client.event.BlurEvent.BlurHandler;
 import com.sencha.gxt.widget.core.client.event.FocusEvent.FocusHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.form.CheckBox;
+import com.sencha.gxt.widget.core.client.form.ComboBox;
+import com.sencha.gxt.widget.core.client.form.FieldLabel;
+import com.sencha.gxt.widget.core.client.form.FieldSet;
+import com.sencha.gxt.widget.core.client.form.Radio;
 import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.form.TextField;
+import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.dialog.VwmlDialogExt;
 import com.vw.ide.client.dialog.remotebrowser.RemoteDirectoryBrowserDialogExt;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.presenters.Presenter;
-import com.vw.ide.client.service.ProcessedResult;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForProjectCreation;
-import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
-import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
+import com.vw.ide.client.service.remote.ResultCallback;
+import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
+import com.vw.ide.shared.servlet.projectmanager.CompilerSwitchesDescription;
+import com.vw.ide.shared.servlet.projectmanager.InterpreterDescription;
+import com.vw.ide.shared.servlet.projectmanager.ParallelInterpreterDescription;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
+import com.vw.ide.shared.servlet.projectmanager.ReactiveInterpreterDescription;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
+import com.vw.ide.shared.servlet.projectmanager.SequentialInterpreterDescription;
 
 /**
  * New VWML project dialog
@@ -33,12 +53,12 @@ import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 
 	private static String s_remoteDirectoryBrowserCaption = "Select project's folder";
-	private static NewVwmlProjectDialogExtUiBinder uiBinder = GWT
-			.create(NewVwmlProjectDialogExtUiBinder.class);
+	private static NewVwmlProjectDialogExtUiBinder uiBinder = GWT.create(NewVwmlProjectDialogExtUiBinder.class);
 	
 	private Presenter presenter = null;
 	private String path4project = "";
-
+	private ProjectDescription projectDescription = null;
+	
 	// @UiField FlowPanel dialogMainPanel;
 	@UiField
 	TextField tfVWMLProjectName;
@@ -46,6 +66,8 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 	TextField tfVWMLProjectPath;
 	@UiField
 	TextButton browseVwmlProjPath;
+	@UiField
+	TextButton browseJavaProjPath;
 	@UiField
 	TextField tfVWMLMainModule;
 	@UiField
@@ -56,59 +78,112 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 	TextField tfJavaPackageName;
 	@UiField
 	TextField tfJavaSourcePath;
+	@UiField(provided = true)
+    LabelProvider<InterpreterDescription> interpreterLabelProvider = interpreterProps.name();	
+	@UiField(provided = true)
+    ListStore<InterpreterDescription> interpretersAsListStore = new ListStore<InterpreterDescription>(interpreterProps.key());	
+	@UiField
+	ComboBox<InterpreterDescription> cbVWMLAvailableInterpreters;
+	@UiField
+	FieldSet fieldSetInterpreterSettings;
+	@UiField 
+	VerticalLayoutContainer fieldInterpreterSettingsArea;
+	@UiField(provided = true)
+    LabelProvider<CompilerSwitchesDescription.Mode> compilationModeLabelProvider = compilerModeProps.mode();
+	@UiField(provided = true)
+    ListStore<CompilerSwitchesDescription.Mode> compilationModesAsListStore = new ListStore<CompilerSwitchesDescription.Mode>(compilerModeProps.key());
+	@UiField
+	ComboBox<CompilerSwitchesDescription.Mode> cbVWMLAvailableModes;
+	@UiField
+	CheckBox bnDebugInfoTrigger;
+	@UiField
+	FieldSet fieldSetCompileModeSettings;
+	@UiField 
+	VerticalLayoutContainer fieldSetCompileModeSettingsArea;
+	
+	private static final int SEQUENTIAL_INTERPRETER_ID = 0x0;
+	private static final int REACTIVE_INTERPRETER_ID   = 0x1;
+	private static final int PARALLEL_INTERPRETER_ID   = 0x2;
 
-	// @UiField TextButton ok;
-	// @UiField TextButton cancel;
-
-	interface NewVwmlProjectDialogExtUiBinder extends
-			UiBinder<Widget, NewVwmlProjectDialogExt> {
+	private static InterpeterProperties interpreterProps = GWT.create(InterpeterProperties.class);
+	private static CompilerModeProperties compilerModeProps = GWT.create(CompilerModeProperties.class);
+	
+	interface NewVwmlProjectDialogExtUiBinder extends UiBinder<Widget, NewVwmlProjectDialogExt> {
 	}
 
-	public NewVwmlProjectDialogExt() {
+	interface InterpeterProperties extends PropertyAccess<InterpreterDescription> {
+	    ModelKeyProvider<InterpreterDescription> key();
+	    LabelProvider<InterpreterDescription> name();
+	}
+
+	interface CompilerModeProperties extends PropertyAccess<CompilerSwitchesDescription.Mode> {
+	    ModelKeyProvider<CompilerSwitchesDescription.Mode> key();
+	    LabelProvider<CompilerSwitchesDescription.Mode> mode();
+	}
+	
+	public NewVwmlProjectDialogExt(ProjectDescription projectDescription, Integer hashId) {
+		this.projectDescription = (projectDescription == null) ? new ProjectDescription() : projectDescription;
 		super.setWidget(uiBinder.createAndBindUi(this));
-		tfVWMLProjectName.addFocusHandler(new FocusHandler() {
-
+		initializationWidgets();
+		setupProjectName();
+		setupMainModule();
+		setupAuthor();
+		setupDescription();
+		setupTargetLangSourcePath();
+		fieldSetInterpreterSettings.collapse();
+		cbVWMLAvailableInterpreters.setEditable(false);
+		cbVWMLAvailableInterpreters.setTriggerAction(TriggerAction.ALL);
+		cbVWMLAvailableInterpreters.setValue(interpretersAsListStore.get(REACTIVE_INTERPRETER_ID));
+		cbVWMLAvailableInterpreters.addSelectionHandler(new SelectionHandler<InterpreterDescription>() {
 			@Override
-			public void onFocus(
-					com.sencha.gxt.widget.core.client.event.FocusEvent event) {
-				String sName = tfVWMLProjectName.getText();
-				tfJavaPackageName.setText(sName);
+			public void onSelection(SelectionEvent<InterpreterDescription> event) {
+				if (event.getSelectedItem().equals(interpretersAsListStore.get(PARALLEL_INTERPRETER_ID))) {
+					fieldSetInterpreterSettings.enable();
+					fieldInterpreterSettingsArea.enable();
+					fieldSetInterpreterSettings.expand();
+					activateParallelInterpreterEditableProperties(fieldInterpreterSettingsArea, (ParallelInterpreterDescription)interpretersAsListStore.get(PARALLEL_INTERPRETER_ID));
+				}
+				else {
+					deactivateParallelInterpreterEditableProperties(fieldInterpreterSettingsArea);
+					fieldSetInterpreterSettings.collapse();
+					fieldSetInterpreterSettings.disable();
+					fieldInterpreterSettingsArea.disable();	
+				}
 			}
 		});
-
-		tfVWMLProjectName.addBlurHandler(new BlurHandler() {
-
+		bnDebugInfoTrigger.setToolTip("Debug information increases size of generated code");
+		cbVWMLAvailableModes.setEditable(false);
+		cbVWMLAvailableModes.setTriggerAction(TriggerAction.ALL);
+		cbVWMLAvailableModes.setValue(CompilerSwitchesDescription.Mode.SOURCE);
+		cbVWMLAvailableModes.addSelectionHandler(new SelectionHandler<CompilerSwitchesDescription.Mode>() {
 			@Override
-			public void onBlur(BlurEvent event) {
-				String sName = tfVWMLProjectName.getText();
-				tfJavaPackageName.setText(makePackageName(sName));
-				tfVWMLProjectPath.setText(path4project + "\\" + sName);
+			public void onSelection(SelectionEvent<CompilerSwitchesDescription.Mode> event) {
+				if (event.getSelectedItem() == CompilerSwitchesDescription.Mode.TEST) {
+					fieldSetCompileModeSettings.enable();
+					fieldSetCompileModeSettingsArea.enable();
+					fieldSetCompileModeSettings.expand();
+					activateTestModeEditableProperties(fieldSetCompileModeSettingsArea);
+				}
+				else {
+					deactivateTestModeEditableProperties(fieldSetCompileModeSettingsArea);
+					fieldSetCompileModeSettings.collapse();
+					fieldSetCompileModeSettings.disable();
+					fieldSetCompileModeSettingsArea.disable();
+				}
 			}
-		});
-
-		tfVWMLMainModule.setText("com.win.strategy.battle.vwml.model");
-		tfVWMLAuthor.setText("Win Interactive LLC");
-		tfVWMLDescr
-				.setText("Here author  should write short description about project");
-		tfJavaSourcePath.setText("java_src");
+		}
+		);
+		fieldSetCompileModeSettings.collapse();
+		fieldSetCompileModeSettings.disable();
 	}
 
-	public class ProjectCreationResult extends
-			ProcessedResult<RequestProjectCreationResult> {
+	public class ProjectCreationResult extends ResultCallback<RequestProjectCreationResult> {
 
 		public ProjectCreationResult() {
-
 		}
 
 		@Override
-		public void onFailure(Throwable caught) {
-			AlertMessageBox alertMessageBox = new AlertMessageBox("Error",
-					caught.getMessage());
-			alertMessageBox.show();
-		}
-
-		@Override
-		public void onSuccess(RequestProjectCreationResult result) {
+		public void handle(RequestProjectCreationResult result) {
 			if (result.getRetCode().intValue() != 0) {
 				String messageAlert = "The operation '" + result.getOperation()
 						+ "' failed.\r\nResult'" + result.getResult() + "'";
@@ -119,9 +194,7 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 				((DevelopmentBoardPresenter) presenter).fireEvent(new GetDirContentEvent());
 			}
 		}
-
 	}
-
 	
 	public void associatePresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -158,18 +231,6 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 		return sPackageName.toString();
 	}
 
-
-
-	// @UiHandler("ok")
-	// void onOkClick(ClickEvent event) {
-	//
-	// }
-
-	// @UiHandler("cancel")
-	// void onCancelClick(ClickEvent event) {
-	// this.hide();
-	// }
-
 	@UiHandler("browseVwmlProjPath")
 	void onBrowseVwmlProjPathClick(SelectEvent event) {
 		RemoteDirectoryBrowserDialogExt d = new RemoteDirectoryBrowserDialogExt();
@@ -183,29 +244,92 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 	protected void onButtonPressed(TextButton textButton) {
 		super.onButtonPressed(textButton);
 		if (textButton == getButton(PredefinedButton.OK)) {
-			requestForProjectCreation(tfVWMLProjectName.getText(),tfVWMLProjectPath.getText(), tfJavaPackageName.getText(),
-					 tfJavaSourcePath.getText(),tfVWMLAuthor.getText(),	tfVWMLDescr.getText()
-					);
+			ProjectDescription description = new ProjectDescription(
+													FlowController.getLoggedAsUser(),
+													tfVWMLProjectName.getText(),
+													tfVWMLProjectPath.getText(),
+													tfJavaPackageName.getText(),
+													tfJavaSourcePath.getText(),
+													tfVWMLAuthor.getText(),
+													tfVWMLDescr.getText());
+			ProjectManagerServiceBroker.requestForProjectCreation(description, new ProjectCreationResult());
 			hide();
-		}
-	}
-
-	protected void requestForProjectCreation(String projectName, String projectPath, String packageName,
-			String javaSrcPath, String author, String descr) {
-		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
-				.getServiceImpl();
-
-		if (service != null) {
-			ServiceCallbackForProjectCreation cbk = RemoteBrowserService
-					.instance().buildCallbackForProjectCreation();
-			cbk.setProcessedResult(new ProjectCreationResult());
-			service.createProject(this.getLoggedAsUser(), projectName,  projectPath, packageName, 
-					javaSrcPath, author, descr, cbk);
 		}
 	}
 	
 	public void setPath4project(String path4project) {
 		this.path4project = path4project;
 	}
+	
+	private void activateParallelInterpreterEditableProperties(VerticalLayoutContainer fieldInterpreterSettingsArea, ParallelInterpreterDescription description) {
+		TextField tf = new TextField();
+		tf.setAllowBlank(false);
+		tf.setText(String.valueOf(description.getNodesPerRing()));
+		FieldLabel fl = new FieldLabel(tf, "Lifeterms per ring");
+		fieldInterpreterSettingsArea.add(fl);
+	}
 
+	private void deactivateParallelInterpreterEditableProperties(VerticalLayoutContainer fieldInterpreterSettingsArea) {
+		fieldInterpreterSettingsArea.clear();
+	}
+	
+	private void activateTestModeEditableProperties(VerticalLayoutContainer fieldSetCompileModeSettingsArea) {
+		HorizontalPanel hp = new HorizontalPanel();
+		Radio testStatic = new Radio();
+		Radio testAll = new Radio();
+		testStatic.setBoxLabel("Static");
+		testAll.setBoxLabel("All");
+		testStatic.setValue(true);
+		hp.add(testStatic);
+		hp.add(testAll);
+	    ToggleGroup toggle = new ToggleGroup();
+	    toggle.add(testStatic);
+	    toggle.add(testAll);		
+		FieldLabel fl = new FieldLabel(hp, "Select type of tests");
+		fl.setToolTip("'Static' test checks consistency of created model by checking relations among contexts. 'All' test adds ability to run model and debug it");
+		fieldSetCompileModeSettingsArea.add(fl);
+	}
+
+	private void deactivateTestModeEditableProperties(VerticalLayoutContainer fieldSetCompileModeSettingsArea) {
+		fieldSetCompileModeSettingsArea.clear();
+	}
+
+	private void initializationWidgets() {
+		interpretersAsListStore.add(new SequentialInterpreterDescription("sequential"));
+		interpretersAsListStore.add(new ReactiveInterpreterDescription("reactive"));
+		interpretersAsListStore.add(new ParallelInterpreterDescription("parallel"));
+		compilationModesAsListStore.add(CompilerSwitchesDescription.Mode.SOURCE);
+		compilationModesAsListStore.add(CompilerSwitchesDescription.Mode.PROJECT);
+		compilationModesAsListStore.add(CompilerSwitchesDescription.Mode.COMPILE);
+		compilationModesAsListStore.add(CompilerSwitchesDescription.Mode.TEST);
+		compilationModesAsListStore.add(CompilerSwitchesDescription.Mode.MAIN);
+	}
+	
+	private void setupProjectName() {
+		tfVWMLProjectName.setText(projectDescription.getProjectName());
+		tfVWMLProjectName.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				projectDescription.setProjectName(tfVWMLProjectName.getText());
+				projectDescription.setMainModuleName(projectDescription.getProjectName());
+				tfVWMLMainModule.setText(projectDescription.getProjectName());
+			}
+		});	
+	}
+
+	private void setupMainModule() {
+		tfVWMLMainModule.setText(projectDescription.getProjectName());
+	}
+
+	private void setupAuthor() {
+		tfVWMLMainModule.setText(projectDescription.getAuthor());
+	}
+	
+	private void setupDescription() {
+		tfVWMLMainModule.setText(projectDescription.getDescr());
+	}
+	
+	private void setupTargetLangSourcePath() {
+		tfJavaSourcePath.setText("java_src");
+	}
 }

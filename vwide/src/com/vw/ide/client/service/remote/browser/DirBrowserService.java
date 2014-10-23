@@ -11,7 +11,6 @@ import com.vw.ide.client.service.factory.ServicesStubFactory;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 /**
@@ -19,12 +18,12 @@ import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
  * @author Oleg
  *
  */
-public class RemoteBrowserService implements BusConnectivity, VwIdeClientService {
+public class DirBrowserService implements BusConnectivity, VwIdeClientService {
 	private HandlerManager bus;
 	// concrete service's instance
 	private RemoteDirectoryBrowserAsync serviceImpl = ServicesStubFactory.createRemoteDirectoryBrowserAsync();
 	
-	private static RemoteBrowserService s_instance = null;
+	private static DirBrowserService s_instance = null;
 	
 	/**
 	 * Callbacks implementation
@@ -44,16 +43,13 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 	public static class ServiceCallbackForAnyOperation extends ServiceCallback<RequestDirOperationResult> {
 	}
 	
-	public static class ServiceCallbackForProjectCreation extends ServiceCallback<RequestProjectCreationResult> {
-	}
-
 	public static class ServiceCallbackForDirOperation extends ServiceCallback<RequestDirOperationResult> {
 	}
 	
 	public static class ServiceCallbackForFileOperation extends ServiceCallback<RequestFileOperationResult> {
 	}
 	
-	private RemoteBrowserService() {
+	private DirBrowserService() {
 		
 	}
 	
@@ -61,11 +57,11 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 	 * Simple singleton implementation
 	 * @return
 	 */
-	public static synchronized RemoteBrowserService instance() {
+	public static synchronized DirBrowserService instance() {
 		if (s_instance != null) {
 			return s_instance;
 		}
-		s_instance = new RemoteBrowserService();
+		s_instance = new DirBrowserService();
 		return s_instance;
 	}
 
@@ -96,10 +92,6 @@ public class RemoteBrowserService implements BusConnectivity, VwIdeClientService
 	public ServiceCallbackForAnyOperation buildCallbackForAnyOperation() {
 		return new ServiceCallbackForAnyOperation();
 	}
-	
-	public ServiceCallbackForProjectCreation buildCallbackForProjectCreation() {
-		return new ServiceCallbackForProjectCreation();
-	}		
 	
 	public ServiceCallbackForDirOperation buildCallbackForDirOperation() {
 		return new ServiceCallbackForDirOperation();

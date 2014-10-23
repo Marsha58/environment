@@ -2,11 +2,11 @@ package com.vw.ide.client.service.remote.security;
 
 import com.vw.ide.client.service.remote.Result;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.client.service.remote.security.RemoteSecurityService.ServiceCallbackForLogin;
+import com.vw.ide.client.service.remote.security.SecurityService.ServiceCallbackForLogin;
 import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;
 
-public class RemoteSecurityServiceBroker {
+public class SecurityServiceBroker {
 
 	/**
 	 * Performs user login remote operation
@@ -16,9 +16,9 @@ public class RemoteSecurityServiceBroker {
 	 */
 	public static void requestForLogin(String userName, String password, ResultCallback<RequestLoginResult> resultCallback) {
 		String sPasswordMD5 = calculateCheckSum(password.trim());
-		RemoteSecurityAsync service = RemoteSecurityService.instance().getServiceImpl();
+		RemoteSecurityAsync service = SecurityService.instance().getServiceImpl();
 		if (service != null) {
-			ServiceCallbackForLogin cbk = RemoteSecurityService.instance().buildCallbackForLogin();
+			ServiceCallbackForLogin cbk = SecurityService.instance().buildCallbackForLogin();
 			cbk.setProcessedResult(new Result<RequestLoginResult>(resultCallback));
 			service.login(userName, sPasswordMD5, cbk);
 		}
@@ -30,9 +30,9 @@ public class RemoteSecurityServiceBroker {
 	 * @param resultCallback
 	 */
 	public static void requestForLogout(String userName, ResultCallback<RequestLoginResult> resultCallback) {
-		RemoteSecurityAsync service = RemoteSecurityService.instance().getServiceImpl();
+		RemoteSecurityAsync service = SecurityService.instance().getServiceImpl();
 		if (service != null) {
-			ServiceCallbackForLogin cbk = RemoteSecurityService.instance().buildCallbackForLogin();
+			ServiceCallbackForLogin cbk = SecurityService.instance().buildCallbackForLogin();
 			cbk.setProcessedResult(new Result<RequestLoginResult>(resultCallback));
 			service.logout(userName, cbk);
 		}

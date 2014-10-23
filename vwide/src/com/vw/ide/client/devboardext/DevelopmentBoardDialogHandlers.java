@@ -8,8 +8,10 @@ import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler
 import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.service.browser.callbacks.AnyDirOperationResultCallback;
 import com.vw.ide.client.devboardext.service.browser.callbacks.AnyFileOperationResultCallback;
+import com.vw.ide.client.devboardext.service.browser.callbacks.ProjectDeletionResultCallback;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserServiceBroker;
+import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
+import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 
@@ -33,10 +35,10 @@ public class DevelopmentBoardDialogHandlers {
 
 			if (s.equalsIgnoreCase("YES")) {
 				owner.getProjectManager().removeProject(owner.getSelectedProjectInTheProjectTree());
-				RemoteBrowserServiceBroker.requestForDeletingProject(FlowController.getLoggedAsUser(),
+				ProjectManagerServiceBroker.requestForDeletingProject(FlowController.getLoggedAsUser(),
 										  owner.getSelectedItemInTheProjectTree().getAbsolutePath(),
 										  owner.getSelectedItemInTheProjectTree().getProjectId(),
-										  new AnyDirOperationResultCallback(owner));
+										  new ProjectDeletionResultCallback(owner));
 
 			}
 		}
@@ -57,7 +59,7 @@ public class DevelopmentBoardDialogHandlers {
 				owner.getProjectManager().removeFile(owner.getSelectedItemInTheProjectTree().getFileId());
 				Widget widget2delete = owner.getProjectManager().getAssociatedTabWidget(owner.getSelectedItemInTheProjectTree().getFileId());
 				owner.getView().removeWidget(widget2delete);
-				RemoteBrowserServiceBroker.requestForFileDeleting(FlowController.getLoggedAsUser(),
+				DirBrowserServiceBroker.requestForFileDeleting(FlowController.getLoggedAsUser(),
 																  owner.getSelectedItemInTheProjectTree().getAbsolutePath(),
 																  owner.getSelectedItemInTheProjectTree().getFileId(),
 																  new AnyFileOperationResultCallback(owner, true));
@@ -78,7 +80,7 @@ public class DevelopmentBoardDialogHandlers {
 		public void onDialogHide(DialogHideEvent event) {
 			if (box.getValue() != null) {
 				if (owner.isValidFileName(box.getValue())) {
-					RemoteBrowserServiceBroker.requestForFileCreating(
+					DirBrowserServiceBroker.requestForFileCreating(
 											FlowController.getLoggedAsUser(),
 											Utils.extractJustPath(owner.getSelectedItemInTheProjectTree().getAbsolutePath()),
 											box.getValue(),
@@ -104,7 +106,7 @@ public class DevelopmentBoardDialogHandlers {
 		public void onDialogHide(DialogHideEvent event) {
 			if (box.getValue() != null) {
 				if (owner.isValidFileName(box.getValue())) {
-					RemoteBrowserServiceBroker.requestForFolderCreating(
+					DirBrowserServiceBroker.requestForFolderCreating(
 											FlowController.getLoggedAsUser(),
 											Utils.extractJustPath(owner.getSelectedItemInTheProjectTree().getAbsolutePath()),
 											box.getValue(),
@@ -126,7 +128,7 @@ public class DevelopmentBoardDialogHandlers {
 		@Override
 		public void onDialogHide(DialogHideEvent event) {
 			if (box.getLoadedFiles() > 0) {
-				RemoteBrowserServiceBroker.requestForFileCreating(
+				DirBrowserServiceBroker.requestForFileCreating(
 						FlowController.getLoggedAsUser(),
 						box.getParentPath(),
 						box.getFileName(0),
@@ -154,13 +156,13 @@ public class DevelopmentBoardDialogHandlers {
 			@Override
 			public void onDialogHide(DialogHideEvent event) {
 				if (event.getHideButton().name().equalsIgnoreCase("YES")) {
-					RemoteBrowserServiceBroker.requestForFileSaving(FlowController.getLoggedAsUser(),
+					DirBrowserServiceBroker.requestForFileSaving(FlowController.getLoggedAsUser(),
 							(String) box.getData("fullFileName"),
 							(Long) box.getData("projectId"),
 							(Long) box.getData("fileId"),
 							(String) box.getData("content"),
 							new AnyFileOperationResultCallback(owner, true));
-					RemoteBrowserServiceBroker.requestForFileRenaming(FlowController.getLoggedAsUser(),
+					DirBrowserServiceBroker.requestForFileRenaming(FlowController.getLoggedAsUser(),
 							owner.getSelectedItemInTheProjectTree().getAbsolutePath(),
 							owner.getSelectedItemInTheProjectTree().getFileId(),
 							fullNewFileName,
@@ -196,7 +198,7 @@ public class DevelopmentBoardDialogHandlers {
 						saveConfirmBox.show();
 					}
 					else {
-						RemoteBrowserServiceBroker.requestForFileRenaming(FlowController.getLoggedAsUser(),
+						DirBrowserServiceBroker.requestForFileRenaming(FlowController.getLoggedAsUser(),
 								owner.getSelectedItemInTheProjectTree().getAbsolutePath(),
 								owner.getSelectedItemInTheProjectTree().getFileId(),
 								fullNewFileName,

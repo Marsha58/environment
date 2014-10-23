@@ -3,8 +3,9 @@ package com.vw.ide.client.service.factory;
 import com.google.gwt.event.shared.HandlerManager;
 import com.vw.ide.client.service.BusConnectivity;
 import com.vw.ide.client.service.VwIdeClientService;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService;
-import com.vw.ide.client.service.remote.security.RemoteSecurityService;
+import com.vw.ide.client.service.remote.browser.DirBrowserService;
+import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService;
+import com.vw.ide.client.service.remote.security.SecurityService;
 import com.vw.ide.client.service.remote.userstate.RemoteUserStateService;
 
 /**
@@ -18,9 +19,10 @@ public class ServicesBrokerFactory {
 	 */
 	public static void instantiateAllServices(HandlerManager eventBus) {
 		VwIdeClientService services[] = {
-											RemoteBrowserService.instance(),
-											RemoteSecurityService.instance(),
-											RemoteUserStateService.instance()
+											DirBrowserService.instance(),
+											SecurityService.instance(),
+											RemoteUserStateService.instance(),
+											ProjectManagerService.instance()
 										};
 		for(VwIdeClientService s : services) {
 			if (s != null && s instanceof BusConnectivity) {

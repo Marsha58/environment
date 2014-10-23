@@ -1,7 +1,10 @@
-package com.vw.ide.shared.servlet.remotebrowser;
+package com.vw.ide.shared.servlet.projectmanager;
 
 import java.io.Serializable;
 import java.util.List;
+
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+import com.vw.ide.shared.servlet.remotebrowser.RequestResult;
 
 @SuppressWarnings("serial")
 public class RequestProjectCreationResult extends RequestResult implements Serializable {

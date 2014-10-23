@@ -86,7 +86,7 @@
 		</container:center>
 		<container:south layoutData="{southData}">
 			<container:SimpleContainer>
-				<g:Label text = "selectedPathField" ui:field="selectedPathField"/>
+				<g:Label text = "" ui:field="selectedPathField"/>
 			</container:SimpleContainer>
 		</container:south>
 	</container:BorderLayoutContainer>

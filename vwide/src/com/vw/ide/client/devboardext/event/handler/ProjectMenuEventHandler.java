@@ -71,11 +71,11 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 	}
 
 	private void makeProjectNew(DevelopmentBoardPresenter presenter, String path4project) {
-		NewVwmlProjectDialogExt d = new NewVwmlProjectDialogExt();
+		NewVwmlProjectDialogExt d = new NewVwmlProjectDialogExt(null, null);
 		d.setLoggedAsUser(FlowController.getLoggedAsUser());
 		d.setPath4project(path4project);
 		d.associatePresenter(presenter);
-		d.setSize("480", "380");
+		d.setSize("480", "350");
 		d.showCenter(s_newVwmlProjectCaption, null);
 	}
 

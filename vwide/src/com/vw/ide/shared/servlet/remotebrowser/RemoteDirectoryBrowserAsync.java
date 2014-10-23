@@ -37,29 +37,6 @@ public interface RemoteDirectoryBrowserAsync {
 	 */
 	public void removeDir(String user, String parent, String dir, AsyncCallback<RequestDirOperationResult> callback);
 
-	
-
-	/**
-	 * Project creating
-	 * @param userName
-	 * @param projectName
-	 * @param packageName
-	 * @param javaSrcPath
-	 * @param author
-	 * @param descr
-	 */
-	public void createProject(String userName,String projectName, String projectPath, String packageName,
-			String javaSrcPath, String author, String descr, AsyncCallback<RequestProjectCreationResult> callback);
-
-	/**
-	 * Project deleting
-	 * @param userName
-	 * @param projectName
-	 * @param projectId
-	 */
-	public void deleteProject(String userName, String projectName, Long projectId,
-			AsyncCallback<RequestDirOperationResult> cbk);
-
 	/**
 	 * Adding file to theProject
 	 * @param user

@@ -29,13 +29,10 @@ import com.vw.ide.client.dialog.simple.SimpleSinglelineEditDialogExt;
 import com.vw.ide.client.model.BaseDto;
 import com.vw.ide.client.model.FileDto;
 import com.vw.ide.client.model.FolderDto;
-import com.vw.ide.client.service.ProcessedResult;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForAnyOperation;
-import com.vw.ide.client.service.remote.browser.RemoteBrowserService.ServiceCallbackForCompleteContent;
+import com.vw.ide.client.service.remote.ResultCallback;
+import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
 import com.vw.ide.client.utils.Utils.YesNoMsgBoxSelctionCallback;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
-import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowserAsync;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 //import com.google.gwt.user.client.ui.Tree;
@@ -48,16 +45,6 @@ import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
  */
 public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 
-	class KeyProvider implements ModelKeyProvider<BaseDto> {
-		@Override
-		public String getKey(BaseDto item) {
-			return (item instanceof FolderDto ? "f-" : "m-")
-					+ item.getId().toString();
-		}
-	}
-
-	private static int autoId = 0;
-
 	public static class NewFolderDialogResult implements
 			SimpleSinglelineEditDialogExt.ResultCallback {
 
@@ -69,13 +56,112 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		}
 
 		public void setResult(String result) {
-
 			owner.onCreateDirectory(result);
 		}
 	}
 
+	/**
+	 * Called upon response from remote service
+	 * 
+	 * @author Oleg
+	 * 
+	 */
+
+	public static class DirContentResult extends ResultCallback<RequestedDirScanResult> {
+
+		private RemoteDirectoryBrowserDialogExt dialog;
+
+		public DirContentResult() {
+
+		}
+
+		public DirContentResult(RemoteDirectoryBrowserDialogExt dialog) {
+			this.dialog = dialog;
+
+		}
+
+		@Override
+		public void handle(RequestedDirScanResult result) {
+			dialog.makeTreeData(result);
+		}
+	}
+
+	public static class DirOperationCreateResult extends ResultCallback<RequestDirOperationResult> {
+
+		private RemoteDirectoryBrowserDialogExt dialog;
+
+		public DirOperationCreateResult() {
+
+		}
+
+		public DirOperationCreateResult(RemoteDirectoryBrowserDialogExt dialog) {
+			this.dialog = dialog;
+		}
+
+		@Override
+		public void handle(RequestDirOperationResult result) {
+			if (result.getRetCode().intValue() != 0) {
+				String messageAlert = "The operation '" + result.getOperation()
+						+ "' failed.\r\nResult'" + result.getResult() + "'";
+				AlertMessageBox alertMessageBox = new AlertMessageBox(
+						"Warning", messageAlert);
+				alertMessageBox.show();
+			} else {
+				dialog.refreshTreeStartingFromSelected();
+			}
+		}
+	}
+
+	public static class DirOperationRemoveResult extends ResultCallback<RequestDirOperationResult> {
+
+		private RemoteDirectoryBrowserDialogExt dialog;
+
+		public DirOperationRemoveResult() {
+
+		}
+
+		public DirOperationRemoveResult(RemoteDirectoryBrowserDialogExt dialog) {
+			this.dialog = dialog;
+		}
+
+		@Override
+		public void handle(RequestDirOperationResult result) {
+			if (result.getRetCode().intValue() != 0) {
+				String messageAlert = "The operation '" + result.getOperation()
+						+ "' failed.\r\nResult'" + result.getResult() + "'";
+				AlertMessageBox alertMessageBox = new AlertMessageBox(
+						"Warning", messageAlert);
+				alertMessageBox.show();
+			} else {
+				dialog.removeSelected();
+			}
+		}
+	}
+
+	public static class ConfirmDirectoryRemoving implements YesNoMsgBoxSelctionCallback {
+
+		private RemoteDirectoryBrowserDialogExt dialog;
+
+		public ConfirmDirectoryRemoving(RemoteDirectoryBrowserDialogExt remoteDirectoryBrowserDialogExt) {
+			this.dialog = remoteDirectoryBrowserDialogExt;
+		}
+
+		public void selected(SELECTION selection) {
+			if (selection == SELECTION.YES) {
+				dialog.onRemoveDirectory();
+			}
+		}
+	}
+
+	protected class KeyProvider implements ModelKeyProvider<BaseDto> {
+		@Override
+		public String getKey(BaseDto item) {
+			return (item instanceof FolderDto ? "f-" : "m-") + item.getId().toString();
+		}
+	}
+
 	@UiFactory
-	public ValueProvider<BaseDto, String> createValueProvider() {
+	protected ValueProvider<BaseDto, String> createValueProvider() {
 		return new ValueProvider<BaseDto, String>() {
 
 			@Override
@@ -93,126 +179,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			}
 		};
 	}
-
-	/**
-	 * Called upon response from remote service
-	 * 
-	 * @author Oleg
-	 * 
-	 */
-
-	public static class DirContentResult extends
-			ProcessedResult<RequestedDirScanResult> {
-
-		private RemoteDirectoryBrowserDialogExt dialog;
-
-		public DirContentResult() {
-
-		}
-
-		public DirContentResult(RemoteDirectoryBrowserDialogExt dialog) {
-			this.dialog = dialog;
-
-		}
-
-		@Override
-		public void onFailure(Throwable caught) {
-		}
-
-		@Override
-		public void onSuccess(RequestedDirScanResult result) {
-			dialog.makeTreeData(result);
-		}
-	}
-
-	public static class DirOperationCreateResult extends
-			ProcessedResult<RequestDirOperationResult> {
-
-		private RemoteDirectoryBrowserDialogExt dialog;
-
-		public DirOperationCreateResult() {
-
-		}
-
-		public DirOperationCreateResult(RemoteDirectoryBrowserDialogExt dialog) {
-			this.dialog = dialog;
-		}
-
-		@Override
-		public void onFailure(Throwable caught) {
-			AlertMessageBox alertMessageBox = new AlertMessageBox("Error",
-					caught.getMessage());
-			alertMessageBox.show();
-		}
-
-		@Override
-		public void onSuccess(RequestDirOperationResult result) {
-			if (result.getRetCode().intValue() != 0) {
-				String messageAlert = "The operation '" + result.getOperation()
-						+ "' failed.\r\nResult'" + result.getResult() + "'";
-				AlertMessageBox alertMessageBox = new AlertMessageBox(
-						"Warning", messageAlert);
-				alertMessageBox.show();
-			} else {
-				dialog.removeAllChildrenStartingFromSelected();
-				dialog.refreshTreeStartingFromSelected();
-			}
-		}
-	}
-
-	public static class DirOperationRemoveResult extends
-			ProcessedResult<RequestDirOperationResult> {
-
-		private RemoteDirectoryBrowserDialogExt dialog;
-
-		public DirOperationRemoveResult() {
-
-		}
-
-		public DirOperationRemoveResult(RemoteDirectoryBrowserDialogExt dialog) {
-			this.dialog = dialog;
-		}
-
-		@Override
-		public void onFailure(Throwable caught) {
-			AlertMessageBox alertMessageBox = new AlertMessageBox("Error",
-					caught.getMessage());
-			alertMessageBox.show();
-		}
-
-		@Override
-		public void onSuccess(RequestDirOperationResult result) {
-			if (result.getRetCode().intValue() != 0) {
-				String messageAlert = "The operation '" + result.getOperation()
-						+ "' failed.\r\nResult'" + result.getResult() + "'";
-				AlertMessageBox alertMessageBox = new AlertMessageBox(
-						"Warning", messageAlert);
-				alertMessageBox.show();
-			} else {
-				dialog.removeSelected();
-			}
-		}
-	}
-
 	
-
-	public static class ConfirmDirectoryRemoving implements
-			YesNoMsgBoxSelctionCallback {
-
-		private RemoteDirectoryBrowserDialogExt dialog;
-
-		public ConfirmDirectoryRemoving(
-				RemoteDirectoryBrowserDialogExt remoteDirectoryBrowserDialogExt) {
-			this.dialog = remoteDirectoryBrowserDialogExt;
-		}
-
-		public void selected(SELECTION selection) {
-			if (selection == SELECTION.YES) {
-				dialog.onRemoveDirectory();
-			}
-		}
-	}
-
 	protected static class ItemResource {
 		private String fullPath;
 
@@ -224,12 +191,7 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			this.fullPath = fullPath;
 		}
 	}
-
-	private static String s_createNewFolderDialog = "Create new folder";
-	private static RemoteDirectoryBrowserDialogUiBinderExt uiBinder = GWT
-			.create(RemoteDirectoryBrowserDialogUiBinderExt.class);
-	// @UiField ListBox filesField;
-	// @UiField Tree dirsField;
+	
 	@UiField
 	Label selectedPathField;
 	@UiField
@@ -238,31 +200,28 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 	TextButton removeDir;
 	@UiField
 	TextButton refreshDir;
-
+	private KeyProvider nodeKeyProvider = new KeyProvider();
 	@UiField(provided = true)
-	TreeStore<BaseDto> store = new TreeStore<BaseDto>(new KeyProvider());
-
-	interface RemoteDirectoryBrowserDialogUiBinderExt extends
-			UiBinder<Widget, RemoteDirectoryBrowserDialogExt> {
-	}
-
-	public FolderDto selectedFolder = null;
-	public BaseDto treeSelectedItem;
-	public static final String SELECT_ID = "SELECT_ID";
-
+	TreeStore<BaseDto> store = new TreeStore<BaseDto>(nodeKeyProvider);
+	private BaseDto treeSelectedItem;
 	@UiField
 	Tree<BaseDto, String> treeDirs;
-
 	TextButton bnSelect = new TextButton("Select");
 	TextButton bnCancel = new TextButton("Cancel");
 
+	private static String s_createNewFolderDialog = "Create new folder";
+	private static RemoteDirectoryBrowserDialogUiBinderExt uiBinder = GWT.create(RemoteDirectoryBrowserDialogUiBinderExt.class);
+	public static final String SELECT_ID = "SELECT_ID";
+	private static int autoId = 0;
+
+	interface RemoteDirectoryBrowserDialogUiBinderExt extends UiBinder<Widget, RemoteDirectoryBrowserDialogExt> {
+	}
+	
 	public RemoteDirectoryBrowserDialogExt() {
 		super.setWidget(uiBinder.createAndBindUi(this));
 		setPredefinedButtons(PredefinedButton.CANCEL);
-		
 		bnSelect.setId(SELECT_ID);
 		bnSelect.addSelectHandler(new SelectHandler() {
-
 			@Override
 			public void onSelect(SelectEvent event) {
 				treeSelectedItem.getName();
@@ -270,35 +229,46 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 			}
 		});
 		getButtonBar().add(bnSelect);
-		// bnSelect.setId(SELECT_ID);
-		// getButtonBar().add(bnSelect);
-		// if(getButton(PredefinedButton.OK) != null) {
-		// getButtonBar().remove(getButton(PredefinedButton.OK));
-		// }
-
 		treeDirs.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		treeDirs.getSelectionModel().addSelectionHandler(
 				new SelectionHandler<BaseDto>() {
-
 					public void onSelection(SelectionEvent<BaseDto> event) {
 						treeSelectedItem = event.getSelectedItem();
-
-						selectedPathField.setText(treeSelectedItem
-								.getAbsolutePath());
+						selectedPathField.setText(treeSelectedItem.getAbsolutePath());
 						if (treeSelectedItem.getType() == "dir") {
-							selectedFolder = (FolderDto) treeSelectedItem;
-							// requestForDirContent(selectedFolder.getRelPath());
-							((TextButton) getButtonBar().getItemByItemId(
-									SELECT_ID)).enable();
+							requestForDirContent(treeSelectedItem.getAbsolutePath());
+							((TextButton) getButtonBar().getItemByItemId(SELECT_ID)).enable();
 						} else {
-							((TextButton) getButtonBar().getItemByItemId(
-									SELECT_ID)).disable();
+							((TextButton) getButtonBar().getItemByItemId(SELECT_ID)).disable();
+						}
+						if (isSelectedRoot()) {
+							removeDir.disable();
+						}
+						else {
+							removeDir.enable();
 						}
 					}
 				});
-
 		bind();
+	}
 
+	public RemoteDirectoryBrowserDialogExt(String firstName) {
+		super.setWidget(uiBinder.createAndBindUi(this));
+		bind();
+	}
+
+	/**
+	 * Performs preparation steps
+	 */
+	public void prepare() {
+		requestForDirContent(null);
+	}
+
+	protected void requestForDirContent(String parent) {
+		DirBrowserServiceBroker.requestForDirContent(getLoggedAsUser(), parent, new DirContentResult(this));
+	}
+
+	protected void bind() {
 	}
 
 	@Override
@@ -309,188 +279,9 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		}
 	}
 
-	public RemoteDirectoryBrowserDialogExt(String firstName) {
-		super.setWidget(uiBinder.createAndBindUi(this));
-		bind();
-	}
-
-	// @UiHandler("cancel")
-	// void onCancelClick(ClickEvent event) {
-	// this.hide(true);
-	// }
-
-	// @UiHandler("ok")
-	// void onOkClick(ClickEvent event) {
-	// }
-
-	/**
-	 * Performs preparation steps
-	 */
-	public void prepare() {
-		requestForDirContent(null);
-	}
-
-	protected void requestForDirContent(String parent) {
-		RemoteDirectoryBrowserAsync service = RemoteBrowserService.instance()
-				.getServiceImpl();
-		if (service != null) {
-			ServiceCallbackForCompleteContent cbk = RemoteBrowserService
-					.instance().buildCallbackForCompleteContent();
-			cbk.setProcessedResult(new DirContentResult(this));
-			service.getDirScan(getLoggedAsUser(), parent, cbk);
-		}
-	}
-
-	protected void bind() {
-	}
-
-	public FolderDto root = null;
-	public String basePath = "";
-
-	public FolderDto makeTree(RequestedDirScanResult dirs) {
-
-		String[] arrPath;
-		String sOwnerFolderName = "";
-
-		if (root == null) {
-			root = makeFolder("Root", "", "");
-			basePath = dirs.getParentPath();
-			String user = getLoggedAsUser();
-			FolderDto owner = makeFolder(user, "", "");
-			List<BaseDto> children = new ArrayList<BaseDto>();
-			children.add(owner);
-			root.setChildren(children);
-		}
-
-		try {
-			String delims = "[\\\\/]+";
-			arrPath = dirs.getParentPath().split(delims);
-			sOwnerFolderName = arrPath[arrPath.length - 1];
-		} catch (Exception e) {
-			System.out.println(e.toString());
-		}
-
-		FolderDto owner = findOwnerElement(root, sOwnerFolderName,
-				dirs.getParentPath(), false);
-
-		FolderDto folder = null;
-		String sNewPath = "";
-
-		for (FileItemInfo fi : dirs.getFiles()) {
-			if (fi.isDir()) {
-				if (owner.getRelPath().trim().length() > 0) {
-					sNewPath = owner.getRelPath() + "\\" + fi.getName();
-				} else {
-					sNewPath = fi.getName();
-				}
-				folder = makeFolder(fi.getName(), sNewPath, fi.getAbsolutePath());
-				owner.addOrReplaceChild(folder);
-				requestForDirContent(folder.getRelPath());
-			} else {
-				owner.addOrReplaceChild(makeFileItem(fi.getName(), owner,
-						owner.getRelPath(), fi.getAbsolutePath()));
-			}
-		}
-
-		return root;
-	}
-
-	private void makeTreeData(RequestedDirScanResult dirs) {
-
-		FolderDto root = makeTree(dirs);
-		for (BaseDto base : root.getChildren()) {
-			store.remove(base);
-			store.add(base);
-			if (base instanceof FolderDto) {
-				processFolder(store, (FolderDto) base);
-			}
-		}
-	}
-
-	private FolderDto findOwnerElement(FolderDto ownerFolder,
-			String sFolderName, String absolutePath, boolean IsCatched) {
-		FolderDto res = null;
-		for (BaseDto el : ownerFolder.getChildren()) {
-			if (el.getType() == "dir") {
-				String sRelPathFromAbsPath = absolutePath.substring(basePath
-						.length());
-				if (sRelPathFromAbsPath.length() > 2) {
-					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) {
-						sRelPathFromAbsPath = sRelPathFromAbsPath.substring(1);
-					}
-				}
-
-/*				System.out.println("el.getName(): " + el.getName()
-						+ "; sFolderName: " + sFolderName);*/
-				if (el.getRelPath().trim()
-						.equalsIgnoreCase(sRelPathFromAbsPath.trim())) {
-					IsCatched = true;
-					res = (FolderDto) el;
-					break;
-				} else {
-					if (!IsCatched) {
-						res = findOwnerElement((FolderDto) el, sFolderName,
-								absolutePath, IsCatched);
-					}
-					if (res != null) {
-						return res;
-					}
-				}
-			}
-		}
-		return res;
-	}
-
-	private void processFolder(TreeStore<BaseDto> store, FolderDto folder) {
-		for (BaseDto child : folder.getChildren()) {
-			store.remove(child);
-			store.add(folder, child);
-			if (child instanceof FolderDto) {
-				processFolder(store, (FolderDto) child);
-			}
-		}
-	}
-
-	private static FolderDto makeFolder(String name, String path,
-			String absolutePath) {
-		FolderDto theReturn = new FolderDto(++autoId, name, path, absolutePath);
-		theReturn.setChildren((List<BaseDto>) new ArrayList<BaseDto>());
-		return theReturn;
-	}
-
-	private static FileDto makeFileItem(String fileName, FolderDto folder,
-			String relPath, String absolutePath) {
-		return makeFileItem(fileName, folder.getName(), relPath, absolutePath);
-	}
-
-	private static FileDto makeFileItem(String fileName, String folder,
-			String relPath, String absolutePath) {
-		return new FileDto(++autoId, fileName, folder, relPath, absolutePath);
-	}
-
 	protected void refreshTreeStartingFromSelected() {
-		requestForDirContent(treeSelectedItem.getRelPath());
+		requestForDirContent(treeSelectedItem.getAbsolutePath());
 	}
-
-	protected void removeAllChildrenStartingFromSelected() {
-		/*
-		 * TreeItem selected = dirsField.getSelectedItem(); if (selected !=
-		 * null) { int children = selected.getChildCount(); for(int i = 0; i <
-		 * children; i++) { selected.getChild(0).remove(); } }
-		 */
-	}
-
-	protected void removeSelected() {
-		// TreeItem selected = dirsField.getSelectedItem();
-		// if (selected != null) {
-		// selected.remove();
-		// }
-	}
-
-	// @UiHandler("dirsField")
-	// protected void onDirsFieldSelection(SelectionEvent<TreeItem> event) {
-	// refreshTreeStartingFromSelected();
-	// }
 
 	@UiHandler("createDir")
 	protected void onCreateDirClick(SelectEvent event) {
@@ -509,13 +300,8 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 
 	@UiHandler("removeDir")
 	protected void onRemoveDirClick(SelectEvent event) {
-		if (selectedFolder != null) {
-			// Utils.messageBoxYesNo("Confirmation required", "The folder '"
-			// + selectedFolder.getAbsolutePath()
-			// + "' is going to be removed", null,
-			// new ConfirmDirectoryRemoving(this));
-
-			String sMessage = "The folder '" + selectedFolder.getAbsolutePath()
+		if (treeSelectedItem != null) {
+			String sMessage = "The folder '" + treeSelectedItem.getAbsolutePath()
 					+ "' is going to be removed";
 
 			MessageBox box = new MessageBox("Confirmation required", "");
@@ -544,72 +330,81 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 
 	@UiHandler("refreshDir")
 	protected void onRefreshDirClick(SelectEvent event) {
-		if (selectedFolder != null) {
-			requestForDirContent(selectedFolder.getRelPath());
+		if (treeSelectedItem != null) {
+			requestForDirContent(treeSelectedItem.getAbsolutePath());
 		} else {
 			requestForDirContent("");
 		}
 	}
 
-	public String extractJustPath(String input) {
-		String output = "";
-		String delims = "[\\\\/]+";
-		String[] arrPath = input.split(delims);
-		String sLastItemName = arrPath[arrPath.length - 1];
-		if (sLastItemName.indexOf(".") == -1) {
-			return input;
-		} else {
-			for (int i = 0; i < arrPath.length - 2; i++) {
-				output += arrPath[i] + "\\";
-			}
-			output += arrPath[arrPath.length - 2];
-		}
-		return output;
-	}
-
-	public String extractJustFileName(String input) {
-		String output = "";
-		String delims = "[\\\\/]+";
-		String[] arrPath = input.split(delims);
-		String sLastItemName = arrPath[arrPath.length - 1];
-		if (sLastItemName.indexOf(".") != -1) {
-			output = arrPath[arrPath.length - 1];
-		}
-		return output;
-	}
-
 	protected void onCreateDirectory(String dir) {
-
 		if (treeSelectedItem != null) {
-			RemoteDirectoryBrowserAsync service = RemoteBrowserService
-					.instance().getServiceImpl();
-			if (service != null) {
-				ServiceCallbackForAnyOperation cbk = RemoteBrowserService
-						.instance().buildCallbackForAnyOperation();
-				cbk.setProcessedResult(new DirOperationCreateResult(this));
-				// ItemResource resource = (ItemResource)
-				// treeSelectedItem.getAbsolutePath();
-				// if (resource != null) {
-				service.createDir(getLoggedAsUser(),
-						extractJustPath(treeSelectedItem.getAbsolutePath()),
-						dir, cbk);
-				// }
-			}
+			DirBrowserServiceBroker.requestForFolderCreating(getLoggedAsUser(),
+															treeSelectedItem.getAbsolutePath(),
+															dir,
+															new DirOperationCreateResult(this));
 		}
-
 	}
 
 	protected void onRemoveDirectory() {
+		if (treeSelectedItem != null && !isSelectedRoot()) {
+			DirBrowserServiceBroker.requestForFolderDeletion(getLoggedAsUser(),
+															null,
+															treeSelectedItem.getAbsolutePath(),
+															new DirOperationRemoveResult(this));
+		}
+	}
+
+	private void makeTreeData(RequestedDirScanResult dirs) {
 		if (treeSelectedItem != null) {
-			RemoteDirectoryBrowserAsync service = RemoteBrowserService
-					.instance().getServiceImpl();
-			if (service != null) {
-				ServiceCallbackForAnyOperation cbk = RemoteBrowserService
-						.instance().buildCallbackForAnyOperation();
-				cbk.setProcessedResult(new DirOperationRemoveResult(this));
-				service.removeDir(getLoggedAsUser(), null,
-						selectedFolder.getAbsolutePath(), cbk);
+			addSubtreeTo(treeSelectedItem, dirs);
+		}
+		else {
+			treeSelectedItem = makeFolder(getLoggedAsUser(), "/", dirs.getParentPath());
+			treeSelectedItem.setAbsolutePath(dirs.getParentPath());
+			store.add(treeSelectedItem);
+			addSubtreeTo(treeSelectedItem, dirs);
+			treeDirs.getSelectionModel().select(treeSelectedItem, true);
+			treeDirs.setExpanded(treeSelectedItem, true);
+		}
+	}
+
+	private void addSubtreeTo(BaseDto parent, RequestedDirScanResult dirs) {
+		List<BaseDto> existing = store.getChildren(parent);
+		for(FileItemInfo fi : dirs.getFiles()) {
+			if (fi.isDir()) {
+				BaseDto node = makeFolder(fi.getName(), parent.getName(), fi.getAbsolutePath());
+				if (existing != null && !existing.contains(node)) {
+					store.add(parent, node);
+				}
 			}
 		}
+	}
+	
+	private void removeSelected() {
+		if (treeSelectedItem != null) {
+			BaseDto parent = store.getParent(treeSelectedItem);
+			store.remove(treeSelectedItem);
+			treeSelectedItem = parent;
+			if (treeSelectedItem != null) {
+				treeDirs.getSelectionModel().select(treeSelectedItem, true);
+				treeDirs.setExpanded(treeSelectedItem, true);
+			}
+		}
+	}
+	
+	private boolean isSelectedRoot() {
+		return ((treeSelectedItem != null) && (store.getParent(treeSelectedItem) == null)) ? true : false;
+	}
+	
+	private static FolderDto makeFolder(String name, String path, String absolutePath) {
+		FolderDto theReturn = new FolderDto(++autoId, name, path, absolutePath);
+		theReturn.setChildren((List<BaseDto>) new ArrayList<BaseDto>());
+		return theReturn;
+	}
+
+	@SuppressWarnings("unused")
+	private static FileDto makeFileItem(String fileName, String folder, String relPath, String absolutePath) {
+		return new FileDto(++autoId, fileName, folder, relPath, absolutePath);
 	}
 }
