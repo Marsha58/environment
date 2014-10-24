@@ -5,6 +5,7 @@ package com.vw.ide.shared.servlet.projectmanager;
  * @author Oleg
  *
  */
+@SuppressWarnings("serial")
 public class SequentialInterpreterDescription extends InterpreterDescription {
 
 	public SequentialInterpreterDescription(String name) {

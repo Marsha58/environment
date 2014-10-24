@@ -114,9 +114,9 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		return r;
 	}
 
-	public RequestDirOperationResult createDir(String user, String parent, String dir) {
+	public RequestDirOperationResult createAbsoluteDir(String user, String dir) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
-		String fullPath = parent + "/" + dir;
+		String fullPath = dir;
 		res.setPath(fullPath);
 		res.setRetCode(0);
 		res.setOperation("create directory");
@@ -134,6 +134,10 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 			res.setRetCode(-1);
 		}
 		return res;
+	}
+	
+	public RequestDirOperationResult createDir(String user, String parent, String dir) {
+		return createAbsoluteDir(user, parent + "/" + dir);
 	}
 
 	public RequestDirOperationResult removeDir(String user, String parent, String dir) {
@@ -226,24 +230,19 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 	    }
 	    folder.delete();
 	}
-	
-	@Override
-	public RequestDirOperationResult addFile(String user, String parent,
-			String fileName, Long projectId, Long fileId, String content) {
+
+	public RequestDirOperationResult createFile(String user, String path, String fileName, String content) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setOperation("file creating");
-//		res.setProjectPath(projectPath);
-		res.setProjectId(projectId);
 		res.setRetCode(0);
-		String sFullProjectPath = parent + "/" + fileName; 
+		String sFullPath = path + "/" + fileName; 
 		try {
 			
-			File parentPath = new File(Utils.extractJustPath(sFullProjectPath));
+			File parentPath = new File(path);
 			if (!parentPath.exists()) {
 				parentPath.mkdirs();
 			}
-			
-			File fNewFile = new File(sFullProjectPath);
+			File fNewFile = new File(sFullPath);
 			if (!fNewFile.exists()) {
 				fNewFile.createNewFile();
 				FileWriter writer = new FileWriter(fNewFile);
@@ -260,14 +259,18 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
 		}		
-		
+		return res;
+	}
+	
+	@Override
+	public RequestDirOperationResult addFile(String user, String parent, String fileName, Long projectId, Long fileId, String content) {
+		RequestDirOperationResult res = createFile(user, parent, fileName, content);
+		res.setProjectId(projectId);
 		return res;
 	}
 
-
 	@Override
-	public RequestFileOperationResult deleteFile(String user, String fileName,
-			Long fileId) {
+	public RequestFileOperationResult deleteFile(String user, String fileName, Long fileId) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
 		res.setFileId(fileId);
 		res.setOperation("deleting file");

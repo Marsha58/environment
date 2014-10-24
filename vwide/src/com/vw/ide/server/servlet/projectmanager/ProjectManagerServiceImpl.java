@@ -25,6 +25,7 @@ import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerService;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectDeletionResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 
 /**
  * Remote management of VWML project
@@ -67,7 +68,6 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 	public RequestProjectCreationResult createProject(ProjectDescription description) {
 		RequestProjectCreationResult res = new RequestProjectCreationResult();
 		res.setOperation("project creating");
-//		res.setProjectPath(projectPath);
 		res.setProjectName(description.getProjectName());
 		res.setRetCode(RequestProjectCreationResult.GENERAL_OK);
 		
@@ -77,66 +77,18 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			res.setResult("Remote browser service wasn't found");
 			return res;
 		}
-		String sUserBasePath = browser.constructUserHomePath(description.getUserName());
-		String sFullProjectPath = "";
-		if((description.getProjectPath().length()>0)&&(!description.getProjectPath().startsWith("/"))) {
-			sFullProjectPath = description.getProjectPath(); 
-		} else {
-			sFullProjectPath = sUserBasePath + "/" + description.getProjectName(); 
-		}
 		try {
-			
-			File dir = new File(sFullProjectPath);
-			if (!dir.exists()) {
-				dir.mkdirs();
-			};
-
-			File dirJavaSrc = new File(sFullProjectPath + "/" + description.getJavaSrcPath());
-			if (!dirJavaSrc.exists()) {
-				dirJavaSrc.mkdirs();
-			};			
-			
-			String sProjectMainFileName = makeMainProjectFileName(description.getProjectName());
-			
-			File fMainVWML = new File(sFullProjectPath + "/" + sProjectMainFileName );
-			if (!fMainVWML.exists()) {
-				fMainVWML.createNewFile();
-				FileWriter writer = new FileWriter(fMainVWML); 
-				writer.write(makeProjectFileHeaderPattern(description.getProjectName(),
-														  description.getPackageName(),
-														  description.getJavaSrcPath(),
-														  description.getAuthor(),
-														  description.getDescr()));
-				writer.flush();
-				writer.close();
-			}
-
-			
-			String projectConfFileFullName = sFullProjectPath + "/" + makeProjectConfigFileName(sProjectMainFileName);
-			
-			makeProjectConfigFile(projectConfFileFullName,
-								  description.getProjectName(),
-								  description.getPackageName(),
-								  description.getJavaSrcPath(),
-								  description.getAuthor(),
-								  description.getDescr());
-/*			
-			File fProjectConf = new File(sFullProjectPath + "\\" + makeProjectConfigFileName(sProjectMainFileName));
-			if (!fProjectConf.exists()) {
-				fProjectConf.createNewFile();
-				FileWriter writerPC = new FileWriter(fProjectConf); 
-				writerPC.write(makeProjectConfigFile(projectName, packageName, javaSrcPath, author, descr));
-				writerPC.flush();
-				writerPC.close();
-			}
-*/			
-			
+			createProjectLayout(browser, description);
+			generateMainProjectFile(browser, description);
 		}
 		catch(Exception ex) {
-			res.setResult(ex.getMessage());
-			res.setRetCode(-1);
+			try {
+				removeProjectLayout(browser, description);
+			} catch (Exception e) {
+				logger.error("User '" + description.getUserName() + "' project '" + description.getProjectName() + "'; error '" + ex.getMessage() + "'");
+			}
+			logger.error("User '" + description.getUserName() + "' project '" + description.getProjectName() + "'; error '" + ex.getMessage() + "'");
 		}		
-		
 		return res;
 	}
 	
@@ -162,14 +114,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		return res;
 	}
 	
-	private String makeMainProjectFileName(String projectName) {
-		StringBuffer sPackageFileName = new StringBuffer();
-		String[] arrProjectFileName = projectName.split(" ");
-		for (String curWord : arrProjectFileName) {
-			sPackageFileName.append(curWord);
-		}
-		sPackageFileName.append(".vwml");		
-		return sPackageFileName.toString().toLowerCase();
+	private String makeMainProjectFileName(String mainModuleName) {
+		mainModuleName = mainModuleName + ".vwml";
+		return mainModuleName.toString().toLowerCase();
 	}
 	
 	private String makeProjectConfigFileName(String projectMainFileName) {
@@ -181,26 +128,6 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		return sProjectConfigFileName.toString().toLowerCase();
 	}
 	
-	private String makeProjectFileHeaderPattern(String projectName, String packageName, String javaSrcPath,
-			String author, String descr) {
-		String pattern = format("options {\n" + 
-				"\tlanguage=_java_ {\n" +
-				"\t\tpackage = \"%s\"\n" + 
-				"\t\tpath = \"%s\"\n" +
-				"\t\tauthor = \"%s\"\n" + 
-				"\t\tproject_name = \"%s\"\n" +
-				"\t\tdescription = \"%s\"\n" + 
-				"\t\tbeyond {\n" + 
-				"\t\t}\n" + 
-				"\t}\n" +
-				"\tconflictring {\n" + 
-				"\t}\n" + 
-				"}\n" +
-				"module %s {\n" +
-				"}",
-				packageName, javaSrcPath, author, projectName,	descr, packageName.toLowerCase());		
-		return pattern;
-	}
 	
 	private void makeProjectConfigFile(String projectConfFileFullName, String projectName, String packageName, String javaSrcPath,
 			String author, String descr) {
@@ -253,6 +180,94 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 	        }
 	}
 	
+	private void createProjectLayout(DirBrowserImpl browser, ProjectDescription description) throws Exception {
+		String dirs[] = {
+				description.getJavaSrcPath(),
+				getProjectOperationalDir(description)
+		};
+		for(String dir : dirs) {
+			if (logger.isInfoEnabled()) {
+				logger.info("User '" + description.getUserName() + "'" + "; project '" + description.getProjectName() + "';" + " create directory '" + dir + "'");
+			}
+			RequestDirOperationResult r = browser.createAbsoluteDir(description.getUserName(), dir);
+			if (r.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
+				throw new Exception(r.getResult());
+			}
+		}
+	}
+
+	private void removeProjectLayout(DirBrowserImpl browser, ProjectDescription description) throws Exception {
+		String dirs[] = {
+				description.getJavaSrcPath(),
+				getProjectOperationalDir(description)
+		};
+		for(String dir : dirs) {
+			if (logger.isInfoEnabled()) {
+				logger.info("User '" + description.getUserName() + "'" + "; project '" + description.getProjectName() + "';" + " create directory '" + dir + "'");
+			}
+			RequestDirOperationResult r = browser.removeDir(description.getUserName(), null, dir);
+			if (r.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
+				throw new Exception(r.getResult());
+			}
+		}
+	}
+	
+	private void generateMainProjectFile(DirBrowserImpl browser, ProjectDescription description) throws Exception {
+		String sProjectMainFileName = makeMainProjectFileName(description.getMainModuleName());
+		if (logger.isInfoEnabled()) {
+			logger.info("User '" + description.getUserName() + "'" + "; project '" + description.getProjectName() + "';" + " main file '" + sProjectMainFileName + "'");
+		}
+		String content = generateContentOfMainProjectFile(description);
+		RequestDirOperationResult res = browser.createFile(	description.getUserName(),
+															getProjectOperationalDir(description),
+															sProjectMainFileName,
+															content);
+		if (res.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
+			throw new Exception(res.getResult());
+		}
+	}
+	
+	private String getProjectOperationalDir(ProjectDescription description) {
+		return description.getProjectPath() + "/" + description.getMainModuleName();
+	}
+	
+	private String generateContentOfMainProjectFile(ProjectDescription description) {
+		return makeProjectFileHeaderPattern(description.getProjectName(),
+											description.getPackageName(),
+											description.getJavaSrcPath(),
+											description.getAuthor(),
+											description.getDescr());
+	}
+	
+	private String makeProjectFileHeaderPattern(String projectName,
+												String packageName,
+												String javaSrcPath,
+												String author,
+												String descr) {
+		String pattern = format("options {\n" + 
+				"\tlanguage=__java__ {\n" +
+				"\t\tpackage = \"%s\"\n" + 
+				"\t\tpath = \"%s\"\n" +
+				"\t\tauthor = \"%s\"\n" + 
+				"\t\tproject_name = \"%s\"\n" +
+				"\t\tdescription = \"%s\"\n" + 
+				"\t\tbeyond {\n" + 
+				"\t\t\tfringe communication ias (\n" +
+				"\t\t\t)\n" +
+				"\t\t\tfringe services ias (\n" +
+				"\t\t\t\tmath ias \"com.vw.lang.beyond.java.fringe.gate.math.Math\"\n" +
+				"\t\t\t)\n" +
+				"\t\t}\n" + 
+				"\t}\n" +
+				"\tconflictring {\n" + 
+				"\t}\n" + 
+				"}\n" +
+				"module %s {\n" +
+				"}\n",
+				packageName, javaSrcPath, author, projectName, descr, packageName.toLowerCase());		
+		return pattern;
+	}
+	
 	private static String format(final String format, final String... args) {
 		String[] split = format.split("%s");
 		final StringBuffer msg = new StringBuffer();
@@ -262,5 +277,5 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		}
 		msg.append(split[split.length - 1]);
 		return msg.toString();
-	}	
+	}
 }

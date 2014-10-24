@@ -51,8 +51,8 @@
 	</ui:with>
 
 	<container:VBoxLayoutContainer padding="{padding105510}" vBoxLayoutAlign="STRETCH">
-		<tabs:TabPanel borders="false">
-			<tabs:child config="{VwmlTabConfig}">
+		<tabs:TabPanel borders="false" ui:field="tabContainer">
+			<tabs:child config="{VwmlTabConfig}" >
 				<container:VerticalLayoutContainer styleName="{style.panel}">
 					<container:child>
 						<form:FieldLabel text="Project Name">
@@ -163,7 +163,7 @@
 					<container:child>
 						<form:FieldLabel text="Package" >
 							<form:widget>
-								<form:TextField ui:field="tfJavaPackageName" allowBlank="false" width="280px" enabled="false"/>
+								<form:TextField ui:field="tfJavaPackageName" allowBlank="false" width="280px"/>
 							</form:widget>
 						</form:FieldLabel>
 					</container:child>
@@ -175,7 +175,7 @@
 										<form:TextField ui:field="tfJavaSourcePath" allowBlank="false" width="280px"/>
 									</container:child>
 									<container:child>
-										<button:TextButton text="Browse" ui:field="browseJavaProjPath" enabled="false" />
+										<button:TextButton text="Browse" ui:field="browseJavaProjPath" />
 									</container:child>
 								</container:HBoxLayoutContainer>		
 							</form:widget>

@@ -5,6 +5,7 @@ package com.vw.ide.shared.servlet.projectmanager;
  * @author Oleg
  *
  */
+@SuppressWarnings("serial")
 public class ReactiveInterpreterDescription extends InterpreterDescription {
 
 	public ReactiveInterpreterDescription(String name) {

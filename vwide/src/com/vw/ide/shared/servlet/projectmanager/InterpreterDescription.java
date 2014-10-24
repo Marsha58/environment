@@ -9,7 +9,14 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class InterpreterDescription implements Serializable {
-	private String name;
+	public static final int SEQUENTIAL_INTERPRETER_ID = 0x0;
+	public static final int REACTIVE_INTERPRETER_ID   = 0x1;
+	public static final int PARALLEL_INTERPRETER_ID   = 0x2;
+	public static final String SEQUENTIAL = "sequential";
+	public static final String REACTIVE = "reactive";
+	public static final String PARALLEL = "parallel";
+	
+	private String name = REACTIVE;
 	
 	public InterpreterDescription() {
 		
@@ -35,5 +42,9 @@ public class InterpreterDescription implements Serializable {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	public String readable() {
+		return "InterpreterDescription [name=" + name + "]";
 	}
 }

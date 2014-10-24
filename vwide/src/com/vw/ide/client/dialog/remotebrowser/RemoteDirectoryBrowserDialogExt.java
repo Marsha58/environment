@@ -14,8 +14,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
+import com.sencha.gxt.widget.core.client.ListView;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
@@ -23,6 +25,7 @@ import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.form.ListField;
 import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.vw.ide.client.dialog.VwmlDialogExt;
 import com.vw.ide.client.dialog.simple.SimpleSinglelineEditDialogExt;
@@ -45,8 +48,16 @@ import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
  */
 public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 
-	public static class NewFolderDialogResult implements
-			SimpleSinglelineEditDialogExt.ResultCallback {
+	/**
+	 * Called when selection proceeded (user pressed Select button)
+	 * @author Oleg
+	 *
+	 */
+	public interface SelectPathHandler {
+		public void onSelection(String selectedPath);
+	}
+	
+	public static class NewFolderDialogResult implements SimpleSinglelineEditDialogExt.ResultCallback {
 
 		private RemoteDirectoryBrowserDialogExt owner;
 
@@ -160,26 +171,6 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		}
 	}
 
-	@UiFactory
-	protected ValueProvider<BaseDto, String> createValueProvider() {
-		return new ValueProvider<BaseDto, String>() {
-
-			@Override
-			public String getValue(BaseDto object) {
-				return object.getName();
-			}
-
-			@Override
-			public void setValue(BaseDto object, String value) {
-			}
-
-			@Override
-			public String getPath() {
-				return "name";
-			}
-		};
-	}
-	
 	protected static class ItemResource {
 		private String fullPath;
 
@@ -206,25 +197,35 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 	private BaseDto treeSelectedItem;
 	@UiField
 	Tree<BaseDto, String> treeDirs;
-	TextButton bnSelect = new TextButton("Select");
-	TextButton bnCancel = new TextButton("Cancel");
-
+	@UiField(provided = true)
+	ListStore<BaseDto> storeFiles = new ListStore<BaseDto>(nodeKeyProvider);
+	@UiField(provided = true)
+	ListField<BaseDto, String> dirFiles;
+	private SelectPathHandler selectPathHandler = null;
+	private TextButton bnSelect = new TextButton("Select");
+	private boolean disableFileViewPanel = true;
+	private boolean disableDeleteOperation = true;
+	
 	private static String s_createNewFolderDialog = "Create new folder";
 	private static RemoteDirectoryBrowserDialogUiBinderExt uiBinder = GWT.create(RemoteDirectoryBrowserDialogUiBinderExt.class);
-	public static final String SELECT_ID = "SELECT_ID";
 	private static int autoId = 0;
+	public static final String SELECT_ID = "SELECT_ID";
 
 	interface RemoteDirectoryBrowserDialogUiBinderExt extends UiBinder<Widget, RemoteDirectoryBrowserDialogExt> {
 	}
 	
 	public RemoteDirectoryBrowserDialogExt() {
+		ListView<BaseDto, String> lw = new ListView<BaseDto, String>(storeFiles, createValueProvider());
+		dirFiles = new ListField<BaseDto, String>(lw);
 		super.setWidget(uiBinder.createAndBindUi(this));
 		setPredefinedButtons(PredefinedButton.CANCEL);
 		bnSelect.setId(SELECT_ID);
 		bnSelect.addSelectHandler(new SelectHandler() {
 			@Override
 			public void onSelect(SelectEvent event) {
-				treeSelectedItem.getName();
+				if (treeSelectedItem != null && getSelectPathHandler() != null) {
+					getSelectPathHandler().onSelection(treeSelectedItem.getAbsolutePath());
+				}
 				hide();
 			}
 		});
@@ -241,14 +242,22 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 						} else {
 							((TextButton) getButtonBar().getItemByItemId(SELECT_ID)).disable();
 						}
-						if (isSelectedRoot()) {
-							removeDir.disable();
-						}
-						else {
-							removeDir.enable();
+						if (!isDisableDeleteOperation()) {
+							if (isSelectedRoot()) {
+								removeDir.disable();
+							}
+							else {
+								removeDir.enable();
+							}
 						}
 					}
 				});
+		if (isDisableDeleteOperation()) {
+			removeDir.disable();
+		}
+		if (isDisableFileViewPanel()) {
+			dirFiles.disable();
+		}
 		bind();
 	}
 
@@ -257,11 +266,55 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 		bind();
 	}
 
+	@UiFactory
+	protected ValueProvider<BaseDto, String> createValueProvider() {
+		return new ValueProvider<BaseDto, String>() {
+
+			@Override
+			public String getValue(BaseDto object) {
+				return object.getName();
+			}
+
+			@Override
+			public void setValue(BaseDto object, String value) {
+			}
+
+			@Override
+			public String getPath() {
+				return "name";
+			}
+		};
+	}
+	
 	/**
 	 * Performs preparation steps
 	 */
 	public void prepare() {
 		requestForDirContent(null);
+	}
+
+	public boolean isDisableFileViewPanel() {
+		return disableFileViewPanel;
+	}
+
+	public void setDisableFileViewPanel(boolean disableFileViewPanel) {
+		this.disableFileViewPanel = disableFileViewPanel;
+	}
+
+	public boolean isDisableDeleteOperation() {
+		return disableDeleteOperation;
+	}
+
+	public void setDisableDeleteOperation(boolean disableDeleteOperation) {
+		this.disableDeleteOperation = disableDeleteOperation;
+	}
+	
+	public SelectPathHandler getSelectPathHandler() {
+		return selectPathHandler;
+	}
+
+	public void setSelectPathHandler(SelectPathHandler selectPathHandler) {
+		this.selectPathHandler = selectPathHandler;
 	}
 
 	protected void requestForDirContent(String parent) {
@@ -370,13 +423,17 @@ public class RemoteDirectoryBrowserDialogExt extends VwmlDialogExt {
 	}
 
 	private void addSubtreeTo(BaseDto parent, RequestedDirScanResult dirs) {
+		storeFiles.clear();
 		List<BaseDto> existing = store.getChildren(parent);
 		for(FileItemInfo fi : dirs.getFiles()) {
+			BaseDto node = makeFolder(fi.getName(), parent.getName(), fi.getAbsolutePath());
 			if (fi.isDir()) {
-				BaseDto node = makeFolder(fi.getName(), parent.getName(), fi.getAbsolutePath());
 				if (existing != null && !existing.contains(node)) {
 					store.add(parent, node);
 				}
+			}
+			else {
+				storeFiles.add(node);
 			}
 		}
 	}

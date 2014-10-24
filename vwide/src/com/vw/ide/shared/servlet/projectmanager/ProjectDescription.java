@@ -1,6 +1,10 @@
 package com.vw.ide.shared.servlet.projectmanager;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
  * Contains information about VWML project
@@ -17,8 +21,9 @@ public class ProjectDescription implements Serializable {
 	private String author;
 	private String descr;
 	private String mainModuleName;
-	private InterpreterDescription interpreterDescription;
-	private CompilerSwitchesDescription compilerSwitches;
+	private InterpreterDescription interpreterDescription = new InterpreterDescription();
+	private CompilerSwitchesDescription compilerSwitches = new CompilerSwitchesDescription();
+	private List<FileItemInfo> projectFiles = new ArrayList<FileItemInfo>();
 	
 	public ProjectDescription() {
 		super();
@@ -115,5 +120,16 @@ public class ProjectDescription implements Serializable {
 
 	public void setMainModuleName(String mainModuleName) {
 		this.mainModuleName = mainModuleName;
+	}
+
+	@Override
+	public String toString() {
+		return "ProjectDescription [userName=" + userName + ", projectName="
+				+ projectName + ", projectPath=" + projectPath
+				+ ", packageName=" + packageName + ", javaSrcPath="
+				+ javaSrcPath + ", author=" + author + ", descr=" + descr
+				+ ", mainModuleName=" + mainModuleName
+				+ ", interpreterDescription=" + ((interpreterDescription != null) ? interpreterDescription.readable() : "null")
+				+ ", compilerSwitches=" + ((compilerSwitches != null) ? compilerSwitches.readable() : "null") + "]";
 	}
 }

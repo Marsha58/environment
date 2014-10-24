@@ -8,7 +8,7 @@ import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.DevelopmentBoardDialogHandlers;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
-import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt;
+import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -71,9 +71,8 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 	}
 
 	private void makeProjectNew(DevelopmentBoardPresenter presenter, String path4project) {
-		NewVwmlProjectDialogExt d = new NewVwmlProjectDialogExt(null, null);
+		VwmlProjectDialog d = new VwmlProjectDialog(null, null);
 		d.setLoggedAsUser(FlowController.getLoggedAsUser());
-		d.setPath4project(path4project);
 		d.associatePresenter(presenter);
 		d.setSize("480", "350");
 		d.showCenter(s_newVwmlProjectCaption, null);

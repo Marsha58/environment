@@ -54,9 +54,9 @@ public class BaseDto implements Serializable, TreeStore.TreeNode<BaseDto> {
   		this.type = type;
   	}
   
-  public String getRelPath() {
+  	public String getRelPath() {
 	    return relPath;
-	  }
+  	}
 
   	public void setRelPath(String relPath) {
   		this.relPath = relPath;

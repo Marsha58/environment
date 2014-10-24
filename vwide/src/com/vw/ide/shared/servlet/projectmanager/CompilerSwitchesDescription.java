@@ -58,13 +58,13 @@ public class CompilerSwitchesDescription implements Serializable {
 	// separated by ',' and has format <directive> = <value> (example debug = true)
 	private String preprocessorDirectives;
 	//  compiler's switches => (source | project | compile | test | main)
-	private Mode compilationMode;
+	private Mode compilationMode = Mode.SOURCE;
 	// static, all
 	// static - post compilation late binding checking (checks contexts and links on consistency)
 	// all - runs static test and model (the model is run twice for checking ability to finish its work in right way)
 	private String testSwitch;
 	// true of false - in case 'true' debug info is included (VWML -> Java) association is built
-	private Boolean includeDebugInfo;
+	private Boolean includeDebugInfo = Boolean.FALSE;
 	
 	public String getPreprocessorDirectives() {
 		return preprocessorDirectives;
@@ -108,5 +108,12 @@ public class CompilerSwitchesDescription implements Serializable {
 	
 	public String toString() {
 		return (getCompilationMode().toValue().split(":"))[Mode.DESCRIPTION];
+	}
+
+	public String readable() {
+		return "CompilerSwitchesDescription [preprocessorDirectives="
+				+ preprocessorDirectives + ", compilationMode="
+				+ compilationMode + ", testSwitch=" + testSwitch
+				+ ", includeDebugInfo=" + includeDebugInfo + "]";
 	}
 }

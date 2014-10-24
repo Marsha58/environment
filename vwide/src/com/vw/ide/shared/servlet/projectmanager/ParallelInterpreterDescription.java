@@ -5,6 +5,7 @@ package com.vw.ide.shared.servlet.projectmanager;
  * @author Oleg
  *
  */
+@SuppressWarnings("serial")
 public class ParallelInterpreterDescription extends InterpreterDescription {
 
 	private int nodesPerRing = DEF_NODES_PER_RING;
