@@ -16,8 +16,7 @@ import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.FileEditedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
-import com.vw.ide.client.utils.Utils;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceCompletion;
 import edu.ycp.cs.dh.acegwt.client.ace.AceCompletionCallback;
@@ -42,11 +41,10 @@ public class FileSheet extends Composite {
 
 	private AceEditor aceEditor;
 	private Presenter presenter;
-	private Long projectId;
-	private Long fileId;
 	private String fileName;
 	private String filePath;
-	private Boolean isFileEdited;
+	private ProjectItemInfo itemInfo;
+	private FileEditedEvent editedEvent = new FileEditedEvent(null); 
 
 	@UiField
 	SimpleContainer fileContainer;
@@ -93,26 +91,19 @@ public class FileSheet extends Composite {
 
 	public FileSheet() {
 		initWidget(uiBinder.createAndBindUi(this));
-		setIsFileEdited(false);
 	}
 
-	public FileSheet(Presenter presenter, Long projectId, Long fileId, String fileFullPathWithName) {
+	public FileSheet(Presenter presenter, ProjectItemInfo itemInfo) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.presenter = presenter;
-		this.projectId = projectId;
-		this.fileId = fileId;
-		this.filePath = Utils.extractJustPath(fileFullPathWithName);
-		this.fileName = Utils.extractJustFileName(fileFullPathWithName);
-		setIsFileEdited(false);
-		
+		this.itemInfo = itemInfo;
+		this.filePath = itemInfo.getAssociatedData().getAbsolutePath();
+		this.fileName = itemInfo.getAssociatedData().getName();
 	}	
-
 
 	private void updateEditor1CursorPosition() {
 		AceEditorCursorPosition cursorPosition = aceEditor.getCursorPosition();
 		rowCol.setText(cursorPosition.toString());
-		
-		
 		int iAbsPos = aceEditor.getIndexFromPosition(cursorPosition);
 		absPos.setText(String.valueOf(iAbsPos));
 	}	
@@ -121,22 +112,6 @@ public class FileSheet extends Composite {
 		dockLayoutPanel.setHeight(sHeight);
 	}	
 	
-	public void setProjectId(Long projectId) {
-		this.projectId = projectId;
-	}
-	
-	public Long getProjectId() {
-		return projectId;
-	}
-	
-	public void setFileId(Long fileId) {
-		this.fileId = fileId;
-	}
-	
-	public Long getFileId() {
-		return fileId;
-	}
-
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
@@ -153,12 +128,18 @@ public class FileSheet extends Composite {
 		return filePath;
 	}
 	
-	
-	
 	public AceEditor getAceEditor() {
 		return aceEditor;
 	}
-	
+
+	public ProjectItemInfo getItemInfo() {
+		return itemInfo;
+	}
+
+	public void setItemInfo(ProjectItemInfo itemInfo) {
+		this.itemInfo = itemInfo;
+	}
+
 	public void constructEditor(String textFile, FilesTypesEnum fileType) {
 		aceEditor = new AceEditor();
 		aceEditor.setWidth("100%");
@@ -223,23 +204,17 @@ public class FileSheet extends Composite {
 			aceEditor.setMode(AceEditorMode.TEXT);	
 			break;
 		}
-		
-
 
 		aceEditor.addOnChangeHandler(new AceEditorCallback() {
 			@Override
 			public void invokeAceCallback(JavaScriptObject obj) {
-				FileItemInfo fileItemInfo = new FileItemInfo(); 
-				fileItemInfo.setAbsolutePath(getFilePath() + "\\" +getFileName());
-				fileItemInfo.setProjectId(projectId);
-				fileItemInfo.setFileId(fileId);
-				FileEditedEvent event= new FileEditedEvent(fileItemInfo); 
-				presenter.fireEvent(event);
+				if (!itemInfo.isEdited()) {
+					editedEvent.setItemInfo(itemInfo);
+					presenter.fireEvent(editedEvent);
+				}
 				System.out.println("invokeAceCallback: ");
 			}
-			
 		});
-		
 		
 		// add some annotations
 		// editor1.addAnnotation(0, 1, "What's up?", AceAnnotationType.WARNING);
@@ -247,25 +222,7 @@ public class FileSheet extends Composite {
 		// AceAnnotationType.ERROR);
 		// editor1.setAnnotations();
 
-		MarginData layoutData = new MarginData(1,1,1,1);
+		MarginData layoutData = new MarginData(1, 1, 1, 1);
 		fileContainer.add(aceEditor,layoutData);
 	}
-	
-	public void setIsFileEdited(Boolean value) {
-		isFileEdited = value;
-		if(value) {
-			status.setText("File have been edited");
-		} else {
-			status.setText("File havn't been edited");
-		}
-	}
-	
-	public Boolean getIsFileEdited() {
-		return isFileEdited;
-	}
-	
-	
-	
-
-	
 }

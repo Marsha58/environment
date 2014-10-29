@@ -1,45 +1,22 @@
 package com.vw.ide.shared.servlet.projectmanager;
 
-import java.io.Serializable;
-import java.util.List;
-
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
-import com.vw.ide.shared.servlet.remotebrowser.RequestResult;
+import com.vw.ide.shared.servlet.RequestResult;
 
 @SuppressWarnings("serial")
-public class RequestProjectCreationResult extends RequestResult implements Serializable {
-	private String projectPath;
-// just name without path	
-	private String projectName;
-	private List<FileItemInfo> files;
-	
-	public String getProjectPath() {
-		return projectPath;
-	}
-	
-	public void setProjectPath(String projectPath) {
-		this.projectPath = projectPath;
-	}
-	
-	public String getProjectName() {
-		return projectName;
-	}
-	
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
-	}	
-	
-	public List<FileItemInfo> getFiles() {
-		return files;
+public class RequestProjectCreationResult extends RequestResult {
+	private ProjectDescription projectDescription;
+
+	public ProjectDescription getProjectDescription() {
+		return projectDescription;
 	}
 
-	public void setFiles(List<FileItemInfo> files) {
-		this.files = files;
+	public void setProjectDescription(ProjectDescription projectDescription) {
+		this.projectDescription = projectDescription;
 	}
 
 	@Override
 	public String toString() {
-		return "RequestedDirScanResult [projectPath=" + projectPath + ", projectName=" + projectName + ", result="  + getResult() + 
-				", retCode="  + getRetCode() + ", operation=" + getOperation() + ", files=" + files.toString() + "]";
+		return "RequestProjectCreationResult [projectDescription="
+				+ projectDescription + "]";
 	}
 }

@@ -12,9 +12,8 @@ import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.presenters.Presenter;
-import com.vw.ide.client.projects.ProjectManager;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.utils.Utils;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler implements ProjectMenuHandler {
 	
@@ -34,17 +33,11 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 	
 	protected void process(DevelopmentBoardPresenter presenter, ProjectMenuEvent event) {
 		String menuId = event.getMenuId();
-		presenter.setSelectedItemInTheProjectTree(presenter.getView().getProjectPanel().getSelectedItem4ContextMenu());
+		presenter.setSelectedItemInTheProjectTree(presenter.getView().getProjectPanel().getTreeSelectedItem());
 		if (menuId != null && presenter.getSelectedItemInTheProjectTree() != null) {
 			switch (menuId) {
 			case "new_project":
-				String sPath;
-				if (presenter.getSelectedItemInTheProjectTree() == null) {
-					sPath = "";
-				} else {
-					sPath = Utils.extractJustPath(presenter.getSelectedItemInTheProjectTree().getAbsolutePath());
-				}
-				makeProjectNew(presenter, sPath);
+				makeProjectNew(presenter);
 				break;
 			case "delete_project":
 				doDelCurrentProject(presenter, presenter.getSelectedItemInTheProjectTree());
@@ -70,7 +63,7 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 		}
 	}
 
-	private void makeProjectNew(DevelopmentBoardPresenter presenter, String path4project) {
+	private void makeProjectNew(DevelopmentBoardPresenter presenter) {
 		VwmlProjectDialog d = new VwmlProjectDialog(null, null);
 		d.setLoggedAsUser(FlowController.getLoggedAsUser());
 		d.associatePresenter(presenter);
@@ -78,52 +71,45 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 		d.showCenter(s_newVwmlProjectCaption, null);
 	}
 
-	private void doDelCurrentProject(DevelopmentBoardPresenter presenter, FileItemInfo fileItemInfo) {
-		ProjectManager projectManager = presenter.getProjectManager();
-		presenter.setSelectedProjectInTheProjectTree(projectManager.getProjectIdByProjectPath(FlowController.getLoggedAsUser(), fileItemInfo.getAbsolutePath()));
+	private void doDelCurrentProject(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
 		String msg = Format.substitute(
 				"Are you sure you want to delete project '{0}'?",
-				fileItemInfo.getName());
+				projectItemInfo.getAssociatedData().getName());
 		ConfirmMessageBox box = new ConfirmMessageBox("Confirm", msg);
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.DeletedProjectDialogHideHandler(presenter));
 		box.show();
 	}
 
-	private void doCreateFile(DevelopmentBoardPresenter presenter, FileItemInfo fileItemInfo) {
-		ProjectManager projectManager = presenter.getProjectManager();
-		presenter.setSelectedProjectInTheProjectTree(projectManager.getProjectIdByProjectPath(FlowController.getLoggedAsUser(), fileItemInfo.getAbsolutePath()));
+	private void doCreateFile(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
 		final PromptMessageBox box = new PromptMessageBox("Name", "Please enter file name:");
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.CreateFileDialogHideHandler(box, presenter));
 		box.show();
 	}
 
-	private void doCreateFolder(DevelopmentBoardPresenter presenter, FileItemInfo fileItemInfo) {
+	private void doCreateFolder(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
 		final PromptMessageBox box = new PromptMessageBox("Name", "Please enter folder name:");
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.CreateFolderDialogHideHandler(box, presenter));
 		box.show();
 	}
 
-	private void doImportFile(DevelopmentBoardPresenter presenter, FileItemInfo fileItemInfo) {
-		ProjectManager projectManager = presenter.getProjectManager();
-		Long projectId = projectManager.getProjectIdByProjectPath(FlowController.getLoggedAsUser(), fileItemInfo.getAbsolutePath());
-		String parentPath = Utils.extractJustPath(fileItemInfo.getAbsolutePath());
+	private void doImportFile(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
+		String parentPath = Utils.extractJustPath(projectItemInfo.getAssociatedData().getAbsolutePath());
 		final FileOpenDialog box = new FileOpenDialog();
 		box.setEditLabelText("Select file to import");
 		box.setParentPath(parentPath);
-		box.setProjectId(projectId);
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.ImportFileDialogHideHandler(box, presenter));
 		box.show();
 	}
 
-	private void doRenameFile(DevelopmentBoardPresenter presenter, FileItemInfo fileItemInfo) {
+	private void doRenameFile(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
 		PromptMessageBox renameBox = new PromptMessageBox("Name", "Please enter new file name:");
-		renameBox.getTextField().setText(presenter.getSelectedItemInTheProjectTree().getName());
-		renameBox.addDialogHideHandler(new DevelopmentBoardDialogHandlers.RenameFileDialogHideHandler(renameBox, presenter));
+		renameBox.getTextField().setText(projectItemInfo.getAssociatedData().getName());
+		renameBox.addDialogHideHandler(new DevelopmentBoardDialogHandlers.RenameFileDialogHideHandler(renameBox, presenter, projectItemInfo));
 		renameBox.show();
 	}
 
-	private void doDelCurrentFile(DevelopmentBoardPresenter presenter, FileItemInfo fileItemInfo) {
-		String msg = Format.substitute("Are you sure you want to delete file '{0}'?", fileItemInfo.getName());
+	private void doDelCurrentFile(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
+		String msg = Format.substitute("Are you sure you want to delete file '{0}'?", projectItemInfo.getAssociatedData().getName());
 		ConfirmMessageBox box = new ConfirmMessageBox("Confirm", msg);
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.DeleteFileDialogHideHandler(presenter));
 		box.show();

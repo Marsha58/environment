@@ -11,10 +11,10 @@ import com.sencha.gxt.widget.core.client.form.NumberField;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.vw.ide.client.dialog.remotebrowser.RemoteDirectoryBrowserDialogExt;
 import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog;
-import com.vw.ide.shared.servlet.projectmanager.InterpreterDescription;
-import com.vw.ide.shared.servlet.projectmanager.ParallelInterpreterDescription;
 import com.vw.ide.shared.servlet.projectmanager.ReactiveInterpreterDescription;
 import com.vw.ide.shared.servlet.projectmanager.SequentialInterpreterDescription;
+import com.vw.ide.shared.servlet.projectmanager.specific.InterpreterDescription;
+import com.vw.ide.shared.servlet.projectmanager.specific.ParallelInterpreterDescription;
 
 public class VwmlGeneralSettingsTab extends VwmlProjTab {
 	
@@ -30,6 +30,10 @@ public class VwmlGeneralSettingsTab extends VwmlProjTab {
 		public void onSelection(String selectedPath) {
 			if (selectedPath != null) {
 				owner.getOwner().getProjectDescription().setProjectPath(selectedPath);
+				if (owner.getOwner().getProjectDescription().getJavaSrcPath() == null || owner.getOwner().getProjectDescription().getJavaSrcPath().length() == 0) {
+					owner.getOwner().getProjectDescription().setJavaSrcPath(selectedPath + "/java_src");
+					owner.getOwner().getVwmlJavaSettingsTab().setupTargetLangSourcePath();
+				}
 				owner.setupProjectPath();
 			}
 		}
@@ -125,6 +129,16 @@ public class VwmlGeneralSettingsTab extends VwmlProjTab {
 		if (owner.getProjectDescription().getProjectPath() == null || owner.getProjectDescription().getProjectPath().length() == 0) {
 			owner.scrollTo(getWidget());
 			owner.getTfVWMLProjectPath().focus();
+			return false;
+		}
+		if (owner.getProjectDescription().getAuthor() == null || owner.getProjectDescription().getAuthor().length() == 0) {
+			owner.scrollTo(getWidget());
+			owner.getTfVWMLAuthor().focus();
+			return false;
+		}
+		if (owner.getProjectDescription().getDescr() == null || owner.getProjectDescription().getDescr().length() == 0) {
+			owner.scrollTo(getWidget());
+			owner.getTfVWMLDescr().focus();
 			return false;
 		}
 		return true;

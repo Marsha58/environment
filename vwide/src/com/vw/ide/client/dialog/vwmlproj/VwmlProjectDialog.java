@@ -29,10 +29,10 @@ import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
-import com.vw.ide.shared.servlet.projectmanager.CompilerSwitchesDescription;
-import com.vw.ide.shared.servlet.projectmanager.InterpreterDescription;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
+import com.vw.ide.shared.servlet.projectmanager.specific.CompilerSwitchesDescription;
+import com.vw.ide.shared.servlet.projectmanager.specific.InterpreterDescription;
 
 /**
  * New VWML project dialog
@@ -285,5 +285,37 @@ public class VwmlProjectDialog extends VwmlDialogExt {
 	
 	public void scrollTo(Widget widget) {
 		tabContainer.setActiveWidget(widget);
+	}
+
+	public TabPanel getTabContainer() {
+		return tabContainer;
+	}
+
+	public Presenter getPresenter() {
+		return presenter;
+	}
+
+	public VwmlGeneralSettingsTab getVwmlGeneralSettingsTab() {
+		return vwmlGeneralSettingsTab;
+	}
+
+	public VwmlCompilerSettingsTab getVwmlCompilerSettingsTab() {
+		return vwmlCompilerSettingsTab;
+	}
+
+	public VwmlJavaSettingsTab getVwmlJavaSettingsTab() {
+		return vwmlJavaSettingsTab;
+	}
+
+	public VwmlProjTab[] getTabs() {
+		return tabs;
+	}
+
+	public static InterpeterProperties getInterpreterProps() {
+		return interpreterProps;
+	}
+
+	public static CompilerModeProperties getCompilerModeProps() {
+		return compilerModeProps;
 	}
 }

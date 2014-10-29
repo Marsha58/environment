@@ -3,6 +3,7 @@ package com.vw.ide.client.projects;
 public enum FilesTypesEnum {
 	NOT_DEF,
 	VWML,
+	VWML_PROJ,
 	JAVA,
 	XML,
 	C,

@@ -1,4 +1,4 @@
-package com.vw.ide.shared.servlet.projectmanager;
+package com.vw.ide.shared.servlet.projectmanager.specific;
 
 import java.io.Serializable;
 
@@ -17,6 +17,8 @@ public class InterpreterDescription implements Serializable {
 	public static final String PARALLEL = "parallel";
 	
 	private String name = REACTIVE;
+	@SuppressWarnings("unused")
+	private String key = null;
 	
 	public InterpreterDescription() {
 		
@@ -37,6 +39,9 @@ public class InterpreterDescription implements Serializable {
 
 	public String getKey() {
 		return name;
+	}
+
+	public void setKey(String key) {
 	}
 	
 	@Override

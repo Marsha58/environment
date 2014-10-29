@@ -5,13 +5,14 @@ import java.io.Serializable;
 import com.vw.ide.client.projects.FilesTypesEnum;
 
 /**
- * Simple class which is used to pass inforemation about file
+ * Simple class which is used to pass information about file
  * 
  * @author Oleg
  * 
  */
 @SuppressWarnings("serial")
 public class FileItemInfo implements Serializable {
+	private Integer id;
 	private String name;
 	private String absolutePath;
 	private String relPath;
@@ -20,10 +21,15 @@ public class FileItemInfo implements Serializable {
 	private Long fileId;
 	private String checkSumOnOpen;
 	private String checkSumOnClose;
+	private String content;
 	private boolean isEdited;
-
+	
+	private static final int offsetId = 0x1023;
+	private static int s_autoInc = 0;
+	
 	public FileItemInfo() {
 		super();
+		id = generatedId();
 	}
 
 	public FileItemInfo(String name, String absolutePath, boolean isDir) {
@@ -31,6 +37,7 @@ public class FileItemInfo implements Serializable {
 		this.name = name;
 		this.absolutePath = absolutePath;
 		this.isDir = isDir;
+		id = generatedId();
 	}
 
 	public FileItemInfo(String name, String absolutePath, String relPath, boolean isDir) {
@@ -39,13 +46,15 @@ public class FileItemInfo implements Serializable {
 		this.absolutePath = absolutePath;
 		this.relPath = relPath;
 		this.isDir = isDir;
+		id = generatedId();
 	}
 	
-	public static FilesTypesEnum getFileType(String fileName) {
+	public static FilesTypesEnum recognizeFileType(String fileName) {
 		if (fileName.indexOf(".") != -1) {
 			String sSuffix = fileName.substring(fileName.indexOf(".") + 1);
 			switch (sSuffix) {
 			case "vwml": return FilesTypesEnum.VWML;
+			case "vwml_proj": return FilesTypesEnum.VWML_PROJ;
 			case "java": return FilesTypesEnum.JAVA;
 			case "xml": return FilesTypesEnum.XML;
 			case "c": return FilesTypesEnum.CPP;
@@ -58,11 +67,6 @@ public class FileItemInfo implements Serializable {
 			}
 		} else return FilesTypesEnum.NOT_DEF;
 	}
-
-	public FilesTypesEnum getFileType() {
-		return getFileType(this.name);
-	}
-	
 	
 	public String getName() {
 		return name;
@@ -137,10 +141,62 @@ public class FileItemInfo implements Serializable {
 	public void setEdited(boolean isEdited) {
 		this.isEdited = isEdited;
 	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((absolutePath == null) ? 0 : absolutePath.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FileItemInfo other = (FileItemInfo) obj;
+		if (absolutePath == null) {
+			if (other.absolutePath != null)
+				return false;
+		} else if (!absolutePath.equals(other.absolutePath))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {
 		return "FileItemInfo [name=" + name + ", absolutePath=" + absolutePath + ", relPath=" + relPath +", isDir="
 				+ isDir + "]";
+	}
+	
+	private int generatedId() {
+		return ++s_autoInc + offsetId;
 	}
 }

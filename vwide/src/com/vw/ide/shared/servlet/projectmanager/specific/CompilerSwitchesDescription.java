@@ -1,4 +1,4 @@
-package com.vw.ide.shared.servlet.projectmanager;
+package com.vw.ide.shared.servlet.projectmanager.specific;
 
 import java.io.Serializable;
 
@@ -65,6 +65,8 @@ public class CompilerSwitchesDescription implements Serializable {
 	private String testSwitch;
 	// true of false - in case 'true' debug info is included (VWML -> Java) association is built
 	private Boolean includeDebugInfo = Boolean.FALSE;
+	@SuppressWarnings("unused")
+	private String key = null;
 	
 	public String getPreprocessorDirectives() {
 		return preprocessorDirectives;
@@ -102,6 +104,10 @@ public class CompilerSwitchesDescription implements Serializable {
 		return getCompilationMode().toValue();
 	}
 
+	public void setKey(String key) {
+		
+	}
+	
 	public String modeName() {
 		return (getCompilationMode().toValue().split(":"))[Mode.NAME];
 	}

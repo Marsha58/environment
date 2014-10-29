@@ -4,29 +4,23 @@ import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
+import com.vw.ide.shared.servlet.userstate.RequestUpdateUserStateResult;
 
-public class GettingUserStateResultCallback extends ResultCallback<RequestUserStateResult> {
+public class UpdatingUserStateResultCallback extends ResultCallback<RequestUpdateUserStateResult> {
 
 	private DevelopmentBoardPresenter owner;
-	private UserStateHandler handler;
-
-	public GettingUserStateResultCallback(DevelopmentBoardPresenter presenter, UserStateHandler handler) {
-		this.owner = presenter;
+	
+	public UpdatingUserStateResultCallback(DevelopmentBoardPresenter owner) {
+		this.owner = owner;
 	}
-
+	
 	@Override
-	public void handle(RequestUserStateResult result) {
+	public void handle(RequestUpdateUserStateResult result) {
 		if (result.getRetCode().intValue() != 0) {
 			String messageAlert = "The operation '" + result.getOperation()
 					+ "' failed.\r\nResult'" + result.getResult() + "'";
 			AlertMessageBox alertMessageBox = new AlertMessageBox("Warning", messageAlert);
 			alertMessageBox.show();
-		}
-		else {
-			if (handler != null) {
-				handler.handle(result.getUserStateInfo());
-			}
 		}
 		owner.fireEvent(new ServerLogEvent(result));
 	}

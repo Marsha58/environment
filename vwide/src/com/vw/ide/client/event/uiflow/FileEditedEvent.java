@@ -2,7 +2,7 @@ package com.vw.ide.client.event.uiflow;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.vw.ide.client.event.handler.FileEditedHandler;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 
 /**
  * Fired when user pressed 'SelectFile'
@@ -11,7 +11,7 @@ import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
  */
 public class FileEditedEvent extends GwtEvent<FileEditedHandler> {
 
-	private FileItemInfo fileItemInfo;
+	private ProjectItemInfo itemInfo;
 	
 	public static Type<FileEditedHandler> TYPE = new Type<FileEditedHandler>();
 	
@@ -19,9 +19,9 @@ public class FileEditedEvent extends GwtEvent<FileEditedHandler> {
 		super();
 	}
 
-	public FileEditedEvent(FileItemInfo fileItemInfo) {
+	public FileEditedEvent(ProjectItemInfo itemInfo) {
 		super();
-		this.fileItemInfo = fileItemInfo;
+		this.itemInfo = itemInfo;
 	}
 
 	@Override
@@ -29,14 +29,14 @@ public class FileEditedEvent extends GwtEvent<FileEditedHandler> {
 		return TYPE;
 	}
 
-	public FileItemInfo getFileItemInfo() {
-		return fileItemInfo;
+
+	public ProjectItemInfo getItemInfo() {
+		return itemInfo;
 	}
 
-	public void setFileItemInfo(FileItemInfo fileItemInfo) {
-		this.fileItemInfo = fileItemInfo;
+	public void setItemInfo(ProjectItemInfo itemInfo) {
+		this.itemInfo = itemInfo;
 	}
-
 
 	@Override
 	protected void dispatch(FileEditedHandler handler) {

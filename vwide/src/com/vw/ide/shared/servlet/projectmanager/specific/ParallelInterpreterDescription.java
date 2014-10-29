@@ -1,4 +1,4 @@
-package com.vw.ide.shared.servlet.projectmanager;
+package com.vw.ide.shared.servlet.projectmanager.specific;
 
 /**
  * Parallel interpreter configurable properties

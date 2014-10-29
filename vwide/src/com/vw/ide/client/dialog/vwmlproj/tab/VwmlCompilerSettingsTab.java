@@ -14,7 +14,7 @@ import com.sencha.gxt.widget.core.client.event.BlurEvent.BlurHandler;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.Radio;
 import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog;
-import com.vw.ide.shared.servlet.projectmanager.CompilerSwitchesDescription;
+import com.vw.ide.shared.servlet.projectmanager.specific.CompilerSwitchesDescription;
 
 public class VwmlCompilerSettingsTab extends VwmlProjTab {
 

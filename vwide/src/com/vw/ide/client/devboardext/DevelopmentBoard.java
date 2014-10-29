@@ -25,41 +25,23 @@ import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderL
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
+import com.vw.ide.client.FlowController;
 import com.vw.ide.client.dialog.about.AboutDialog;
-import com.vw.ide.client.event.uiflow.LogoutEvent;
+import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
-import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.ui.editorpanel.EditorPanel;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
 import com.vw.ide.client.ui.windowspanel.WindowsPanelView;
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
 public class DevelopmentBoard extends ResizeComposite implements IsWidget, PresenterViewerLink {
-
-	/**
-	 * Fired by menu-item 'Logout' in case if last was selected
-	 * 
-	 * @author Oleg
-	 * 
-	 */
-	public static class LogoutCommand implements ScheduledCommand {
-
-		private DevelopmentBoard view = null;
-
-		public LogoutCommand(DevelopmentBoard view) {
-			this.view = view;
-		}
-
-		public void execute() {
-			if (view.getAssociatedPresenter() != null) {
-				view.getAssociatedPresenter().fireEvent(new LogoutEvent());
-			}
-		}
-	}
 
 	/**
 	 * Fired when 'Project -> New' menu item selected
@@ -207,7 +189,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 			widget = uiBinder.createAndBindUi(this);
 		}
 		associatePresenterWithSubpanels(presenter);
-		requestInitialDirContent();
+		requestUserProjects();
 		return widget;
 	}
 
@@ -219,28 +201,35 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		return presenter;
 	}
 	
-	public void setProjectManager(ProjectManager projectManager) {
-		projectPanel.setProjectManager(projectManager);
-	}
-	
 	public FileSheet getActiveFileSheetWidget() {
 		return (FileSheet)editor.getTabPanel().getActiveWidget();
 	}
 	
-	public void markFileAsEdited(Widget editedWidget, boolean isEdited) {
-		editor.setFileEditedState(editedWidget, isEdited);		
+	public void markFileAsEdited(ProjectItemInfo itemInfo, boolean edited) {
+		if (!itemInfo.isEdited()) {
+			itemInfo.setEdited(edited);
+			editor.setFileEditedState(itemInfo.getFileSheet(), edited);
+		}
 	}
 	
-	public void deleteFileItemId(Long fileId) {
-		topPanel.delItemFromScrollMenu(fileId);	
+	public void deleteFileItemId(ProjectItemInfo itemInfo) {
+		topPanel.delItemFromScrollMenu(itemInfo);	
 	}
 
-	public void addNewFileTabItem(FileSheet newFileSheet, TabItemConfig tabItemConfig) {
+	public void addNewFileTabItem(ProjectItemInfo itemInfo) {
+		TabItemConfig tabItemConfig = new TabItemConfig(itemInfo.getAssociatedData().getName());
+		FileSheet newFileSheet = new FileSheet(presenter, itemInfo);
+		newFileSheet.constructEditor(itemInfo.getAssociatedData().getContent(),
+									FileItemInfo.recognizeFileType(itemInfo.getAssociatedData().getName()));
 		editor.getTabPanel().add(newFileSheet, tabItemConfig);
+		itemInfo.setFileSheet(newFileSheet);
+		scrollToTab(itemInfo);
+		addFileItemToScrollMenu(itemInfo);
+		itemInfo.setAlreadyOpened(true);
 	}
 	
-	public void addFileItemToScrollMenu(String path, Long fileId) {
-		topPanel.addItemToScrollMenu(path, fileId);
+	public void addFileItemToScrollMenu(ProjectItemInfo itemInfo) {
+		topPanel.addItemToScrollMenu(itemInfo);
 	}
 	
 	public void removeWidget(Widget widget2delete) {
@@ -255,19 +244,32 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		return projectPanel;
 	}
 	
-	public void scrollToTab(FileSheet curFileSheet, boolean animate) {
-		editor.getTabPanel().setActiveWidget(curFileSheet);
-		editor.getTabPanel().scrollToTab(curFileSheet, animate);
+	public void scrollToTab(ProjectItemInfo itemInfo) {
+		if (itemInfo.getFileSheet() != null) {
+			editor.getTabPanel().setActiveWidget(itemInfo.getFileSheet());
+			editor.getTabPanel().scrollToTab(itemInfo.getFileSheet(), true);
+		}
 	}
 	
-	public void requestInitialDirContent() {
-		projectPanel.requestDirContent(null);
+	public void requestUserProjects() {
+		projectPanel.requestUserProjects(FlowController.getLoggedAsUser());
 	}
 
 	public void updateEditorFileSheetName(FileSheet updatedFileSheet, String fileName) {
 		TabItemConfig conf = editor.getTabPanel().getConfig(updatedFileSheet);
 		conf.setText(Utils.extractJustFileName(fileName));
 		editor.getTabPanel().update(updatedFileSheet, conf);
+	}
+	
+	public void updateEditorPanelTheme(AceColorThemeChangedEvent event) {
+		for (int i = 0; i < editor.getTabPanel().getWidgetCount(); i++) {
+			FileSheet curFileSheet = (FileSheet)editor.getTabPanel().getWidget(i);
+			curFileSheet.getAceEditor().setTheme(event.getEvent().getSelectedItem());
+		}
+	}
+	
+	public void restoreView(UserStateInfo userState) {
+		
 	}
 	
 	public void appendLog(String log) {

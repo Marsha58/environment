@@ -31,7 +31,7 @@ public interface UserStateServiceAsync {
 	 * @param callback
 	 * @return
 	 */
-	public void updateUserState(String user, UserStateInfo state, AsyncCallback<RequestUserStateResult> callback);
+	public void updateUserState(String user, UserStateInfo state, AsyncCallback<RequestUpdateUserStateResult> callback);
 
 	/**
 	 * Removes user state

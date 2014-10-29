@@ -15,12 +15,12 @@
  */
 package com.vw.ide.client.ui.projectpanel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
@@ -28,29 +28,26 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.data.shared.IconProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
 import com.sencha.gxt.widget.core.client.tree.Tree;
-import com.vw.ide.client.FlowController;
+import com.vw.ide.client.Resources;
+import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.images.IdeImages;
-import com.vw.ide.client.model.BaseDto;
-import com.vw.ide.client.model.FileDto;
-import com.vw.ide.client.model.FolderDto;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
-import com.vw.ide.client.projects.ProjectItem;
-import com.vw.ide.client.projects.ProjectItemImpl;
-import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
-import com.vw.ide.client.utils.Utils;
+import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
+import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
+import com.vw.ide.shared.servlet.projectmanager.RequestUserAvailableProjectResult;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
-import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 
 /**
  * A composite that contains the shortcut stack panel on the left side. The
@@ -64,70 +61,161 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	interface Binder extends UiBinder<Widget, ProjectPanel> {
 	}
 
-	private static class DirContentResultCallback extends ResultCallback<RequestedDirScanResult> {
+	public static class ProjectItemInfo implements TreeStore.TreeNode<ProjectItemInfo> {
+
+		private ProjectDescription projectDescription;
+		private FileItemInfo associatedData;
+		private FileSheet fileSheet;
+		private boolean markAsProject = false;
+		private boolean alreadyOpened = false;
+		private boolean isEdited = false;
+		
+		@Override
+		public List<? extends com.sencha.gxt.data.shared.TreeStore.TreeNode<ProjectItemInfo>> getChildren() {
+			return null;
+		}
+
+		@Override
+		public ProjectItemInfo getData() {
+			return this;
+		}
+
+		public FileItemInfo getAssociatedData() {
+			return associatedData;
+		}
+
+		public void setAssociatedData(FileItemInfo associatedData) {
+			this.associatedData = associatedData;
+		}
+
+		public ProjectDescription getProjectDescription() {
+			return projectDescription;
+		}
+
+		public void setProjectDescription(ProjectDescription projectDescription) {
+			this.projectDescription = projectDescription;
+		}
+
+		public boolean isMarkAsProject() {
+			return markAsProject;
+		}
+
+		public void setMarkAsProject(boolean markAsProject) {
+			this.markAsProject = markAsProject;
+		}
+		
+		public boolean isAlreadyOpened() {
+			return alreadyOpened;
+		}
+
+		public void setAlreadyOpened(boolean alreadyOpened) {
+			this.alreadyOpened = alreadyOpened;
+		}
+
+		public FileSheet getFileSheet() {
+			return fileSheet;
+		}
+
+		public void setFileSheet(FileSheet fileSheet) {
+			this.fileSheet = fileSheet;
+		}
+
+		public boolean isEdited() {
+			return isEdited;
+		}
+
+		public void setEdited(boolean isEdited) {
+			this.isEdited = isEdited;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime
+					* result
+					+ ((associatedData == null) ? 0 : associatedData.getRelPath().hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ProjectItemInfo other = (ProjectItemInfo) obj;
+			if (associatedData == null) {
+				if (other.associatedData != null)
+					return false;
+			} else if (!associatedData.getRelPath().equals(other.associatedData.getRelPath()))
+				return false;
+			return true;
+		}
+	}
+	
+	class KeyProvider implements ModelKeyProvider<ProjectItemInfo> {
+		@Override
+		public String getKey(ProjectItemInfo item) {
+			return item.getAssociatedData().getRelPath();
+		}
+	}
+
+	private static class AvailableProjectsResultCallback extends ResultCallback<RequestUserAvailableProjectResult> {
 
 		private ProjectPanel owner;
 		
-		public DirContentResultCallback(ProjectPanel owner) {
+		public AvailableProjectsResultCallback(ProjectPanel owner) {
 			this.owner = owner;
 		}
 		
 		@Override
-		public void handle(RequestedDirScanResult result) {
-			owner.makeTreeData(result);
-			owner.updateProjects(owner.searchProjects());
-			owner.updateProjectsFiles(owner.getStore());
-			owner.updateProjectsDirField(owner.getStore().getRootItems().get(0));
+		public void handle(RequestUserAvailableProjectResult result) {
+			owner.makeTree(result);
 			owner.getAssociatedPresenter().fireEvent(new ServerLogEvent(result));
 		}
 	}
 
 	@UiField(provided = true)
-	TreeStore<BaseDto> store = new TreeStore<BaseDto>(new KeyProvider());
+	TreeStore<ProjectItemInfo> store = new TreeStore<ProjectItemInfo>(new KeyProvider());
 	@UiField
-	Tree<BaseDto, String> projectsDirsField;
+	Tree<ProjectItemInfo, String> projectsField;
 	@UiField
 	IdeImages images;
 	
 	private Presenter presenter = null;
-	private static int autoId = 0;
 	private Widget widget;
-	private DirContentResultCallback dirContentResultCbk = new DirContentResultCallback(this);
-	private ProjectManager projectManager;
-	private BaseDto treeSelectedItem;
-	private FileItemInfo selectedItem4ContextMenu;
-	private ProPanelContextMenu contextMenu;
-	private FolderDto root = null;
-	private String basePath = "";
+	private ProjectItemInfo treeSelectedItem;
+	private ProjectPanelContextMenu contextMenu;
 
 	public static final String SELECT_ID = "SELECT_ID";
+
 	private static final Binder uiBinder = GWT.create(Binder.class);
 	
-	class KeyProvider implements ModelKeyProvider<BaseDto> {
-		@Override
-		public String getKey(BaseDto item) {
-			return (item instanceof FolderDto ? "f-" : "m-") + item.getId().toString();
-		}
-	}
-
 	@UiFactory
-	public ValueProvider<BaseDto, String> createValueProvider() {
-		return new ValueProvider<BaseDto, String>() {
+	public ValueProvider<ProjectItemInfo, String> createValueProvider() {
+		return new ValueProvider<ProjectItemInfo, String>() {
 
 			@Override
-			public String getValue(BaseDto object) {
-				return object.getName();
+			public String getValue(ProjectItemInfo object) {
+				return object.getAssociatedData().getName();
 			}
 
 			@Override
-			public void setValue(BaseDto object, String value) {
+			public void setValue(ProjectItemInfo object, String value) {
 			}
 
 			@Override
 			public String getPath() {
-				return "name";
+				return "associatedData";
 			}
 		};
+	}
+
+	public ProjectItemInfo getTreeSelectedItem() {
+		return treeSelectedItem;
 	}
 
 	public void associatePresenter(Presenter presenter) {
@@ -152,247 +240,155 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		prepare();
 	}
 
-	public ProjectManager getProjectManager() {
-		return projectManager;
-	}
-
-	public void setProjectManager(ProjectManager projectManager) {
-		this.projectManager = projectManager;
-	}
-
-	protected ArrayList<ProjectItem> searchProjects() {
-		ArrayList<ProjectItem> projectList = new ArrayList<ProjectItem>();
-		for (BaseDto allBaseDto : getStore().getAll()) {
-			String sPath = allBaseDto.getRelPath();
-			String sName = allBaseDto.getName();
-			String sProjectName = selectProjectName(sPath);
-			if ((sProjectName + ".xml").equalsIgnoreCase(sName)) {
-				if (sProjectName.length() > 0) {
-					ProjectItem newProjectItem = new ProjectItemImpl(sProjectName, sPath);
-					projectList.add(newProjectItem);
-				}
-			}
-		}
-		return projectList;
-	}
-
-	protected void updateProjects(ArrayList<ProjectItem> projectsList) {
-		for (ProjectItem curPI : projectsList) {
-			Long projectId = projectManager.getProjectIdByProjectInfo(curPI);
-			if (projectId == -1L) {
-				projectManager.addProject(curPI);
-			}
-		}
-	}
-
-	protected void updateProjectsFiles(TreeStore<BaseDto> store) {
-		List<BaseDto> bdto = store.getAll();
-		for (BaseDto b : bdto) {
-			try {
-				if (b instanceof FileDto) {
-					FileDto curItemInStore = (FileDto) b;
-					Long fileId = -1l;
-					Long projectId = projectManager.getProjectIdByRelPath(curItemInStore.getRelPath());
-					projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
-					if (!projectManager.checkIfFileExists(curItemInStore
-							.getAbsolutePath())) {
-						FileItemInfo newFileItemInfo = new FileItemInfo();
-						newFileItemInfo.setAbsolutePath(curItemInStore.getAbsolutePath());
-						newFileItemInfo.setRelPath(curItemInStore.getRelPath());
-						newFileItemInfo.setName(Utils.extractJustFileName(curItemInStore.getAbsolutePath()));
-						newFileItemInfo.setDir(false);
-						newFileItemInfo.setProjectId(projectId);
-						fileId = projectManager.addFile(newFileItemInfo);
-					}
-					else {
-						fileId = projectManager.getFileIdByFilePath(curItemInStore.getAbsolutePath());
-					}
-					curItemInStore.setProjectId(projectId);
-					curItemInStore.setFileId(fileId);
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-		}
-	}
-	
-	private Widget constructUi() {
-		widget = uiBinder.createAndBindUi(this);
-		widget.addStyleName("margin-10");
-		projectsDirsField.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		projectsDirsField.getSelectionModel().addSelectionHandler(
-				new SelectionHandler<BaseDto>() {
-					public void onSelection(SelectionEvent<BaseDto> event) {
-						treeSelectedItem = event.getSelectedItem();
-						FileItemInfo fileItemInfo = new FileItemInfo();
-						fileItemInfo.setName(treeSelectedItem.getName());
-						fileItemInfo.setAbsolutePath(treeSelectedItem.getAbsolutePath());
-						if (treeSelectedItem.getType() == "file") {
-							fileItemInfo.setDir(false);
-							fileItemInfo.setProjectId(((FileDto) treeSelectedItem).getProjectId());
-							fileItemInfo.setFileId(((FileDto) treeSelectedItem).getFileId());
-							if (presenter != null) {
-								presenter.fireEvent(new SelectFileEvent(
-										fileItemInfo));
-							}
-						} else {
-							fileItemInfo.setDir(true);
-						}
-						selectedItem4ContextMenu = fileItemInfo; 
-					}
-				});
-
-		return widget;
-	}
-
 	public void prepare() {
 		buildContextMenu();
 	}
 
 	public void buildContextMenu() {
-		contextMenu = new ProPanelContextMenu(); 
+		contextMenu = new ProjectPanelContextMenu(); 
 		contextMenu.setWidth(160);
 		contextMenu.addBeforeShowHandler(new BeforeShowHandler(){
 			@Override
 			public void onBeforeShow(BeforeShowEvent event) {
 				contextMenu.associatePresenter(getAssociatedPresenter());
-				contextMenu.checkEnabling(selectedItem4ContextMenu);
-			}	
-		});
-		projectsDirsField.setContextMenu(contextMenu);
-	}
-
-	public void requestDirContent(String root) {
-		DirBrowserServiceBroker.requestForDirContent(FlowController.getLoggedAsUser(), root, dirContentResultCbk);
-	}
-
-	public FileItemInfo getSelectedItem4ContextMenu() {
-		return selectedItem4ContextMenu;
-	}
-
-	protected FolderDto makeTree(RequestedDirScanResult dirs) {
-		String[] arrPath;
-		String sOwnerFolderName = "";
-		String delims = "[\\\\/]+";
-
-		if (root == null) {
-			root = makeFolder("Root", "", "");
-			basePath = dirs.getParentPath();
-			String user = presenter.getLoggedAsUser();
-			FolderDto owner = makeFolder(user, "", "");
-			List<BaseDto> children = new ArrayList<BaseDto>();
-			children.add(owner);
-			root.setChildren(children);
-		}
-		try {
-			arrPath = dirs.getParentPath().split(delims);
-			sOwnerFolderName = arrPath[arrPath.length - 1];
-		} catch (Exception e) {
-			System.out.println(e.toString());
-		}
-		FolderDto owner = findOwnerElement(root, sOwnerFolderName, dirs.getParentPath(), false);
-		FolderDto folder = null;
-		String sNewPath = "";
-		for (FileItemInfo fi : dirs.getFiles()) {
-			if (fi.isDir()) {
-				if (owner.getRelPath().trim().length() > 0) {
-					sNewPath = owner.getRelPath() + "\\" + fi.getName();
-				} else {
-					sNewPath = fi.getName();
+				if (treeSelectedItem != null) {
+					contextMenu.checkEnabling(treeSelectedItem.getAssociatedData());
 				}
-				folder = makeFolder(fi.getName(), sNewPath, fi.getAbsolutePath());
-				owner.addOrReplaceChild(folder);
-				requestDirContent(folder.getRelPath());
+			}
+		});
+		projectsField.setContextMenu(contextMenu);
+	}
+
+	public void requestUserProjects(String user) {
+		ProjectManagerServiceBroker.requestForAvailableProjects(user, new AvailableProjectsResultCallback(this));
+	}
+
+	protected void makeTree(RequestUserAvailableProjectResult projects) {
+		if (store.getRootCount() == 0) {
+			store.add(makeUserRoot(presenter.getLoggedAsUser()));
+		}
+		ProjectItemInfo root = store.findModelWithKey(presenter.getLoggedAsUser());
+		for(ProjectDescription description : projects.getAvailableProjects()) {
+			ProjectItemInfo projectRoot = makeProjectRoot(description, description.getMainModuleName());
+			projectRoot.setMarkAsProject(true);
+			store.add(root, projectRoot);
+			buildProjectTreeBranchView(projectRoot);
+		}
+	}
+	
+	private void buildProjectTreeBranchView(ProjectItemInfo projectRoot) {
+		for(FileItemInfo fi : projectRoot.getProjectDescription().getProjectFiles()) {
+			ProjectItemInfo p = buildTreeBranch(projectRoot.getProjectDescription(), projectRoot, fi);
+			if (p != null) {
+				ProjectItemInfo pi = new ProjectItemInfo();
+				pi.setProjectDescription(projectRoot.getProjectDescription());
+				pi.setAssociatedData(fi);
+				store.add(p, pi);
+			}
+		}
+	}
+	
+	private ProjectItemInfo buildTreeBranch(ProjectDescription projectDescription, ProjectItemInfo projectItem, FileItemInfo fileInfo) {
+		ProjectItemInfo p = null;
+		String projectFullPath = projectDescription.getProjectPath() + "/" + projectDescription.getMainModuleName();
+		if (fileInfo.getAbsolutePath().equals(projectFullPath)) {
+			p = projectItem;
+		}
+		else
+		if (fileInfo.getAbsolutePath().startsWith(projectFullPath)) {
+			String[] splittedPath = fileInfo.getAbsolutePath().substring(projectFullPath.length() + 1).split("[\\\\/]+");
+			if (splittedPath.length > 0) {
+				int depth = 0;
+				return buildTreeBranchImpl(projectDescription, projectItem, splittedPath, fileInfo, depth);
 			}
 			else {
-				owner.addOrReplaceChild(makeFileItem(fi.getName(), owner, owner.getRelPath(), fi.getAbsolutePath()));
+				p = projectItem;
 			}
 		}
-		return root;
-	}
-	
-	private void makeTreeData(RequestedDirScanResult dirs) {
-		FolderDto root = makeTree(dirs);
-		for (BaseDto base : root.getChildren()) {
-			store.remove(base);
-			store.add(base);
-			if (base instanceof FolderDto) {
-				processFolder(store, (FolderDto) base);
-			}
-		}
+		return p;
 	}
 
-	private FolderDto findOwnerElement(FolderDto ownerFolder, String sFolderName, String absolutePath, boolean IsCatched) {
-		FolderDto res = null;
-		for (BaseDto el : ownerFolder.getChildren()) {
-			if (el.getType() == "dir") {
-				String sRelPathFromAbsPath = absolutePath.substring(basePath
-						.length());
-				if (sRelPathFromAbsPath.length() > 2) {
-					if (sRelPathFromAbsPath.substring(0, 1).equalsIgnoreCase("\\")) {
-						sRelPathFromAbsPath = sRelPathFromAbsPath.substring(1);
+	private ProjectItemInfo buildTreeBranchImpl(ProjectDescription projectDescription,
+												ProjectItemInfo parentProjectItem,
+												String[] splittedPath,
+												FileItemInfo fileInfo,
+												int depth) {
+		ProjectItemInfo r = parentProjectItem;
+		if (depth == splittedPath.length) {
+			return r;
+		}
+		List<ProjectItemInfo> items = store.getChildren(parentProjectItem);
+		if (items != null && items.contains(splittedPath[depth])) {
+			r = buildTreeBranchImpl(projectDescription,
+								items.get(items.indexOf(splittedPath[depth])),
+								splittedPath,
+								fileInfo,
+								++depth);
+		}
+		else {
+			ProjectItemInfo pi = new ProjectItemInfo();
+			FileItemInfo fi = new FileItemInfo(splittedPath[depth], null, true);
+			fi.setAbsolutePath(parentProjectItem.getAssociatedData().getAbsolutePath() + "/" + splittedPath[depth]);
+			fi.setRelPath(parentProjectItem.getAssociatedData().getRelPath() + "/" + splittedPath[depth]);
+			pi.setProjectDescription(projectDescription);
+			pi.setAssociatedData(fi);
+			store.add(parentProjectItem, pi);
+			r = buildTreeBranchImpl(projectDescription, pi, splittedPath, fileInfo, ++depth);
+		}
+		return r;
+	}
+	
+	private static ProjectItemInfo makeUserRoot(String name) {
+		ProjectItemInfo pi = new ProjectItemInfo();
+		FileItemInfo fi = new FileItemInfo();
+		fi.setName(name);
+		fi.setDir(true);
+		fi.setRelPath(name);
+		pi.setAssociatedData(fi);
+		return pi;
+	}
+
+	private static ProjectItemInfo makeProjectRoot(ProjectDescription projectDescription, String name) {
+		ProjectItemInfo pi = new ProjectItemInfo();
+		FileItemInfo fi = new FileItemInfo();
+		fi.setName(name);
+		fi.setDir(true);
+		fi.setRelPath(name);
+		pi.setAssociatedData(fi);
+		pi.setProjectDescription(projectDescription);
+		return pi;
+	}
+	
+	private Widget constructUi() {
+		widget = uiBinder.createAndBindUi(this);
+		widget.addStyleName("margin-10");
+		projectsField.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		projectsField.getSelectionModel().addSelectionHandler(
+				new SelectionHandler<ProjectItemInfo>() {
+					public void onSelection(SelectionEvent<ProjectItemInfo> event) {
+						treeSelectedItem = event.getSelectedItem();
+						FileItemInfo fileItemInfo = treeSelectedItem.getAssociatedData();
+						if (!fileItemInfo.isDir() && !treeSelectedItem.isAlreadyOpened()) {
+							if (presenter != null) {
+								presenter.fireEvent(new SelectFileEvent(treeSelectedItem));
+							}
+						}
+						else {
+							if (treeSelectedItem.isAlreadyOpened()) {
+								((DevelopmentBoardPresenter)presenter).getView().scrollToTab(treeSelectedItem);
+							}
+						}
 					}
+				});
+		projectsField.setIconProvider(new IconProvider<ProjectItemInfo>() {
+			@Override
+			public ImageResource getIcon(ProjectItemInfo model) {
+				if (model.isMarkAsProject()) {
+					return Resources.IMAGES.new_wiz_en();
 				}
-				if (el.getRelPath().trim()
-						.equalsIgnoreCase(sRelPathFromAbsPath.trim())) {
-					IsCatched = true;
-					res = (FolderDto) el;
-					break;
-				} else {
-					if (!IsCatched) {
-						res = findOwnerElement((FolderDto) el, sFolderName,
-								absolutePath, IsCatched);
-					}
-					if (res != null) {
-						return res;
-					}
-				}
+				return null;
 			}
-		}
-		return res;
-	}
-
-	private void processFolder(TreeStore<BaseDto> store, FolderDto folder) {
-		for (BaseDto child : folder.getChildren()) {
-			store.remove(child);
-			store.add(folder, child);
-			if (child instanceof FolderDto) {
-				processFolder(store, (FolderDto) child);
-			}
-		}
-	}
-
-	private static FolderDto makeFolder(String name, String path, String absolutePath) {
-		FolderDto theReturn = new FolderDto(++autoId, name, path, absolutePath);
-		theReturn.setChildren((List<BaseDto>) new ArrayList<BaseDto>());
-		return theReturn;
-	}
-
-	private static FileDto makeFileItem(String fileName, FolderDto folder, String relPath, String absolutePath) {
-		return makeFileItem(fileName, folder.getName(), relPath, absolutePath);
-	}
-
-	private static FileDto makeFileItem(String fileName, String folder, String relPath, String absolutePath) {
-		return new FileDto(++autoId, fileName, folder, relPath, absolutePath);
-	}
-	
-	private TreeStore<BaseDto> getStore() {
-		return store;
-	}
-
-	private String selectProjectName(String sPath) {
-		String sRes = sPath;
-		String delims = "[\\\\/]+"; // / parse such string as
-									// "\\aaaa\\bbbb\\\\cccc\\\\dddd/eeee//ffff/gggg"
-		if (sPath.length() > 0) {
-			String[] arrSpl = sPath.split(delims);
-			sRes = arrSpl[arrSpl.length - 1];
-		}
-		return sRes;
-	}
-	
-	private void updateProjectsDirField(BaseDto rootItem) {
-		projectsDirsField.getSelectionModel().select(rootItem, true);
-		projectsDirsField.setExpanded(rootItem, true);
+		});
+		return widget;
 	}
 } 

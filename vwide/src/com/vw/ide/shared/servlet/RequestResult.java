@@ -1,4 +1,4 @@
-package com.vw.ide.shared.servlet.remotebrowser;
+package com.vw.ide.shared.servlet;
 
 import java.io.Serializable;
 
@@ -12,7 +12,7 @@ public class RequestResult implements Serializable {
 	
 	private String result;
 	private String operation;
-	private Integer retCode;	
+	private Integer retCode = GENERAL_OK;	
 	private OperationTypes operationType;
 	
 	public OperationTypes getOperationType() {

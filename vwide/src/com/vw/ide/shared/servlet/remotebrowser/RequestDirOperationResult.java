@@ -2,6 +2,8 @@ package com.vw.ide.shared.servlet.remotebrowser;
 
 import java.io.Serializable;
 
+import com.vw.ide.shared.servlet.RequestResult;
+
 /**
  * Result on any operation with directory
  * @author Oleg

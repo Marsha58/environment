@@ -13,7 +13,7 @@ import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
-public class ProPanelContextMenu extends Menu{
+public class ProjectPanelContextMenu extends Menu{
 	private MenuItem importFile; 
 	private MenuItem newFile; 
 	private MenuItem renameFile; 
@@ -27,8 +27,8 @@ public class ProPanelContextMenu extends Menu{
 	public SelectionHandler<Item> selectionHandler = new SelectionHandler<Item>() {
 		@Override
 		public void onSelection(SelectionEvent<Item> event) {
-			if (event.getSelectedItem().getParent() instanceof ProPanelContextMenu) {
-				ProPanelContextMenu menu = (ProPanelContextMenu) event.getSelectedItem().getParent();
+			if (event.getSelectedItem().getParent() instanceof ProjectPanelContextMenu) {
+				ProjectPanelContextMenu menu = (ProjectPanelContextMenu) event.getSelectedItem().getParent();
 				if (menu.presenter != null) {
 					menu.presenter.fireEvent(new ProjectMenuEvent(event.getSelectedItem().getItemId())); 
 				}
@@ -38,7 +38,7 @@ public class ProPanelContextMenu extends Menu{
 	};  
 	
 	
-	public ProPanelContextMenu() {
+	public ProjectPanelContextMenu() {
 		
 		importFile = new MenuItem();
 		importFile.setItemId(OperationTypes.IMPORT_FILE.getName());
@@ -121,7 +121,7 @@ public class ProPanelContextMenu extends Menu{
 	  Boolean isDelProjectEnabled = true;	
 		
 	  if(fileItemInfo != null) {
-		  if(fileItemInfo.getFileType() == FilesTypesEnum.XML) {
+		  if(FileItemInfo.recognizeFileType(fileItemInfo.getName()) == FilesTypesEnum.XML) {
 			  isDelFileEnabled = !checkIsFileProXml(fileItemInfo);
 		  } else {
 			  if (fileItemInfo.isDir()) {

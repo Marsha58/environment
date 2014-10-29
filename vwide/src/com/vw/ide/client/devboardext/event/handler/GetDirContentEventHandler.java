@@ -20,6 +20,6 @@ public class GetDirContentEventHandler extends Presenter.PresenterEventHandler i
 	}
 	
 	protected void process(DevelopmentBoardPresenter presenter, GetDirContentEvent event) {
-		presenter.getView().requestInitialDirContent();
+		// presenter.getView().requestInitialDirContent();
 	}
 }

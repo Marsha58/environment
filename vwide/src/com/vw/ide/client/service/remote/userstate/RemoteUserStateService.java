@@ -7,6 +7,7 @@ import com.vw.ide.client.service.ServiceCallback;
 import com.vw.ide.client.service.VwIdeClientService;
 import com.vw.ide.client.service.factory.ServicesStubFactory;
 import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
+import com.vw.ide.shared.servlet.userstate.RequestUpdateUserStateResult;
 import com.vw.ide.shared.servlet.userstate.UserStateServiceAsync;
 
 /**
@@ -17,6 +18,9 @@ import com.vw.ide.shared.servlet.userstate.UserStateServiceAsync;
 public class RemoteUserStateService implements BusConnectivity, VwIdeClientService {
 
 	public static class ServiceCallbackForUserState extends ServiceCallback<RequestUserStateResult> {
+	}	
+
+	public static class ServiceCallbackForUpdateUserState extends ServiceCallback<RequestUpdateUserStateResult> {
 	}	
 	
 	private HandlerManager bus;
@@ -57,4 +61,9 @@ public class RemoteUserStateService implements BusConnectivity, VwIdeClientServi
 	public ServiceCallbackForUserState buildCallbackForUserState() {
 		return new ServiceCallbackForUserState();
 	}
+
+	public ServiceCallbackForUpdateUserState buildCallbackForUpdateUserState() {
+		return new ServiceCallbackForUpdateUserState();
+	}
+	
 }

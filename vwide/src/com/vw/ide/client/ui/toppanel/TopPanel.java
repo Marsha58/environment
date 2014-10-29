@@ -56,6 +56,7 @@ import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 
 import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 
@@ -192,7 +193,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 			        default:
 			            assert false : "Unsupported theme enum";
 			    }
-			    ((DevelopmentBoardPresenter)getAssociatedPresenter()).getView().getProjectPanel().requestDirContent(null);
+			    //((DevelopmentBoardPresenter)getAssociatedPresenter()).getView().getProjectPanel().requestDirContent(null);
 		    }
 		});
 		comboPlaceCont.add(combo);
@@ -200,9 +201,8 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 			@Override
 			public void onBeforeSelection(BeforeSelectionEvent<Item> event) {
 				if (event.getItem().getData("fileId") != null) {
-					Long fileId = event.getItem().getData("fileId");
-					FileSheet curFileSheet = (FileSheet)((DevelopmentBoardPresenter)presenter).getProjectManager().getAssociatedTabWidgetsContext().get(fileId);
-					((DevelopmentBoardPresenter)presenter).getView().scrollToTab(curFileSheet, true);	
+					ProjectItemInfo itemInfo = event.getItem().getData("fileId");
+					((DevelopmentBoardPresenter)presenter).getView().scrollToTab(itemInfo);	
 				}
 			}
 		});
@@ -275,15 +275,15 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 
 	}  
 	
-	public void addItemToScrollMenu(String sFullFileName, Long fileId) {
-		MenuItem mi = new MenuItem(sFullFileName);
-		mi.setData("fileId", fileId);
+	public void addItemToScrollMenu(ProjectItemInfo itemInfo) {
+		MenuItem mi = new MenuItem(itemInfo.getAssociatedData().getAbsolutePath());
+		mi.setData("fileId", itemInfo);
 		scrollMenu.add(mi);
 	}
   
-	public void delItemFromScrollMenu(Long fileId) {
+	public void delItemFromScrollMenu(ProjectItemInfo itemInfo) {
 		for (int i = 0; i < scrollMenu.getWidgetCount(); i++) {
-			if(((MenuItem) scrollMenu.getWidget(i)).getData("fileId") == fileId) {
+			if(((MenuItem) scrollMenu.getWidget(i)).getData("fileId") == itemInfo) {
 				scrollMenu.remove(scrollMenu.getWidget(i));
 				break;
 			}

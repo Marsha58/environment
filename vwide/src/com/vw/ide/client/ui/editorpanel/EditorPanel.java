@@ -81,7 +81,6 @@ public class EditorPanel extends Composite {
 				sTitle = sTitle.substring(1);
 			}
 			tabPanel.getConfig(associatedTabWidget).setText(sTitle);
-			((FileSheet) associatedTabWidget).setIsFileEdited(isEdited);
 		}
 	}
 	

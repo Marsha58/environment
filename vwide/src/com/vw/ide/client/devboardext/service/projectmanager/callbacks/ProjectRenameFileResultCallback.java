@@ -4,18 +4,18 @@ import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.shared.servlet.projectmanager.RequestProjectDeletionResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectRenameFileResult;
 
-public class ProjectDeletionResultCallback extends ResultCallback<RequestProjectDeletionResult>{
+public class ProjectRenameFileResultCallback extends ResultCallback<RequestProjectRenameFileResult> {
 
-	private DevelopmentBoardPresenter owner = null;
-
-	public ProjectDeletionResultCallback(DevelopmentBoardPresenter owner) {
+	private DevelopmentBoardPresenter owner;
+	
+	public ProjectRenameFileResultCallback(DevelopmentBoardPresenter owner) {
 		this.owner = owner;
 	}
-	
+
 	@Override
-	public void handle(RequestProjectDeletionResult result) {
+	public void handle(RequestProjectRenameFileResult result) {
 		if (result.getRetCode().intValue() != 0) {
 			String messageAlert = "The operation '" + result.getOperation()
 					+ "' failed.\r\nResult'" + result.getResult() + "'";
@@ -23,9 +23,7 @@ public class ProjectDeletionResultCallback extends ResultCallback<RequestProject
 					"Warning", messageAlert);
 			alertMessageBox.show();
 		} 
-		else {
-			// owner.getView().getProjectPanel().requestDirContent(null);
-		}
 		owner.fireEvent(new ServerLogEvent(result));
 	}
+
 }

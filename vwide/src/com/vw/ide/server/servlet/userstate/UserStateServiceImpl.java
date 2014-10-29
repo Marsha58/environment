@@ -12,6 +12,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.server.servlet.IService;
 import com.vw.ide.server.servlet.locator.ServiceLocator;
 import com.vw.ide.shared.servlet.remotebrowser.RequestUserStateResult;
+import com.vw.ide.shared.servlet.userstate.RequestUpdateUserStateResult;
 import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 import com.vw.ide.shared.servlet.userstate.UserStateService;
 
@@ -73,8 +74,8 @@ public class UserStateServiceImpl extends RemoteServiceServlet implements UserSt
 	}
 
 	@Override
-	public RequestUserStateResult updateUserState(String user, UserStateInfo state) {
-		RequestUserStateResult res = new RequestUserStateResult();
+	public RequestUpdateUserStateResult updateUserState(String user, UserStateInfo state) {
+		RequestUpdateUserStateResult res = new RequestUpdateUserStateResult();
 		updateUserStateInfo(user, state);
 		res.setRetCode(RequestUserStateResult.GENERAL_OK);
 		return res;

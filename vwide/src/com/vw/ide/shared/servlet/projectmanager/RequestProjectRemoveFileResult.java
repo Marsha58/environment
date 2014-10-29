@@ -3,11 +3,11 @@ package com.vw.ide.shared.servlet.projectmanager;
 import com.vw.ide.shared.servlet.RequestResult;
 
 /**
- * Result on project deletion
+ * Result of removing file from the given project
  * @author Oleg
  *
  */
 @SuppressWarnings("serial")
-public class RequestProjectDeletionResult extends RequestResult {
+public class RequestProjectRemoveFileResult extends RequestResult {
 
 }

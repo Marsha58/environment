@@ -7,8 +7,13 @@ import com.vw.ide.client.service.ServiceCallback;
 import com.vw.ide.client.service.VwIdeClientService;
 import com.vw.ide.client.service.factory.ServicesStubFactory;
 import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerServiceAsync;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectAddFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectDeletionResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectRemoveFileResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectRenameFileResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectUpdateResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestUserAvailableProjectResult;
 
 /**
  * Project manager service proxy
@@ -21,6 +26,21 @@ public class ProjectManagerService implements BusConnectivity, VwIdeClientServic
 	}
 
 	public static class ServiceCallbackForProjectDeletion extends ServiceCallback<RequestProjectDeletionResult> {
+	}
+
+	public static class ServiceCallbackForUpdatingProject extends ServiceCallback<RequestProjectUpdateResult> {
+	}
+
+	public static class ServiceCallbackForAvailableProjects extends ServiceCallback<RequestUserAvailableProjectResult> {
+	}
+
+	public static class ServiceCallbackForAddFileToProject extends ServiceCallback<RequestProjectAddFileResult> {
+	}
+
+	public static class ServiceCallbackForRemoveFileFromProject extends ServiceCallback<RequestProjectRemoveFileResult> {
+	}
+
+	public static class ServiceCallbackForRenameFileOnProject extends ServiceCallback<RequestProjectRenameFileResult> {
 	}
 	
 	private RemoteProjectManagerServiceAsync serviceImpl = ServicesStubFactory.createRemoteProjectManagerServiceAsync();
@@ -65,5 +85,24 @@ public class ProjectManagerService implements BusConnectivity, VwIdeClientServic
 	public ServiceCallbackForProjectDeletion buildCallbackForProjectDeletion() {
 		return new ServiceCallbackForProjectDeletion();
 	}		
+
+	public ServiceCallbackForUpdatingProject buildCallbackForUpdatingProject() {
+		return new ServiceCallbackForUpdatingProject();
+	}		
+
+	public ServiceCallbackForAvailableProjects buildCallbackForAvailableProjects() {
+		return new ServiceCallbackForAvailableProjects();
+	}
+
+	public ServiceCallbackForAddFileToProject buildCallbackForAddFileToProject() {
+		return new ServiceCallbackForAddFileToProject();
+	}
+
+	public ServiceCallbackForRemoveFileFromProject buildCallbackForRemoveFileFromProject() {
+		return new ServiceCallbackForRemoveFileFromProject();
+	}
 	
+	public ServiceCallbackForRenameFileOnProject buildCallbackForRenameFileOnProject() {
+		return new ServiceCallbackForRenameFileOnProject();
+	}
 }

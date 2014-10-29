@@ -23,9 +23,6 @@ public class AnyDirOperationResultCallback extends ResultCallback<RequestDirOper
 					"Warning", messageAlert);
 			alertMessageBox.show();
 		} 
-		else {
-			owner.getView().getProjectPanel().requestDirContent(null);
-		}
 		owner.fireEvent(new ServerLogEvent(result));
 	}
 }

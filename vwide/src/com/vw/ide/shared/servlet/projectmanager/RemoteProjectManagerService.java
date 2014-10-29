@@ -2,6 +2,7 @@ package com.vw.ide.shared.servlet.projectmanager;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
  * Defines project managment's logic on server side
@@ -19,10 +20,47 @@ public interface RemoteProjectManagerService extends RemoteService {
 
 	/**
 	 * Deletes existing project
-	 * @param userName
-	 * @param projectName
-	 * @param projectId
+	 * @param description
 	 * @return
 	 */
-	public RequestProjectDeletionResult deleteProject(String userName, String projectName, Long projectId);
+	public RequestProjectDeletionResult deleteProject(ProjectDescription description);
+
+	/**
+	 * Updates project
+	 * @param description
+	 * @return
+	 */
+	public RequestProjectUpdateResult updateProject(ProjectDescription description);
+	
+	/**
+	 * Returns list of user's projects
+	 * @param userName
+	 * @return
+	 */
+	public RequestUserAvailableProjectResult getUserAvailableProjects(String userName);
+
+	/**
+	 * Adding file to project
+	 * @param description
+	 * @param toAdd
+	 * @return
+	 */
+	public RequestProjectAddFileResult addFileToProject(ProjectDescription description, FileItemInfo toAdd);
+
+	/**
+	 * Removing file from project
+	 * @param description
+	 * @param toRemove
+	 * @return
+	 */
+	public RequestProjectRemoveFileResult removeFileFromProject(ProjectDescription description, FileItemInfo toRemove);
+
+	/**
+	 * Renaming file from project
+	 * @param description
+	 * @param toRemove
+	 * @param newName
+	 * @return
+	 */
+	public RequestProjectRenameFileResult renameFileFromProject(ProjectDescription description, FileItemInfo toRename, FileItemInfo newName);
 }

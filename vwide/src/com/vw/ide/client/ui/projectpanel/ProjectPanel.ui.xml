@@ -57,7 +57,7 @@
 	<gxt:TabPanel width="450" addStyleNames="margin-10" borders="false">
 		<gxt:child config="{shortTextTabConfig}">
 			<container:SimpleContainer>
-			        <tree:Tree ui:field="projectsDirsField" width="300" borders="false" 
+			        <tree:Tree ui:field="projectsField" width="300" borders="false" 
 			        	valueProvider="{valueProvider}" store="{store}">
         			</tree:Tree>
 			</container:SimpleContainer>

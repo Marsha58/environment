@@ -1,19 +1,18 @@
 package com.vw.ide.client.devboardext;
 
-import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.box.PromptMessageBox;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
 import com.vw.ide.client.FlowController;
-import com.vw.ide.client.devboardext.service.browser.callbacks.AnyDirOperationResultCallback;
-import com.vw.ide.client.devboardext.service.browser.callbacks.AnyFileOperationResultCallback;
-import com.vw.ide.client.devboardext.service.browser.callbacks.ProjectDeletionResultCallback;
+import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectAddFileResultCallback;
+import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectDeletionResultCallback;
+import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRemoveFileResultCallback;
+import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRenameFileResultCallback;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
-import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
-import com.vw.ide.client.ui.toppanel.FileSheet;
-import com.vw.ide.client.utils.Utils;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
  * Set of dialog handlers
@@ -21,6 +20,7 @@ import com.vw.ide.client.utils.Utils;
  *
  */
 public class DevelopmentBoardDialogHandlers {
+	
 	public static class DeletedProjectDialogHideHandler implements DialogHideHandler {
 
 		private DevelopmentBoardPresenter owner;
@@ -34,12 +34,9 @@ public class DevelopmentBoardDialogHandlers {
 			String s = event.getHideButton().name();
 
 			if (s.equalsIgnoreCase("YES")) {
-				owner.getProjectManager().removeProject(owner.getSelectedProjectInTheProjectTree());
-				ProjectManagerServiceBroker.requestForDeletingProject(FlowController.getLoggedAsUser(),
-										  owner.getSelectedItemInTheProjectTree().getAbsolutePath(),
-										  owner.getSelectedItemInTheProjectTree().getProjectId(),
+				ProjectManagerServiceBroker.requestForDeletingProject(
+										  owner.getSelectedItemInTheProjectTree().getProjectDescription(),
 										  new ProjectDeletionResultCallback(owner));
-
 			}
 		}
 	};
@@ -56,13 +53,9 @@ public class DevelopmentBoardDialogHandlers {
 			String s = event.getHideButton().name();
 
 			if (s.equalsIgnoreCase("YES") && owner.getSelectedItemInTheProjectTree() != null) {
-				owner.getProjectManager().removeFile(owner.getSelectedItemInTheProjectTree().getFileId());
-				Widget widget2delete = owner.getProjectManager().getAssociatedTabWidget(owner.getSelectedItemInTheProjectTree().getFileId());
-				owner.getView().removeWidget(widget2delete);
-				DirBrowserServiceBroker.requestForFileDeleting(FlowController.getLoggedAsUser(),
-																  owner.getSelectedItemInTheProjectTree().getAbsolutePath(),
-																  owner.getSelectedItemInTheProjectTree().getFileId(),
-																  new AnyFileOperationResultCallback(owner, true));
+				ProjectManagerServiceBroker.requestForRemovingFileFromProject(owner.getSelectedItemInTheProjectTree().getProjectDescription(),
+																			  owner.getSelectedItemInTheProjectTree().getAssociatedData(),
+																			  new ProjectRemoveFileResultCallback(owner));
 			}
 		}
 	}
@@ -80,16 +73,19 @@ public class DevelopmentBoardDialogHandlers {
 		public void onDialogHide(DialogHideEvent event) {
 			if (box.getValue() != null) {
 				if (owner.isValidFileName(box.getValue())) {
-					DirBrowserServiceBroker.requestForFileCreating(
-											FlowController.getLoggedAsUser(),
-											Utils.extractJustPath(owner.getSelectedItemInTheProjectTree().getAbsolutePath()),
-											box.getValue(),
-											owner.getSelectedItemInTheProjectTree().getProjectId(),
-											1000L,
-											"",
-											new AnyDirOperationResultCallback(owner));
+					createFileAndAddToProject(box.getValue());
 				}
 			}
+		}
+		
+		private void createFileAndAddToProject(String fileName) {
+			ProjectItemInfo projectItemInfo = owner.getSelectedItemInTheProjectTree();
+			String path = deducePathByProjectItem(projectItemInfo);
+			FileItemInfo fileInfo = new FileItemInfo(fileName, path, false);
+			ProjectManagerServiceBroker.requestForAddingFileToProject(FlowController.getLoggedAsUser(),
+					projectItemInfo.getProjectDescription(),
+					fileInfo,
+					new ProjectAddFileResultCallback(owner));
 		}
 	}
 
@@ -106,14 +102,20 @@ public class DevelopmentBoardDialogHandlers {
 		public void onDialogHide(DialogHideEvent event) {
 			if (box.getValue() != null) {
 				if (owner.isValidFileName(box.getValue())) {
-					DirBrowserServiceBroker.requestForFolderCreating(
-											FlowController.getLoggedAsUser(),
-											Utils.extractJustPath(owner.getSelectedItemInTheProjectTree().getAbsolutePath()),
-											box.getValue(),
-											new AnyDirOperationResultCallback(owner));
+					createFolderAndAddToProject(box.getValue());
 				}
 			}
 		}
+		
+		private void createFolderAndAddToProject(String fileName) {
+			ProjectItemInfo projectItemInfo = owner.getSelectedItemInTheProjectTree();
+			String path = deducePathByProjectItem(projectItemInfo);
+			FileItemInfo fileInfo = new FileItemInfo(fileName, path, true);
+			ProjectManagerServiceBroker.requestForAddingFileToProject(FlowController.getLoggedAsUser(),
+					projectItemInfo.getProjectDescription(),
+					fileInfo,
+					new ProjectAddFileResultCallback(owner));
+		}		
 	}
 
 	public static class ImportFileDialogHideHandler implements DialogHideHandler {
@@ -128,84 +130,91 @@ public class DevelopmentBoardDialogHandlers {
 		@Override
 		public void onDialogHide(DialogHideEvent event) {
 			if (box.getLoadedFiles() > 0) {
-				DirBrowserServiceBroker.requestForFileCreating(
-						FlowController.getLoggedAsUser(),
-						box.getParentPath(),
-						box.getFileName(0),
-						box.getProjectId(),
-						0L,
-						box.getContent(0),
-						new AnyDirOperationResultCallback(owner));
+				importFileAndAddToProject(box.getFileName(0), box.getContent(0));
 			}
 		}
+	
+		private void importFileAndAddToProject(String fileName, String content) {
+			ProjectItemInfo projectItemInfo = owner.getSelectedItemInTheProjectTree();
+			String path = deducePathByProjectItem(projectItemInfo);
+			FileItemInfo fileInfo = new FileItemInfo(fileName, path, false);
+			fileInfo.setContent(content);
+			ProjectManagerServiceBroker.requestForAddingFileToProject(FlowController.getLoggedAsUser(),
+					projectItemInfo.getProjectDescription(),
+					fileInfo,
+					new ProjectAddFileResultCallback(owner));
+		}		
 	}
 
 	public static class RenameFileDialogHideHandler implements DialogHideHandler {
 
 		private static class SaveFileDialogHideHandler implements DialogHideHandler {
-			private ConfirmMessageBox box;
 			private DevelopmentBoardPresenter owner;
 			private String fullNewFileName;
+			private String content;
 			
-			protected SaveFileDialogHideHandler(ConfirmMessageBox box, DevelopmentBoardPresenter owner, String fullNewFileName) {
+			protected SaveFileDialogHideHandler(DevelopmentBoardPresenter owner, String fullNewFileName, String content) {
 				this.owner = owner;
-				this.box = box;
+				this.content = content;
 				this.fullNewFileName = fullNewFileName;
 			}
 			
 			@Override
 			public void onDialogHide(DialogHideEvent event) {
 				if (event.getHideButton().name().equalsIgnoreCase("YES")) {
-					DirBrowserServiceBroker.requestForFileSaving(FlowController.getLoggedAsUser(),
-							(String) box.getData("fullFileName"),
-							(Long) box.getData("projectId"),
-							(Long) box.getData("fileId"),
-							(String) box.getData("content"),
-							new AnyFileOperationResultCallback(owner, true));
-					DirBrowserServiceBroker.requestForFileRenaming(FlowController.getLoggedAsUser(),
-							owner.getSelectedItemInTheProjectTree().getAbsolutePath(),
-							owner.getSelectedItemInTheProjectTree().getFileId(),
-							fullNewFileName,
-							new AnyFileOperationResultCallback(owner, false));
+					RenameFileDialogHideHandler.renameFile(owner, fullNewFileName, content);
 				}
 			}
 		}
 
 		private PromptMessageBox box;
 		private DevelopmentBoardPresenter owner;
+		private ProjectItemInfo projectItemInfo;
 		
-		public RenameFileDialogHideHandler(PromptMessageBox box, DevelopmentBoardPresenter owner) {
+		public RenameFileDialogHideHandler(PromptMessageBox box, DevelopmentBoardPresenter owner, ProjectItemInfo projectItemInfo) {
 			this.owner = owner;
 			this.box = box;
+			this.projectItemInfo = projectItemInfo;
 		}
 		
 		@Override
 		public void onDialogHide(DialogHideEvent event) {
 			if (event.getHideButton().name().equalsIgnoreCase("ok")) {
 				if (box.getValue() != null && owner.getSelectedItemInTheProjectTree() != null) {
-					String justFilePath = Utils.extractJustPath(owner.getSelectedItemInTheProjectTree().getAbsolutePath());
-					String fullNewFileName = justFilePath + "/" + box.getValue();
-					Long fileId = owner.getSelectedItemInTheProjectTree().getFileId();
-					FileSheet currFileSheet = (FileSheet)owner.getProjectManager().getAssociatedTabWidget(fileId);
-					if (currFileSheet.getIsFileEdited()) {
+					String newFileName = box.getValue();
+					if (projectItemInfo.isEdited()) {
 						final ConfirmMessageBox saveConfirmBox = new ConfirmMessageBox("Confirm", "Save changes ?");
-						saveConfirmBox.addDialogHideHandler(new RenameFileDialogHideHandler.SaveFileDialogHideHandler(saveConfirmBox, owner, fullNewFileName));
-						saveConfirmBox.setData("fullFileName", owner.getSelectedItemInTheProjectTree().getAbsolutePath());
-						saveConfirmBox.setData("fullNewFileName", fullNewFileName);
-						saveConfirmBox.setData("projectId", owner.getSelectedItemInTheProjectTree().getProjectId());
-						saveConfirmBox.setData("fileId", fileId);
-						saveConfirmBox.setData("content", currFileSheet.getAceEditor().getText());
+						saveConfirmBox.addDialogHideHandler(new RenameFileDialogHideHandler.SaveFileDialogHideHandler(owner, newFileName, projectItemInfo.getFileSheet().getAceEditor().getText()));
 						saveConfirmBox.show();
 					}
 					else {
-						DirBrowserServiceBroker.requestForFileRenaming(FlowController.getLoggedAsUser(),
-								owner.getSelectedItemInTheProjectTree().getAbsolutePath(),
-								owner.getSelectedItemInTheProjectTree().getFileId(),
-								fullNewFileName,
-								new AnyFileOperationResultCallback(owner, false));
+						renameFile(owner, newFileName, null);
 					}
 				}	
 			}
 		}
+		
+		private static void renameFile(DevelopmentBoardPresenter owner, String newFileName, String content) {
+			ProjectItemInfo projectItemInfo = owner.getSelectedItemInTheProjectTree();
+			String path = deducePathByProjectItem(projectItemInfo);
+			FileItemInfo newFileInfo = new FileItemInfo(newFileName, path, false);
+			newFileInfo.setContent(content);
+			ProjectManagerServiceBroker.requestForRenamingFileOnProject(
+							projectItemInfo.getProjectDescription(),
+							projectItemInfo.getAssociatedData(),
+							newFileInfo,
+							new ProjectRenameFileResultCallback(owner));
+		}
+	}
+	
+	protected static String deducePathByProjectItem(ProjectItemInfo projectItemInfo) {
+		String path = null;
+		if (projectItemInfo.isMarkAsProject()) {
+			path = projectItemInfo.getProjectDescription().getProjectPath() + "/" + projectItemInfo.getProjectDescription().getMainModuleName();
+		}
+		else {
+			path = projectItemInfo.getAssociatedData().getAbsolutePath();
+		}
+		return path;
 	}
 }

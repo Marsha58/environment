@@ -3,6 +3,8 @@ package com.vw.ide.shared.servlet.remotebrowser;
 import java.io.Serializable;
 import java.util.List;
 
+import com.vw.ide.shared.servlet.RequestResult;
+
 @SuppressWarnings("serial")
 public class RequestedDirScanResult extends RequestResult implements Serializable {
 	private String parentPath;

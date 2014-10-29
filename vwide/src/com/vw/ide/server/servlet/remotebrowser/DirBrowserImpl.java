@@ -19,6 +19,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.client.utils.Utils;
@@ -26,11 +27,12 @@ import com.vw.ide.server.servlet.IService;
 import com.vw.ide.server.servlet.locator.ServiceLocator;
 import com.vw.ide.server.servlet.userstate.UserStateServiceImpl;
 import com.vw.ide.shared.OperationTypes;
+import com.vw.ide.shared.servlet.RequestResult;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RemoteDirectoryBrowser;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
-import com.vw.ide.shared.servlet.remotebrowser.RequestResult;
+import com.vw.ide.shared.servlet.remotebrowser.RequestSerializationOperationResult;
 import com.vw.ide.shared.servlet.remotebrowser.RequestedDirScanResult;
 import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
@@ -106,7 +108,7 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 			if (logger.isDebugEnabled()) {
 				logger.debug("Asking for dirs list for user '" + user + "'; dir '" + dir + "'; full path '" + path + "'");
 			}
-			r.setFiles(getListOfFileItems(path));
+			r.setFiles(getListOfFileItems(path, null));
 		}
 		else {
 			r.setFiles(new ArrayList<FileItemInfo>());
@@ -155,68 +157,6 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		return res;
 	}
 	
-	private List<FileItemInfo> getListOfFileItems(String dir) {
-		List<FileItemInfo> filesInfo = new ArrayList<FileItemInfo>();
-		File directory = new File(dir);
-	    // get all the files from a directory
-	    File[] fList = directory.listFiles();
-	    if (fList != null) {
-		    for (File file : fList) {
-		    	FileItemInfo fi = new FileItemInfo();
-		    	fi.setName(file.getName());
-		    	fi.setAbsolutePath(file.getAbsolutePath());
-		        fi.setDir(true);
-		    	if (file.isFile()) {
-		        	fi.setDir(false);
-		        }
-		    	filesInfo.add(fi);
-		    }
-	    }
-	    return filesInfo;
-	}
-
-	private void loadProperties(ServletContext context) {
-		Properties prop = new Properties();
-		try {
-		    //load a properties file from class path, inside static method
-			InputStream isPropertiesFile = context.getResourceAsStream("/WEB-INF/classes/config.properties");
-			if(isPropertiesFile != null) {
-				prop.load(isPropertiesFile);
-				if (prop.getProperty("root_dir") != null) {
-					s_defRootDir = prop.getProperty("root_dir");
-				}
-			}
-		} 
-		catch (IOException ex) {
-		    ex.printStackTrace();
-		}		
-	}
-	
-	private void purgeDirectory(File dir) {
-	    for (File file: dir.listFiles()) {
-	        if (file.isDirectory()) purgeDirectory(file);
-	        file.delete();
-	    }
-	    dir.delete();
-	}
-	
-	private String openFile(String fileName) throws IOException {
-	    BufferedReader br = new BufferedReader(new FileReader(fileName));
-	    try {
-	        StringBuilder sb = new StringBuilder();
-	        String line = br.readLine();
-
-	        while (line != null) {
-	            sb.append(line);
-	            sb.append("\n");
-	            line = br.readLine();
-	        }
-	        return sb.toString();
-	    } finally {
-	        br.close();
-	    }
-	}
-
 	public void deleteFolder(File folder) {
 	    File[] files = folder.listFiles();
 	    if(files!=null) { //some JVMs return null for empty dirs
@@ -234,7 +174,7 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 	public RequestDirOperationResult createFile(String user, String path, String fileName, String content) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
 		res.setOperation("file creating");
-		res.setRetCode(0);
+		res.setRetCode(RequestDirOperationResult.GENERAL_OK);
 		String sFullPath = path + "/" + fileName; 
 		try {
 			
@@ -257,11 +197,41 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		}
 		catch(Exception ex) {
 			res.setResult(ex.getMessage());
-			res.setRetCode(-1);
+			res.setRetCode(RequestDirOperationResult.GENERAL_FAIL);
 		}		
 		return res;
 	}
+
+	public RequestSerializationOperationResult serializeObjectToJson(String user, String fileName, String path, Object content) {
+		RequestSerializationOperationResult res = new RequestSerializationOperationResult();
+		res.setOperation("file serialization json");
+		res.setRetCode(RequestSerializationOperationResult.GENERAL_OK);
+		String fullPath = path + "/" + fileName;
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			mapper.writeValue(new File(fullPath), content);
+		} catch (IOException ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(RequestSerializationOperationResult.GENERAL_FAIL);
+		}
+		return res;
+	}
 	
+	public RequestSerializationOperationResult deserializeObjectFromJson(String user, String fileName, String path, Class<?> desirialization) {
+		RequestSerializationOperationResult res = new RequestSerializationOperationResult();
+		res.setOperation("file serialization json");
+		res.setRetCode(RequestSerializationOperationResult.GENERAL_OK);
+		String fullPath = (fileName != null) ? path + "/" + fileName : path;
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			res.setSerializiedObject(mapper.readValue(new File(fullPath), desirialization));
+		} catch (IOException ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(RequestSerializationOperationResult.GENERAL_FAIL);
+		}
+		return res;
+	}
+
 	@Override
 	public RequestDirOperationResult addFile(String user, String parent, String fileName, Long projectId, Long fileId, String content) {
 		RequestDirOperationResult res = createFile(user, parent, fileName, content);
@@ -301,12 +271,6 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		FileItemInfo fileItemInfo = new FileItemInfo(Utils.extractJustFileName(fileName),Utils.extractJustPath(fileName),false);
 		fileItemInfo.setFileId(fileId);
 		fileItemInfo.setProjectId(projectId);
-		
-		userStateInfo.addFile2OpenedFiles(fileId, fileItemInfo);
-		userStateInfo.setProjectIdSelected(projectId);
-		userStateInfo.setFileIdSelected(fileId);
-		locateUserStateService().updateUserStateInfo(user,userStateInfo);
-		
 		res.setProjectId(projectId);
 		res.setFileId(fileId);
 		res.setOperation("reading file");
@@ -357,16 +321,6 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 			userNotFoundReport(res, user, "close_file");
 			return res;
 		}
-		FileItemInfo value = null;
-		for(Object key :  userStateInfo.getOpenedFiles().keySet()) {
-			value = userStateInfo.getOpenedFiles().get(key);
-			String sFullName = value.getAbsolutePath() + "/" + value.getName();  
-			if (sFullName.equalsIgnoreCase(fileName)) {
-				userStateInfo.getOpenedFiles().remove(key);
-				break;
-			}
-		}			
-		locateUserStateService().updateUserStateInfo(user, userStateInfo);
 		res.setFileId(fileId);
 		res.setOperation("closing file");
 		res.setFileName(fileName);
@@ -390,10 +344,6 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 	    File newFile = new File(fileNewName);
 	    if(!newFile.exists()) {
 	    	if (oldFile.renameTo(newFile)) {
-				if (userStateInfo.getOpenedFiles().get(fileId) != null) {
-					userStateInfo.getOpenedFiles().get(fileId).setAbsolutePath(fileNewName);
-					userStateInfo.getOpenedFiles().get(fileId).setName(Utils.extractJustFileName(fileNewName));
-				}
 				res.setResult("File has been renamed");
 				res.setRetCode(0);
 	    	} else {
@@ -415,5 +365,75 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		res.setOperation(operation);
 		res.setResult("user '" + user + "' not found or wasn't registered");
 		res.setRetCode(-2);
+	}
+	
+	private List<FileItemInfo> getListOfFileItems(String dir, List<FileItemInfo> filesInfo) {
+		if (filesInfo == null) {
+			filesInfo = new ArrayList<FileItemInfo>();
+		}
+		File directory = new File(dir);
+	    // get all the files from a directory
+	    File[] fList = directory.listFiles();
+	    if (fList != null) {
+		    for (File file : fList) {
+		    	FileItemInfo fi = new FileItemInfo();
+		    	fi.setName(file.getName());
+		    	fi.setAbsolutePath(file.getAbsolutePath());
+		        fi.setDir(true);
+		    	if (file.isFile()) {
+		        	fi.setDir(false);
+		        }
+		    	else {
+		    		filesInfo = getListOfFileItems(file.getAbsolutePath(), filesInfo);
+		    	}
+		    	if (logger.isDebugEnabled()) {
+		    		logger.debug("Scanned " + fi.getAbsolutePath());
+		    	}
+		    	filesInfo.add(fi);
+		    }
+	    }
+	    return filesInfo;
+	}
+
+	private void loadProperties(ServletContext context) {
+		Properties prop = new Properties();
+		try {
+		    //load a properties file from class path, inside static method
+			InputStream isPropertiesFile = context.getResourceAsStream("/WEB-INF/classes/config.properties");
+			if(isPropertiesFile != null) {
+				prop.load(isPropertiesFile);
+				if (prop.getProperty("root_dir") != null) {
+					s_defRootDir = prop.getProperty("root_dir");
+				}
+			}
+		} 
+		catch (IOException ex) {
+		    ex.printStackTrace();
+		}		
+	}
+	
+	private void purgeDirectory(File dir) {
+	    for (File file: dir.listFiles()) {
+	        if (file.isDirectory()) purgeDirectory(file);
+	        file.delete();
+	    }
+	    dir.delete();
+	}
+	
+	private String openFile(String fileName) throws IOException {
+	    BufferedReader br = new BufferedReader(new FileReader(fileName));
+	    try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } finally {
+	        br.close();
+	    }
 	}
 }

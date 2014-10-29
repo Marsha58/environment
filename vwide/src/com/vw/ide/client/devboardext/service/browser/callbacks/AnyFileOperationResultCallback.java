@@ -3,20 +3,17 @@ package com.vw.ide.client.devboardext.service.browser.callbacks;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
-import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.client.ui.toppanel.FileSheet;
-import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
 
 public class AnyFileOperationResultCallback extends ResultCallback<RequestFileOperationResult> {
 
 	private DevelopmentBoardPresenter owner = null;
-	private boolean requestForUpdateDirContent = true;
+	private HandlerOnFileOpertaion handler = null;
 
-	public AnyFileOperationResultCallback(DevelopmentBoardPresenter owner, boolean requestForUpdateDirContent) {
+	public AnyFileOperationResultCallback(DevelopmentBoardPresenter owner, HandlerOnFileOpertaion handler) {
 		this.owner = owner;
-		this.requestForUpdateDirContent = requestForUpdateDirContent;
+		this.handler = handler;
 	}
 	
 	@Override
@@ -29,25 +26,10 @@ public class AnyFileOperationResultCallback extends ResultCallback<RequestFileOp
 			alertMessageBox.show();
 		}
 		else {
-			if (result.getOperationType() == OperationTypes.RENAME_FILE) {
-				updateFileName(owner, result.getFileId(),result.getFileName(),result.getFileNewName()); 
+			if (handler != null) {
+				handler.handle(result);
 			}
-			else
-			if (result.getOperationType() == OperationTypes.SAVE_FILE) {
-				FileSheet savedFileSheet = (FileSheet)owner.getProjectManager().getAssociatedTabWidget(result.getFileId());
-				savedFileSheet.setIsFileEdited(false);
-			}
-		}
-		if (requestForUpdateDirContent) {
-			owner.getView().getProjectPanel().requestDirContent(null);
 		}
 		owner.fireEvent(new ServerLogEvent(result));
-	}
-	
-	private void updateFileName(DevelopmentBoardPresenter presenter, Long fileId, String oldFileName, String newFileName) {
-		ProjectManager projectManager = presenter.getProjectManager();
-		projectManager.changeFileName(fileId, newFileName);
-		FileSheet updatedFileSheet = (FileSheet) projectManager.getAssociatedTabWidget(fileId);
-		presenter.getView().updateEditorFileSheetName(updatedFileSheet, newFileName);
 	}
 }

@@ -2,7 +2,7 @@ package com.vw.ide.client.event.uiflow;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.vw.ide.client.event.handler.SelectFileHandler;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 
 /**
  * Fired when user pressed 'SelectFile'
@@ -11,7 +11,7 @@ import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
  */
 public class SelectFileEvent extends GwtEvent<SelectFileHandler> {
 
-	private FileItemInfo fileItemInfo;
+	private ProjectItemInfo fileItemInfo;
 	
 	public static Type<SelectFileHandler> TYPE = new Type<SelectFileHandler>();
 	
@@ -19,7 +19,7 @@ public class SelectFileEvent extends GwtEvent<SelectFileHandler> {
 		super();
 	}
 
-	public SelectFileEvent(FileItemInfo fileItemInfo) {
+	public SelectFileEvent(ProjectItemInfo fileItemInfo) {
 		super();
 		this.fileItemInfo = fileItemInfo;
 	}
@@ -29,11 +29,11 @@ public class SelectFileEvent extends GwtEvent<SelectFileHandler> {
 		return TYPE;
 	}
 
-	public FileItemInfo getFileItemInfo() {
+	public ProjectItemInfo getFileItemInfo() {
 		return fileItemInfo;
 	}
 
-	public void setFileItemInfo(FileItemInfo fileItemInfo) {
+	public void setFileItemInfo(ProjectItemInfo fileItemInfo) {
 		this.fileItemInfo = fileItemInfo;
 	}
 

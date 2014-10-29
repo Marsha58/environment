@@ -16,7 +16,8 @@ import com.vw.ide.client.devboardext.event.handler.ProjectMenuEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SaveFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SelectFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ServerLogEventHandler;
-import com.vw.ide.client.devboardext.service.browser.callbacks.GettingUserStateResultCallback;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.GettingUserStateResultCallback;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateHandler;
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
 import com.vw.ide.client.event.handler.FileEditedHandler;
@@ -37,11 +38,10 @@ import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
-import com.vw.ide.client.projects.ProjectManager;
-import com.vw.ide.client.projects.ProjectManagerImpl;
 import com.vw.ide.client.service.remote.userstate.RemoteUserStateServiceBroker;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.ui.toppanel.TopPanel;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
 /**
  * Development board screen
@@ -51,11 +51,23 @@ import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
  */
 public class DevelopmentBoardPresenter extends Presenter {
 
+	private static class RestoreUserDevelopmentEnvironment implements UserStateHandler {
+
+		private DevelopmentBoardPresenter owner;
+		
+		public RestoreUserDevelopmentEnvironment(DevelopmentBoardPresenter owner) {
+			this.owner = owner;
+		}
+		
+		@Override
+		public void handle(UserStateInfo userState) {
+			owner.getView().restoreView(userState);
+		}
+	}
+	
 	public final HandlerManager eventBus;
 	private final PresenterViewerLink view;
-	private ProjectManager projectManager;
-	private FileItemInfo selectedItemInTheProjectTree;
-	private Long selectedProjectInTheProjectTree;
+	private ProjectItemInfo selectedItemInTheProjectTree;
 	
 	@SuppressWarnings("serial")
 	private static Map<Type<?>, Presenter.PresenterEventHandler> dispatcher = new HashMap<Type<?>, Presenter.PresenterEventHandler>() {
@@ -78,14 +90,13 @@ public class DevelopmentBoardPresenter extends Presenter {
 		if (view != null) {
 			view.associatePresenter(this);
 		}
-		projectManager = new ProjectManagerImpl();
-		((DevelopmentBoard)view).setProjectManager(projectManager);
 	}
 
 	public void go(HasWidgets container) {
 		container.clear();
 		container.add(view.asWidget());
-		RemoteUserStateServiceBroker.requestForGettingUserState(getLoggedAsUser(), new GettingUserStateResultCallback(this));
+		RemoteUserStateServiceBroker.requestForGettingUserState(getLoggedAsUser(),
+																new GettingUserStateResultCallback(this, new RestoreUserDevelopmentEnvironment(this)));
 	}
 
 	@Override
@@ -138,10 +149,6 @@ public class DevelopmentBoardPresenter extends Presenter {
 		return (DevelopmentBoard)view;
 	}
 
-	public ProjectManager getProjectManager() {
-		return projectManager;
-	}
-	
 	public static String calculateCheckSum(String md5) {
 		try {
 			java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
@@ -156,20 +163,12 @@ public class DevelopmentBoardPresenter extends Presenter {
 		return null;
 	}
 
-	public FileItemInfo getSelectedItemInTheProjectTree() {
+	public ProjectItemInfo getSelectedItemInTheProjectTree() {
 		return selectedItemInTheProjectTree;
 	}
 
-	public Long getSelectedProjectInTheProjectTree() {
-		return selectedProjectInTheProjectTree;
-	}
-
-	public void setSelectedItemInTheProjectTree(FileItemInfo selectedItemInTheProjectTree) {
+	public void setSelectedItemInTheProjectTree(ProjectItemInfo selectedItemInTheProjectTree) {
 		this.selectedItemInTheProjectTree = selectedItemInTheProjectTree;
-	}
-
-	public void setSelectedProjectInTheProjectTree(Long selectedProjectInTheProjectTree) {
-		this.selectedProjectInTheProjectTree = selectedProjectInTheProjectTree;
 	}
 
 	protected boolean isValidFileName(String fileName) {

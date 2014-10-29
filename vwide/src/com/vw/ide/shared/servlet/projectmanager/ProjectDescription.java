@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vw.ide.shared.servlet.projectmanager.specific.CompilerSwitchesDescription;
+import com.vw.ide.shared.servlet.projectmanager.specific.InterpreterDescription;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
@@ -13,6 +15,7 @@ import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
  */
 @SuppressWarnings("serial")
 public class ProjectDescription implements Serializable {
+	private Integer id;
 	private String userName;
 	private String projectName;
 	private String projectPath;
@@ -23,6 +26,8 @@ public class ProjectDescription implements Serializable {
 	private String mainModuleName;
 	private InterpreterDescription interpreterDescription = new InterpreterDescription();
 	private CompilerSwitchesDescription compilerSwitches = new CompilerSwitchesDescription();
+	private FileItemInfo mainProjectFile = new FileItemInfo();
+	private FileItemInfo projectDescriptionFile = new FileItemInfo();
 	private List<FileItemInfo> projectFiles = new ArrayList<FileItemInfo>();
 	
 	public ProjectDescription() {
@@ -120,6 +125,38 @@ public class ProjectDescription implements Serializable {
 
 	public void setMainModuleName(String mainModuleName) {
 		this.mainModuleName = mainModuleName;
+	}
+
+	public List<FileItemInfo> getProjectFiles() {
+		return projectFiles;
+	}
+
+	public void setProjectFiles(List<FileItemInfo> projectFiles) {
+		this.projectFiles = projectFiles;
+	}
+
+	public FileItemInfo getProjectDescriptionFile() {
+		return projectDescriptionFile;
+	}
+
+	public void setProjectDescriptionFile(FileItemInfo projectDescriptionFile) {
+		this.projectDescriptionFile = projectDescriptionFile;
+	}
+
+	public FileItemInfo getMainProjectFile() {
+		return mainProjectFile;
+	}
+
+	public void setMainProjectFile(FileItemInfo mainProjectFile) {
+		this.mainProjectFile = mainProjectFile;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	@Override

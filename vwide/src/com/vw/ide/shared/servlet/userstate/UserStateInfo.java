@@ -1,48 +1,52 @@
 package com.vw.ide.shared.servlet.userstate;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
+import com.google.gwt.dev.util.collect.HashSet;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 @SuppressWarnings("serial")
 public class UserStateInfo implements Serializable {
-	private Long projectIdSelected;
-	private Long fileIdSelected;
-	private Map<Long, FileItemInfo> openedFiles; 
+	private ProjectDescription projectIdSelected;
+	private FileItemInfo fileIdSelected;
+	private Set<FileItemInfo> openedFiles = new HashSet<FileItemInfo>(); 
 	
 	public UserStateInfo() {
 		super();
-		openedFiles = new HashMap <Long, FileItemInfo>();
 	}
 
-	public Long getProjectIdSelected() {
+	public ProjectDescription getProjectIdSelected() {
 		return projectIdSelected;
 	}
 
-	public void setProjectIdSelected(Long projectIdSelected) {
+	public void setProjectIdSelected(ProjectDescription projectIdSelected) {
 		this.projectIdSelected = projectIdSelected;
 	}
 
-	public Long getFileIdSelected() {
+	public FileItemInfo getFileIdSelected() {
 		return fileIdSelected;
 	}
 
-	public void setFileIdSelected(Long fileIdSelected) {
+	public void setFileIdSelected(FileItemInfo fileIdSelected) {
 		this.fileIdSelected = fileIdSelected;
 	}
 
-	public Map<Long, FileItemInfo> getOpenedFiles() {
+	public Set<FileItemInfo> getOpenedFiles() {
 		return openedFiles;
 	}
 
-	public void setOpenedFiles(Map<Long, FileItemInfo> openedFiles) {
-		this.openedFiles = openedFiles;
+	public void addFileToOpenedFiles(FileItemInfo openedFile) {
+		openedFiles.add(openedFile);
 	}
-
-	public void addFile2OpenedFiles(Long fileId, FileItemInfo openedFile) {
-		openedFiles.put(fileId, openedFile);
+	
+	public void removeFileFromOpenedFiles(FileItemInfo openedFile) {
+		openedFiles.remove(openedFile);
+	}
+	
+	public boolean hasFileAlreadyOpened(FileItemInfo openedFile) {
+		return openedFiles.contains(openedFile);
 	}
 
 	@Override

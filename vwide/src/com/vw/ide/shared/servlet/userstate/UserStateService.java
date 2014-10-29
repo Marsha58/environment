@@ -31,7 +31,7 @@ public interface UserStateService extends RemoteService {
 	 * @param state
 	 * @return
 	 */
-	public RequestUserStateResult updateUserState(String user, UserStateInfo state);
+	public RequestUpdateUserStateResult updateUserState(String user, UserStateInfo state);
 	
 	/**
 	 * Removes user state

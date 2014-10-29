@@ -80,11 +80,11 @@ public class VwmlJavaSettingsTab extends VwmlProjTab {
 		return owner;
 	}
 
-	private void setupTargetLangSourcePath() {
+	public void setupTargetLangSourcePath() {
 		owner.getTfJavaSourcePath().setText(owner.getProjectDescription().getJavaSrcPath());
 	}
 	
-	private void setupJavaPackage() {
+	public void setupJavaPackage() {
 		owner.getTfJavaPackageName().setText(owner.getProjectDescription().getPackageName());
 	}
 }

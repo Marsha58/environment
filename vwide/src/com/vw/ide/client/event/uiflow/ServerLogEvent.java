@@ -2,7 +2,7 @@ package com.vw.ide.client.event.uiflow;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.vw.ide.client.event.handler.ServerLogHandler;
-import com.vw.ide.shared.servlet.remotebrowser.RequestResult;
+import com.vw.ide.shared.servlet.RequestResult;
 
 /**
  * Fired when user pressed 'SelectFile'
