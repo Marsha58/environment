@@ -57,10 +57,12 @@ import com.vw.ide.client.dialog.about.AboutDialogExt;
 import com.vw.ide.client.dialog.newvwmlproj.NewVwmlProjectDialogExt;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
+import com.vw.ide.client.event.uiflow.OpenFringeManagerEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.sencha.gxt.widget.core.client.button.TextButton;
@@ -85,37 +87,24 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 	public ComboBox<AceEditorTheme> comboATh;
 
 	// @UiField MenuItem logoutField;
-	@UiField
-	MenuItem newVwmlProjField;
-	@UiField
-	TextButton bnNewVwmlProjField;
-	@UiField
-	TextButton bnSaveSelectedFile;
-	@UiField
-	MenuItem miHelpAboutField;
+	@UiField MenuItem newVwmlProjField;
+	@UiField TextButton bnNewVwmlProjField;
+	@UiField TextButton bnSaveSelectedFile;
+	@UiField MenuItem openFringeManager;
+	@UiField MenuItem miHelpAboutField;
 	// @UiField FlowPanel panelEditor;
-	@UiField
-	SimpleContainer comboAceEditorPlaceCont;
-	@UiField
-	SimpleContainer userNamePlaceCont;
-	@UiField
-	SimpleContainer comboPlaceCont;
+	@UiField SimpleContainer comboAceEditorPlaceCont;
+	@UiField SimpleContainer userNamePlaceCont;
+	@UiField SimpleContainer comboPlaceCont;
 	// @UiField SimpleContainer outer;
-	@UiField
-	Label userName;
-	@UiField
-	TextButton userLogout;
-	@UiField
-	Menu scrollMenu;
+	@UiField Label userName;
+	@UiField TextButton userLogout;
+	@UiField Menu scrollMenu;
 
-	@UiField(provided = true)
-	BorderLayoutData northDataTP = new BorderLayoutData(21);
-	@UiField(provided = true)
-	MarginData centerDataTP = new MarginData();
-	@UiField(provided = true)
-	BorderLayoutData eastDataTP = new BorderLayoutData(630);
-	@UiField
-	BorderLayoutContainer conTP;
+	@UiField (provided = true) BorderLayoutData northDataTP = new BorderLayoutData(21);
+	@UiField (provided = true) MarginData centerDataTP = new MarginData();
+	@UiField (provided = true) BorderLayoutData eastDataTP = new BorderLayoutData(630);
+	@UiField BorderLayoutContainer conTP;
 
 	public enum Theme {
 		BLUE("Blue Theme"), GRAY("Gray Theme"), NEPTUNE("Neptune Theme");
@@ -274,14 +263,17 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 		return this.presenter;
 	}
 
-	@UiHandler(value = { "miHelpAboutField", "newVwmlProjField" })
+	@UiHandler(value = { "miHelpAboutField", "newVwmlProjField", "openFringeManager" })
 	public void onMenuSelection(SelectionEvent<Item> event) {
 		MenuItem item = (MenuItem) event.getSelectedItem();
-		Info.display("Action", "You selected the " + item.getText());
-		if (item.getText().equalsIgnoreCase("about")) {
+		if (item.getItemId().equalsIgnoreCase("idHelpAbout")) {
 			executeHelpAbout();
-		} else {
+		} if (item.getItemId().equalsIgnoreCase("idNewVwmlProjField")) {
 			presenter.fireEvent(new ProjectMenuEvent("idNewProject"));
+		} if (item.getItemId().equalsIgnoreCase("idOpenFringeManager")) {
+			presenter.fireEvent(new OpenFringeManagerEvent("idOpenFringeManager"));
+		} else {
+			
 		}
 	}
 

@@ -67,7 +67,7 @@ public class FileSheet extends Composite {
 	private static class MyCompletionProvider implements AceCompletionProvider {
 		@Override		
 		public void getProposals(AceEditor editor, AceEditorCursorPosition pos, String prefix, AceCompletionCallback callback) {
-			GWT.log("sending completion proposals");
+//			GWT.log("sending completion proposals");
 			callback.invokeWithCompletions(new AceCompletion[]{
 					new AceCompletionValue("first", "firstcompletion", "custom", 10),
 					new AceCompletionValue("second", "secondcompletion", "custom", 11),
@@ -163,13 +163,14 @@ public class FileSheet extends Composite {
 		aceEditor.setWidth("100%");
 		aceEditor.setHeight("100%");
 		
-		try {
-			 AceEditor.addCompletionProvider(new MyCompletionProvider()); 
+
+//      this don't work		
+/*		try {
+			AceEditor.addCompletionProvider(new MyCompletionProvider()); 
 		} catch (Exception e) {
 			System.out.println(e.getLocalizedMessage());
 		}
-
-
+*/
 		// start the first editor and set its theme and mode
 		aceEditor.startEditor(); // must be called before calling
 								// setTheme/setMode/etc.
@@ -220,6 +221,7 @@ public class FileSheet extends Composite {
 			break;
 		}
 		
+	
 
 
 		aceEditor.addOnChangeHandler(new AceEditorCallback() {
@@ -240,6 +242,7 @@ public class FileSheet extends Composite {
 
 		MarginData layoutData = new MarginData(1,1,1,1);
 		fileContainer.add(aceEditor,layoutData);
+		
 	}
 	
 	public void setIsFileEdited(Boolean value) {

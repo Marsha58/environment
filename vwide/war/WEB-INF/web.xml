@@ -22,6 +22,15 @@
     <servlet-name>securityServlet</servlet-name> 
     <url-pattern>/vwide/security</url-pattern> 
   </servlet-mapping>
+  <servlet>
+    <servlet-name>fringesServiceServlet</servlet-name> 
+    <servlet-class>com.vw.ide.server.servlet.fringes.RemoteFringeServiceImpl</servlet-class> 
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>fringesServiceServlet</servlet-name> 
+    <url-pattern>/vwide/fringes</url-pattern> 
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Vwide.html</welcome-file>

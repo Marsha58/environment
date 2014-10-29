@@ -17,8 +17,6 @@ import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
-import com.vw.ide.client.ui.projectpanel.ProPanelContextMenu;
-import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 

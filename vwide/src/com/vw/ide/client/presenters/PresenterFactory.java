@@ -3,6 +3,7 @@ package com.vw.ide.client.presenters;
 import com.google.gwt.event.shared.HandlerManager;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.login.LoginGxtPresenter;
+import com.vw.ide.client.dialog.fringemanagment.FringeManagerPresenter;;
 
 /**
  * Instantiates available presenters
@@ -23,4 +24,8 @@ public class PresenterFactory {
 	public static Presenter buildDevBoardPresenter(HandlerManager eventBus, PresenterViewerLink view) {
 		return new DevelopmentBoardPresenter(eventBus, view);
 	}
+	
+	public static Presenter buildFringeManagerPresenter(HandlerManager eventBus, PresenterViewerLink view) {
+		return new FringeManagerPresenter(eventBus, view);
+	}	
 }

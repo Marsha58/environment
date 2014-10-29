@@ -63,7 +63,7 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 	// @UiField TextButton ok;
 	// @UiField TextButton cancel;
 
-	interface NewVwmlProjectDialogExtUiBinder extends
+	interface NewVwmlProjectDialogExtUiBinder extends 
 			UiBinder<Widget, NewVwmlProjectDialogExt> {
 	}
 
@@ -134,13 +134,13 @@ public class NewVwmlProjectDialogExt extends VwmlDialogExt {
 		return this.presenter;
 	}		
 	
-	public NewVwmlProjectDialogExt(String firstName) {
+/*	public NewVwmlProjectDialogExt(String firstName) {
 		super.setWidget(uiBinder.createAndBindUi(this));
 	}
 
 	public String getText() {
 		return null;
-	}
+	}*/
 
 	public void setText(String text) {
 	}

@@ -49,8 +49,6 @@ public class VwmlDialogExt extends Dialog{
 		this.toDisable = toDisable;
 		super.setHeadingText(caption);
 //		setGlassEnabled(true);
-		
-		
 		int iX = Integer.parseInt( this.width.substring(0, this.width.length()-2))/2; 
 		int iY = Integer.parseInt(this.height.substring(0, this.height.length()-2))/2; 
 	    Point p = getElement().getAlignToXY(Document.get().getBody(), new AnchorAlignment(Anchor.CENTER, Anchor.CENTER), -iX, -iY);

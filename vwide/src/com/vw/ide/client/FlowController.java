@@ -6,6 +6,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
+import com.vw.ide.client.dialog.fringemanagment.FringeManager;
 import com.vw.ide.client.login.LoginViewGxt;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterFactory;
@@ -23,7 +24,8 @@ public class FlowController implements ValueChangeHandler<String> {
 	
 	private static final String LOGIN_SCREEN = "loginGxt";
 	private static final String DEV_SCREEN = "dev";
-
+	private static final String FRINGE_MANAGER_SCREEN = "fringeManager";
+	
 	public FlowController(HandlerManager eventBus) {
 		this.eventBus = eventBus;
 		bind();
@@ -48,7 +50,9 @@ public class FlowController implements ValueChangeHandler<String> {
 				setLoggedAsUser(getUserNameFromDevBoardLoginString(token));
 			    presenter = PresenterFactory.buildDevBoardPresenter(eventBus, new DevelopmentBoard());
 			    presenter.setLoggedAsUser(getLoggedAsUser());
-			} 
+			} else 	if (token.startsWith(FRINGE_MANAGER_SCREEN)) {
+			    presenter = PresenterFactory.buildFringeManagerPresenter(eventBus, new FringeManager());
+			}
 			if (presenter != null) {
 				if (prevPresenter != null) {
 					prevPresenter.unregisterOnEventBus(eventBus);

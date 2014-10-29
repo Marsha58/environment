@@ -108,8 +108,7 @@
 					<menu:MenuBarItem text="Project">
 						<menu:menu>
 							<menu:Menu>
-								<menu:MenuItem text="New" icon="{images.new_wiz_en}"
-									ui:field="newVwmlProjField" />
+								<menu:MenuItem text="New" icon="{images.new_wiz_en}" ui:field="newVwmlProjField" itemId="idNewVwmlProjField"/>
 								<menu:MenuItem text="Open File" icon="{images.prj_obj}">
 									<menu:submenu>
 										<menu:Menu>
@@ -157,8 +156,8 @@
 					<menu:MenuBarItem text="Fringes">
 						<menu:menu>
 							<menu:Menu ui:field="fringesMenu">
-								<menu:MenuItem text="Install new" />
-								<menu:MenuItem text="Remove" />
+								<menu:MenuItem ui:field="openFringeManager" itemId="idOpenFringeManager" text="Open Fringe Manager" />
+								<menu:MenuItem text="Insert Fringe" />
 								<menu:MenuItem text="List of installed" />
 							</menu:Menu>
 						</menu:menu>
@@ -167,7 +166,7 @@
 						<menu:menu>
 							<menu:Menu>
 								<menu:MenuItem text="Reference" />
-								<menu:MenuItem text="About" ui:field="miHelpAboutField" />
+								<menu:MenuItem text="About" ui:field="miHelpAboutField" itemId="idHelpAbout" />
 							</menu:Menu>
 						</menu:menu>
 					</menu:MenuBarItem>
@@ -212,7 +211,8 @@
 
 					<button:TextButton text="Scrolling Menu">
 						<button:menu>
-							<menu:Menu ui:field="scrollMenu" maxHeight="500" minWidth="400"/>
+							<menu:Menu ui:field="scrollMenu" maxHeight="500"
+								minWidth="400" />
 						</button:menu>
 					</button:TextButton>
 
@@ -220,27 +220,19 @@
 					<!-- <container:HBoxLayoutContainer borders="false" hBoxLayoutAlign="MIDDLE" 
 						padding="{paddingComboboxes}"> -->
 
-<!-- 
-					<button:TextButton text="Options" icon="{images.menu_show}">
-						<button:menu>
-							<menu:Menu ui:field="menu1">
-								<menu:MenuItem text="m1" />
-								<menu:MenuItem text="m2">
-								</menu:MenuItem>
-							</menu:Menu>
-						</button:menu>
-					</button:TextButton>
- -->
+					<!-- <button:TextButton text="Options" icon="{images.menu_show}"> <button:menu> 
+						<menu:Menu ui:field="menu1"> <menu:MenuItem text="m1" /> <menu:MenuItem text="m2"> 
+						</menu:MenuItem> </menu:Menu> </button:menu> </button:TextButton> -->
 
 
 
 
 					<!-- </container:HBoxLayoutContainer> -->
-<!-- 					<toolbar:SeparatorToolItem />
- -->
+					<!-- <toolbar:SeparatorToolItem /> -->
 					<container:SimpleContainer ui:field="comboAceEditorPlaceCont">
 					</container:SimpleContainer>
-					<container:SimpleContainer ui:field="comboPlaceCont" visible="true">
+					<container:SimpleContainer ui:field="comboPlaceCont"
+						visible="true">
 					</container:SimpleContainer>
 
 

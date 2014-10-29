@@ -6,7 +6,7 @@ import com.vw.ide.client.event.uiflow.FileStateChangedEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
 

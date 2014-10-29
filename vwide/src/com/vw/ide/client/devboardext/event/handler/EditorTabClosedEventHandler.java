@@ -11,8 +11,8 @@ import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
-import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 
 public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler implements EditorTabClosedHandler {
 	@Override

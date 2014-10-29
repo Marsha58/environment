@@ -10,7 +10,7 @@ import com.vw.ide.client.devboardext.service.browser.callbacks.AnyDirOperationRe
 import com.vw.ide.client.devboardext.service.browser.callbacks.AnyFileOperationResultCallback;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 
 /**

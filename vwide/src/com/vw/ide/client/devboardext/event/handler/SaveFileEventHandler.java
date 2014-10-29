@@ -8,7 +8,7 @@ import com.vw.ide.client.event.handler.SaveFileHandler;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 
 public class SaveFileEventHandler extends Presenter.PresenterEventHandler implements SaveFileHandler {

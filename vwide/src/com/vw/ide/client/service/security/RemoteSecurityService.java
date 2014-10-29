@@ -10,7 +10,7 @@ import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;
 
 /**
- * Remote browser service for client side (implemented as singleton)
+ * Remote security service for client side (implemented as singleton)
  * @author OMelnyk
  *
  */

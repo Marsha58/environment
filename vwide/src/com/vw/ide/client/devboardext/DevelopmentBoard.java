@@ -32,7 +32,7 @@ import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.projects.ProjectManager;
 import com.vw.ide.client.ui.editorpanel.EditorPanel;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
 import com.vw.ide.client.ui.windowspanel.WindowsPanelView;
@@ -81,10 +81,10 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	private static DevelopmentBoardUiBinder uiBinder = GWT.create(DevelopmentBoardUiBinder.class);
 
 	private static String s_AboutCaption = "About";
-	
+
 	@UiField
 	SimpleContainer mainContainer = new SimpleContainer();
-	
+
 	@UiField(provided = true)
 	MarginData outerData = new MarginData(1);
 	@UiField(provided = true)
@@ -99,8 +99,9 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	BorderLayoutData southData = new BorderLayoutData(120);
 	@UiField
 	BorderLayoutContainer con;
-	
-	@UiField ContentPanel editorContentPanel;
+
+	@UiField
+	ContentPanel editorContentPanel;
 
 	@UiField
 	TopPanel topPanel;
@@ -115,24 +116,22 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 
 	interface DevelopmentBoardUiBinder extends UiBinder<SimpleContainer, DevelopmentBoard> {
 	}
-	
+
 	public DevelopmentBoard() {
-		ListStore<Theme> colors = new ListStore<Theme>(
-			new ModelKeyProvider<Theme>() {
-				@Override
-				public String getKey(Theme item) {
-					return item.name();
-				}
+		ListStore<Theme> colors = new ListStore<Theme>(new ModelKeyProvider<Theme>() {
+			@Override
+			public String getKey(Theme item) {
+				return item.name();
+			}
 		});
-		
+
 		colors.addAll(Arrays.asList(Theme.values()));
 
 		final SimpleContainer con = new SimpleContainer();
 		con.getElement().getStyle().setMargin(3, Unit.PX);
 		con.setResize(false);
 
-		ComboBox<Theme> combo = new ComboBox<Theme>(colors,
-				new StringLabelProvider<Theme>());
+		ComboBox<Theme> combo = new ComboBox<Theme>(colors, new StringLabelProvider<Theme>());
 		combo.setTriggerAction(TriggerAction.ALL);
 		combo.setForceSelection(true);
 		combo.setEditable(false);
@@ -144,18 +143,15 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 			public void onSelection(SelectionEvent<Theme> event) {
 				switch (event.getSelectedItem()) {
 				case BLUE:
-					Window.Location.assign(GWT.getHostPageBaseURL()
-							+ "Vwide.html" + Window.Location.getHash());
+					Window.Location.assign(GWT.getHostPageBaseURL() + "Vwide.html" + Window.Location.getHash());
 					northData.setSize(74);
 					break;
 				case GRAY:
-					Window.Location.assign(GWT.getHostPageBaseURL()
-							+ "Vwide-gray.html" + Window.Location.getHash());
+					Window.Location.assign(GWT.getHostPageBaseURL() + "Vwide-gray.html" + Window.Location.getHash());
 					northData.setSize(76);
 					break;
 				case NEPTUNE:
-					Window.Location.assign(GWT.getHostPageBaseURL()
-							+ "Vwide-neptune.html" + Window.Location.getHash());
+					Window.Location.assign(GWT.getHostPageBaseURL() + "Vwide-neptune.html" + Window.Location.getHash());
 					northData.setSize(94);
 					break;
 				default:
@@ -170,7 +166,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 			northData.setSize(76);
 		} else {
 			northData.setSize(94);
-		}		
+		}
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
@@ -218,56 +214,56 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	protected Presenter getAssociatedPresenter() {
 		return presenter;
 	}
-	
+
 	public void setProjectManager(ProjectManager projectManager) {
 		projectPanel.setProjectManager(projectManager);
 	}
-	
+
 	public FileSheet getActiveFileSheetWidget() {
-		return (FileSheet)editor.getTabPanel().getActiveWidget();
+		return (FileSheet) editor.getTabPanel().getActiveWidget();
 	}
-	
+
 	public void markFileAsEdited(Widget editedWidget, boolean isEdited) {
-		editor.setFileEditedState(editedWidget, isEdited);		
+		editor.setFileEditedState(editedWidget, isEdited);
 	}
-	
+
 	public void deleteFileItemId(Long fileId) {
-		topPanel.delItemFromScrollMenu(fileId);	
+		topPanel.delItemFromScrollMenu(fileId);
 	}
 
 	public void addNewFileTabItem(FileSheet newFileSheet, TabItemConfig tabItemConfig) {
 		editor.getTabPanel().add(newFileSheet, tabItemConfig);
 	}
-	
+
 	public void addFileItemToScrollMenu(String path, Long fileId) {
 		topPanel.addItemToScrollMenu(path, fileId);
 	}
-	
+
 	public void removeWidget(Widget widget2delete) {
-		editor.getTabPanel().remove(widget2delete);		
+		editor.getTabPanel().remove(widget2delete);
 	}
 
 	public void setTextForEditorContentPanel(String text) {
 		editorContentPanel.setHeadingText(text);
 	}
-	
+
 	public ProjectPanel getProjectPanel() {
 		return projectPanel;
 	}
-	
+
 	public EditorPanel getEditorPanel() {
 		return editor;
 	}
-	
+
 	public ContentPanel getEditorContentPanel() {
 		return editorContentPanel;
-	}		
-	
+	}
+
 	public void scrollToTab(FileSheet curFileSheet, boolean animate) {
 		editor.getTabPanel().setActiveWidget(curFileSheet);
 		editor.getTabPanel().scrollToTab(curFileSheet, animate);
 	}
-	
+
 	public void requestInitialDirContent() {
 		projectPanel.requestDirContent(null);
 	}
@@ -277,11 +273,11 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		conf.setText(Utils.extractJustFileName(fileName));
 		editor.getTabPanel().update(updatedFileSheet, conf);
 	}
-	
+
 	public void appendLog(String log) {
-		windows.appendLog(log);		
+		windows.appendLog(log);
 	}
-	
+
 	protected void associatePresenterWithSubpanels(Presenter presenter) {
 		topPanel.associatePresenter(presenter);
 		editor.associatePresenter(presenter);

@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
- * Implemented by Remote directory browser servlet
+ * Implemented by Remote security servlet
  * @author OMelnyk
  *
  */
@@ -12,8 +12,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface RemoteSecurity extends RemoteService {
 	/**
 	 * Returns list of directories, for given user, from the parent 'dir'
-	 * @param user
-	 * @param dir
+	 * @param userName
+	 * @param password
 	 * @return
 	 */
 	public RequestLoginResult login(String userName, String password);

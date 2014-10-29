@@ -13,16 +13,20 @@ import com.vw.ide.client.devboardext.event.handler.EditorTabClosedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.FileStateChangedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.GetDirContentEventHandler;
 import com.vw.ide.client.devboardext.event.handler.LogoutEventHandler;
+import com.vw.ide.client.devboardext.event.handler.OpenFringeManagerEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ProjectMenuEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SaveFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SelectFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ServerLogEventHandler;
 import com.vw.ide.client.devboardext.service.browser.callbacks.GettingUserStateResultCallback;
+import com.vw.ide.client.dialog.fringemanagment.event.handler.GetCategoriesEventHandler;
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
 import com.vw.ide.client.event.handler.FileStateChangedHandler;
+import com.vw.ide.client.event.handler.GetCategoriesHandler;
 import com.vw.ide.client.event.handler.GetDirContentHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
+import com.vw.ide.client.event.handler.OpenFringeManagerHandler;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
 import com.vw.ide.client.event.handler.SaveFileHandler;
 import com.vw.ide.client.event.handler.SelectFileHandler;
@@ -30,8 +34,10 @@ import com.vw.ide.client.event.handler.ServerLogHandler;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.FileStateChangedEvent;
+import com.vw.ide.client.event.uiflow.GetCategoriesEvent;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
+import com.vw.ide.client.event.uiflow.OpenFringeManagerEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
@@ -43,8 +49,11 @@ import com.vw.ide.client.projects.ProjectManagerImpl;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
 import com.vw.ide.client.ui.editorpanel.EditorPanel;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
+import com.vw.ide.server.servlet.fringes.persistance.dao.CategoriesDAO;
+import com.vw.ide.server.servlet.fringes.persistance.dao.FringesDAO;
+import com.vw.ide.server.servlet.fringes.persistance.dao.FringesDAOFactory;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
@@ -61,6 +70,11 @@ public class DevelopmentBoardPresenter extends Presenter {
 	private FileItemInfo selectedItemInTheProjectTree;
 	private Long selectedProjectInTheProjectTree;
 	
+	
+	
+
+	
+	
 	@SuppressWarnings("serial")
 	private static Map<Type<?>, Presenter.PresenterEventHandler> dispatcher = new HashMap<Type<?>, Presenter.PresenterEventHandler>() {
 		{
@@ -73,6 +87,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 			put(LogoutEvent.TYPE, new LogoutEventHandler());
 			put(ProjectMenuEvent.TYPE, new ProjectMenuEventHandler());
 			put(ServerLogEvent.TYPE, new ServerLogEventHandler());
+			put(OpenFringeManagerEvent.TYPE, new OpenFringeManagerEventHandler());
 		}
 	};
 	
@@ -120,6 +135,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.addHandler(LogoutEvent.TYPE, (LogoutHandler)dispatcher.get(LogoutEvent.TYPE));
 		eventBus.addHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.addHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
+		eventBus.addHandler(OpenFringeManagerEvent.TYPE, (OpenFringeManagerHandler)dispatcher.get(OpenFringeManagerEvent.TYPE));
+		
 	}
 	
 	@Override
@@ -133,6 +150,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(LogoutEvent.TYPE, (LogoutHandler)dispatcher.get(LogoutEvent.TYPE));
 		eventBus.removeHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.removeHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
+		eventBus.removeHandler(OpenFringeManagerEvent.TYPE, (OpenFringeManagerHandler)dispatcher.get(OpenFringeManagerEvent.TYPE));
+		
 	}
 
 	

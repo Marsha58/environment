@@ -1,7 +1,7 @@
 package com.vw.ide.client.service;
 
 /**
- * Simple marker inteface
+ * Simple marker interface
  * @author Oleg
  *
  */

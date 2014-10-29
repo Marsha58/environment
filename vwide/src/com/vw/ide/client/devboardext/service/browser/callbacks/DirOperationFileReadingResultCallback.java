@@ -5,7 +5,7 @@ import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.remotebrowser.RemoteBrowserServiceBroker;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;

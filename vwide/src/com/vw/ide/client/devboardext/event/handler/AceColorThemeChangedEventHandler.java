@@ -6,7 +6,7 @@ import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.ProjectManager;
-import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.ui.editorpanel.FileSheet;
 
 public class AceColorThemeChangedEventHandler extends Presenter.PresenterEventHandler implements AceColorThemeChangedHandler {
 	@Override
