@@ -77,9 +77,10 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 	public ComboBox<AceEditorTheme> comboATh;
 	
 	 @UiField MenuItem newVwmlProjField;
+	 @UiField MenuItem miHelpAboutField;
 	 @UiField TextButton bnNewVwmlProjField;
 	 @UiField TextButton bnSaveFileField;
-	 @UiField MenuItem miHelpAboutField;
+	 @UiField TextButton bnSaveAllField;
 	 @UiField SimpleContainer comboAceEditorPlaceCont;
 	 @UiField SimpleContainer userNamePlaceCont;
 	 @UiField SimpleContainer comboPlaceCont;
@@ -206,6 +207,8 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 				}
 			}
 		});
+		bnSaveFileField.disable();
+		bnSaveAllField.disable();
 		bind();
 	}
   
@@ -220,10 +223,6 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 		userName.setText("logged as '" + presenter.getLoggedAsUser() + "'");
 	}
 
-	protected Presenter getAssociatedPresenter() {
-		return this.presenter;
-	}
-    
     @UiHandler(value = {"miHelpAboutField","newVwmlProjField"})
 	public void onMenuSelection(SelectionEvent<Item> event) {
 	    MenuItem item = (MenuItem) event.getSelectedItem();
@@ -249,7 +248,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 			break;
 		case "idSaveSelectedFile":
 			presenter.fireEvent(new SaveFileEvent());
-			break;			
+			break;
 		default:
 			break;
 		}
@@ -270,10 +269,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 		d.setSize("350", "270");
 		d.showCenter(s_HelpAboutCaption, null);
 	}    
-    
-	private void bind() {
 
-	}  
 	
 	public void addItemToScrollMenu(ProjectItemInfo itemInfo) {
 		MenuItem mi = new MenuItem(itemInfo.getAssociatedData().getAbsolutePath() + "/" + itemInfo.getAssociatedData().getName());
@@ -289,4 +285,39 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 			}
 		}
 	}
+
+	public void enableNewVwmlProject(boolean enable) {
+		if (enable) {
+			bnNewVwmlProjField.enable();
+		}
+		else {
+			bnNewVwmlProjField.disable();
+		}
+	}
+
+	public void enableSaveFile(boolean enable) {
+		if (enable) {
+			bnSaveFileField.enable();
+		}
+		else {
+			bnSaveFileField.disable();
+		}
+	}
+
+	public void enableSaveAll(boolean enable) {
+		if (enable) {
+			bnSaveAllField.enable();
+		}
+		else {
+			bnSaveAllField.disable();
+		}
+	}
+	
+	protected Presenter getAssociatedPresenter() {
+		return this.presenter;
+	}
+	
+	private void bind() {
+
+	}  
 }

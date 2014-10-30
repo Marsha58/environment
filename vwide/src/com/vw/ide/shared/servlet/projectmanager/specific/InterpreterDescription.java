@@ -15,11 +15,14 @@ public class InterpreterDescription implements Serializable {
 	public static final String SEQUENTIAL = "sequential";
 	public static final String REACTIVE = "reactive";
 	public static final String PARALLEL = "parallel";
-	
+
+	private int nodesPerRing = DEF_NODES_PER_RING;
 	private String name = REACTIVE;
 	@SuppressWarnings("unused")
 	private String key = null;
 	
+	public static final int DEF_NODES_PER_RING = 50;
+
 	public InterpreterDescription() {
 		
 	}
@@ -51,5 +54,13 @@ public class InterpreterDescription implements Serializable {
 
 	public String readable() {
 		return "InterpreterDescription [name=" + name + "]";
+	}
+	
+	public int getNodesPerRing() {
+		return nodesPerRing;
+	}
+
+	public void setNodesPerRing(int nodesPerRing) {
+		this.nodesPerRing = nodesPerRing;
 	}
 }

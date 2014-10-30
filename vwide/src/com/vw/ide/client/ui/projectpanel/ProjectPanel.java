@@ -314,6 +314,15 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		}
 	}
 
+	public boolean isEdited(FileItemInfo fi) {
+		boolean r = false;
+		ProjectItemInfo p = store.findModelWithKey(fi.generateKey());
+		if (p != null && p.isEdited()) {
+			r = true;
+		}
+		return r;
+	}
+	
 	protected void buildContextMenu() {
 		contextMenu = new ProjectPanelContextMenu(); 
 		contextMenu.setWidth(170);
@@ -438,6 +447,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		projectsField.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		projectsField.getSelectionModel().addSelectionHandler(
 				new SelectionHandler<ProjectItemInfo>() {
+					@Override
 					public void onSelection(SelectionEvent<ProjectItemInfo> event) {
 						treeSelectedItem = event.getSelectedItem();
 						FileItemInfo fileItemInfo = treeSelectedItem.getAssociatedData();

@@ -170,9 +170,10 @@
 					<button:TextButton icon="{images.new_wiz_en}"
 						itemId="idNewVwmlProjField" ui:field="bnNewVwmlProjField" toolTip="New project" />
 					<toolbar:SeparatorToolItem />
-					<button:TextButton icon="{images.save_edit_dis}" ui:field="bnSaveFileField"  toolTip="Save" />
-					<button:TextButton icon="{images.saveall_edit_dis}"
-						toolTip="Save all" />
+					<button:TextButton icon="{images.save_edit_en}" ui:field="bnSaveFileField" 
+								itemId="idSaveSelectedFile" toolTip="Save" />
+					<button:TextButton icon="{images.saveall_edit_en}" ui:field="bnSaveAllField"
+								itemId="idSaveAll" toolTip="Save All" />
 					<toolbar:SeparatorToolItem />
 					<button:TextButton icon="{images.exec_dis}"
 						toolTip="Continue execution" />

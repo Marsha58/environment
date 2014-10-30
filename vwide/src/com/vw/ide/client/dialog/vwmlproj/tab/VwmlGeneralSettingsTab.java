@@ -11,10 +11,8 @@ import com.sencha.gxt.widget.core.client.form.NumberField;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.vw.ide.client.dialog.remotebrowser.RemoteDirectoryBrowserDialogExt;
 import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog;
-import com.vw.ide.shared.servlet.projectmanager.ReactiveInterpreterDescription;
-import com.vw.ide.shared.servlet.projectmanager.SequentialInterpreterDescription;
+import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog.EditMode;
 import com.vw.ide.shared.servlet.projectmanager.specific.InterpreterDescription;
-import com.vw.ide.shared.servlet.projectmanager.specific.ParallelInterpreterDescription;
 
 public class VwmlGeneralSettingsTab extends VwmlProjTab {
 	
@@ -50,19 +48,7 @@ public class VwmlGeneralSettingsTab extends VwmlProjTab {
 		@Override
 		public void onSelection(SelectionEvent<InterpreterDescription> event) {
 			owner.getOwner().getProjectDescription().setInterpreterDescription(event.getSelectedItem());
-			if (event.getSelectedItem().equals(owner.getOwner().getInterpretersAsListStore().get(InterpreterDescription.PARALLEL_INTERPRETER_ID))) {
-				owner.getOwner().getFieldSetInterpreterSettings().enable();
-				owner.getOwner().getFieldInterpreterSettingsArea().enable();
-				owner.getOwner().getFieldSetInterpreterSettings().expand();
-				owner.activateParallelInterpreterEditableProperties(owner.getOwner().getFieldInterpreterSettingsArea(),
-						(ParallelInterpreterDescription)owner.getOwner().getInterpretersAsListStore().get(InterpreterDescription.PARALLEL_INTERPRETER_ID));
-			}
-			else {
-				owner.deactivateParallelInterpreterEditableProperties(owner.getOwner().getFieldInterpreterSettingsArea());
-				owner.getOwner().getFieldSetInterpreterSettings().collapse();
-				owner.getOwner().getFieldSetInterpreterSettings().disable();
-				owner.getOwner().getFieldInterpreterSettingsArea().disable();	
-			}
+			owner.forceExpandParallelInterpreterParams(event.getSelectedItem());
 		}
 	}
 	
@@ -84,9 +70,16 @@ public class VwmlGeneralSettingsTab extends VwmlProjTab {
 	}
 
 	public void initWidgets() {
-		owner.getInterpretersAsListStore().add(new SequentialInterpreterDescription(InterpreterDescription.SEQUENTIAL));
-		owner.getInterpretersAsListStore().add(new ReactiveInterpreterDescription(InterpreterDescription.REACTIVE));
-		owner.getInterpretersAsListStore().add(new ParallelInterpreterDescription(InterpreterDescription.PARALLEL));
+		owner.getInterpretersAsListStore().add(new InterpreterDescription(InterpreterDescription.SEQUENTIAL));
+		owner.getInterpretersAsListStore().add(new InterpreterDescription(InterpreterDescription.REACTIVE));
+		owner.getInterpretersAsListStore().add(new InterpreterDescription(InterpreterDescription.PARALLEL));
+		if (getEditMode() != EditMode.NEW) {
+			InterpreterDescription d = owner.getInterpretersAsListStore().findModelWithKey(owner.getProjectDescription().getInterpreterDescription().getKey());
+			if (d != null) {
+				owner.getInterpretersAsListStore().remove(d);
+				owner.getInterpretersAsListStore().add(owner.getProjectDescription().getInterpreterDescription());
+			}
+		}
 		owner.getFieldSetInterpreterSettings().collapse();
 		owner.getCbVWMLAvailableInterpreters().setEditable(false);
 		owner.getCbVWMLAvailableInterpreters().setTriggerAction(TriggerAction.ALL);
@@ -154,6 +147,22 @@ public class VwmlGeneralSettingsTab extends VwmlProjTab {
 	protected VwmlProjectDialog getOwner() {
 		return owner;
 	}
+
+	protected void forceExpandParallelInterpreterParams(InterpreterDescription description) {
+		if (description.getName().equals(InterpreterDescription.PARALLEL)) {
+			owner.getFieldSetInterpreterSettings().enable();
+			owner.getFieldInterpreterSettingsArea().enable();
+			owner.getFieldSetInterpreterSettings().expand();
+			activateParallelInterpreterEditableProperties(owner.getFieldInterpreterSettingsArea(),
+					owner.getInterpretersAsListStore().get(InterpreterDescription.PARALLEL_INTERPRETER_ID));
+		}
+		else {
+			deactivateParallelInterpreterEditableProperties(owner.getFieldInterpreterSettingsArea());
+			owner.getFieldSetInterpreterSettings().collapse();
+			owner.getFieldSetInterpreterSettings().disable();
+			owner.getFieldInterpreterSettingsArea().disable();	
+		}
+	}
 	
 	private void setupProjectName() {
 		owner.getTfVWMLProjectName().setText(owner.getProjectDescription().getProjectName());
@@ -184,16 +193,17 @@ public class VwmlGeneralSettingsTab extends VwmlProjTab {
 	}
 	
 	private void setupInterpreter() {
-		owner.getCbVWMLAvailableInterpreters().setValue(owner.getProjectDescription().getInterpreterDescription());
+		owner.getCbVWMLAvailableInterpreters().setValue(owner.getProjectDescription().getInterpreterDescription(), true);
+		forceExpandParallelInterpreterParams(owner.getProjectDescription().getInterpreterDescription());
 	}
 	
-	private void activateParallelInterpreterEditableProperties(VerticalLayoutContainer fieldInterpreterSettingsArea, ParallelInterpreterDescription description) {
+	private void activateParallelInterpreterEditableProperties(VerticalLayoutContainer fieldInterpreterSettingsArea, InterpreterDescription description) {
 		NumberField<Integer> tf = new NumberField<Integer>(new NumberPropertyEditor.IntegerPropertyEditor());
 		tf.addBlurHandler(new BlurHandler() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void onBlur(BlurEvent event) {
-				ParallelInterpreterDescription pid = (ParallelInterpreterDescription)owner.getProjectDescription().getInterpreterDescription();
+				InterpreterDescription pid = owner.getProjectDescription().getInterpreterDescription();
 				pid.setNodesPerRing(((NumberField<Integer>)event.getSource()).getValue());
 			}
 		});

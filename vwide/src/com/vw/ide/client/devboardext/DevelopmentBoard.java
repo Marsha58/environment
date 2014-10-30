@@ -187,6 +187,20 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		if (!itemInfo.isEdited()) {
 			itemInfo.setEdited(edited);
 			editor.setFileEditedState(itemInfo.getFileSheet(), edited);
+			topPanel.enableSaveFile(edited);
+			if (edited) {
+				topPanel.enableSaveAll(edited);
+			}
+			else {
+				boolean saveAllEnabled = false;
+				for(FileItemInfo fi : itemInfo.getProjectDescription().getProjectFiles()) {
+					if (getProjectPanel().isEdited(fi)) {
+						saveAllEnabled = true;
+						break;
+					}
+				}
+				topPanel.enableSaveAll(saveAllEnabled);
+			}
 		}
 	}
 	

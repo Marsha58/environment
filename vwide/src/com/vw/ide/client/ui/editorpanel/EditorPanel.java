@@ -80,10 +80,11 @@ public class EditorPanel extends Composite {
 				sTitle = "*" + sTitle;
 			}
 			else
-			if ((sTitle.charAt(0) == '*')&&(!isEdited)) {
+			if ((sTitle.charAt(0) == '*') && (!isEdited)) {
 				sTitle = sTitle.substring(1);
 			}
 			tabPanel.getConfig(associatedTabWidget).setText(sTitle);
+			tabPanel.update(associatedTabWidget, tabPanel.getConfig(associatedTabWidget));
 		}
 	}
 	

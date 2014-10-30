@@ -55,6 +55,38 @@ public class CompilerSwitchesDescription implements Serializable {
 			return (toValue().split(":"))[Mode.DESCRIPTION];
 		}
 	}
+	
+	public static enum TestSwitches {
+		All("All"),
+		Static("Static");
+		
+		String value;
+		
+		TestSwitches(String value) {
+			this.value = value;
+		}
+		
+		public static TestSwitches fromValue(String value) {
+			if (value != null) {
+				for(TestSwitches s : values()) {
+					if (s.value.equals(value)) {
+						return s;
+					}
+				}
+			}
+			return defSwitch();
+		}
+		
+		public static TestSwitches defSwitch() {
+			return Static;
+		}
+		
+		public String toValue() {
+			return value;
+		}
+		
+	}
+	
 	// separated by ',' and has format <directive> = <value> (example debug = true)
 	private String preprocessorDirectives;
 	//  compiler's switches => (source | project | compile | test | main)

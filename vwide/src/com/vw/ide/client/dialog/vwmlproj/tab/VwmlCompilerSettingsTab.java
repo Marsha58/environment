@@ -14,6 +14,7 @@ import com.sencha.gxt.widget.core.client.event.BlurEvent.BlurHandler;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.Radio;
 import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog;
+import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog.EditMode;
 import com.vw.ide.shared.servlet.projectmanager.specific.CompilerSwitchesDescription;
 
 public class VwmlCompilerSettingsTab extends VwmlProjTab {
@@ -29,18 +30,7 @@ public class VwmlCompilerSettingsTab extends VwmlProjTab {
 		@Override
 		public void onSelection(SelectionEvent<CompilerSwitchesDescription.Mode> event) {
 			owner.getOwner().getProjectDescription().getCompilerSwitches().setCompilationMode(event.getSelectedItem());
-			if (event.getSelectedItem() == CompilerSwitchesDescription.Mode.TEST) {
-				owner.getOwner().getFieldSetCompileModeSettings().enable();
-				owner.getOwner().getFieldSetCompileModeSettingsArea().enable();
-				owner.getOwner().getFieldSetCompileModeSettings().expand();
-				owner.activateTestModeEditableProperties(owner.getOwner().getFieldSetCompileModeSettingsArea());
-			}
-			else {
-				owner.deactivateTestModeEditableProperties(owner.getOwner().getFieldSetCompileModeSettingsArea());
-				owner.getOwner().getFieldSetCompileModeSettings().collapse();
-				owner.getOwner().getFieldSetCompileModeSettings().disable();
-				owner.getOwner().getFieldSetCompileModeSettingsArea().disable();
-			}
+			owner.selectAdvancedTestOptions(event.getSelectedItem());
 		}
 	}
 	
@@ -91,6 +81,21 @@ public class VwmlCompilerSettingsTab extends VwmlProjTab {
 	public boolean validate() {
 		return true;
 	}
+
+	protected void selectAdvancedTestOptions(CompilerSwitchesDescription.Mode mode) {
+		if (mode == CompilerSwitchesDescription.Mode.TEST) {
+			owner.getFieldSetCompileModeSettings().enable();
+			owner.getFieldSetCompileModeSettingsArea().enable();
+			owner.getFieldSetCompileModeSettings().expand();
+			activateTestModeEditableProperties(owner.getFieldSetCompileModeSettingsArea());
+		}
+		else {
+			deactivateTestModeEditableProperties(owner.getFieldSetCompileModeSettingsArea());
+			owner.getFieldSetCompileModeSettings().collapse();
+			owner.getFieldSetCompileModeSettings().disable();
+			owner.getFieldSetCompileModeSettingsArea().disable();
+		}
+	}
 	
 	private void setupPreprocessorDirectives() {
 		String directives = owner.getProjectDescription().getCompilerSwitches().getPreprocessorDirectives();
@@ -98,20 +103,28 @@ public class VwmlCompilerSettingsTab extends VwmlProjTab {
 	}
 	
 	private void setupDebugInfoTrigger() {
-		owner.getBnDebugInfoTrigger().setValidateOnBlur(owner.getProjectDescription().getCompilerSwitches().getIncludeDebugInfo());		
+		owner.getBnDebugInfoTrigger().setValue(owner.getProjectDescription().getCompilerSwitches().getIncludeDebugInfo());		
 	}
 	
 	private void setupCompilationMode() {
 		owner.getCbVWMLAvailableModes().setValue(owner.getProjectDescription().getCompilerSwitches().getCompilationMode());
+		selectAdvancedTestOptions(owner.getProjectDescription().getCompilerSwitches().getCompilationMode());
 	}
 	
 	private void activateTestModeEditableProperties(VerticalLayoutContainer fieldSetCompileModeSettingsArea) {
 		HorizontalPanel hp = new HorizontalPanel();
 		Radio testStatic = new Radio();
 		Radio testAll = new Radio();
-		testStatic.setBoxLabel("Static");
-		testAll.setBoxLabel("All");
-		testStatic.setValue(true);
+		testStatic.setBoxLabel(CompilerSwitchesDescription.TestSwitches.Static.toValue());
+		testAll.setBoxLabel(CompilerSwitchesDescription.TestSwitches.All.toValue());
+		if (getEditMode() != EditMode.NEW) {
+			if (owner.getProjectDescription().getCompilerSwitches().getTestSwitch().equals(CompilerSwitchesDescription.TestSwitches.Static.toValue())) {
+				testStatic.setValue(true);
+			}
+			else {
+				testAll.setValue(true);
+			}
+		}
 		hp.add(testStatic);
 		hp.add(testAll);
 	    ToggleGroup toggle = new ToggleGroup();
