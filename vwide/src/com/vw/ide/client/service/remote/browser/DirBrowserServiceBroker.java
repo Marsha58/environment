@@ -35,12 +35,12 @@ public class DirBrowserServiceBroker {
 	 * @param projectId
 	 * @param fileId
 	 */
-	public static void requestForReadingFile(String user, String fileName, Long projectId, Long fileId, ResultCallback<RequestDirOperationResult> resultCallback) {
+	public static void requestForReadingFile(String user, String path, String fileName, Long projectId, Long fileId, ResultCallback<RequestDirOperationResult> resultCallback) {
 		RemoteDirectoryBrowserAsync service = DirBrowserService.instance().getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForAnyOperation cbk = DirBrowserService.instance().buildCallbackForAnyOperation();
 			cbk.setProcessedResult(new Result<RequestDirOperationResult>(resultCallback));
-			service.readFile(user, "", fileName, projectId, fileId, cbk);
+			service.readFile(user, path, fileName, projectId, fileId, cbk);
 		}
 	}
 
@@ -68,12 +68,12 @@ public class DirBrowserServiceBroker {
 	 * @param content
 	 * @param resultCallback
 	 */
-	public static void requestForFileSaving(String user, String fileName, Long projectId, Long fileId, String content, ResultCallback<RequestFileOperationResult> resultCallback) {
+	public static void requestForFileSaving(String user, String path, String fileName, Long projectId, Long fileId, String content, ResultCallback<RequestFileOperationResult> resultCallback) {
 		RemoteDirectoryBrowserAsync service = DirBrowserService.instance().getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForFileOperation cbk = DirBrowserService.instance().buildCallbackForFileOperation();
 			cbk.setProcessedResult(new Result<RequestFileOperationResult>(resultCallback));
-			service.saveFile(user, fileName, projectId, fileId, content, cbk);
+			service.saveFile(user, path, fileName, projectId, fileId, content, cbk);
 		}
 	}
 	
@@ -84,12 +84,12 @@ public class DirBrowserServiceBroker {
 	 * @param fileId
 	 * @param resultCallback
 	 */
-	public static void requestForFileDeleting(String user, String fileName, Long fileId, ResultCallback<RequestFileOperationResult> resultCallback) {
+	public static void requestForFileDeleting(String user, String path, String fileName, Long fileId, ResultCallback<RequestFileOperationResult> resultCallback) {
 		RemoteDirectoryBrowserAsync service = DirBrowserService.instance().getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForFileOperation cbk = DirBrowserService.instance().buildCallbackForFileOperation();
 			cbk.setProcessedResult(new Result<RequestFileOperationResult>(resultCallback));
-			service.deleteFile(user, fileName, fileId, cbk);
+			service.deleteFile(user, path, fileName, fileId, cbk);
 		}
 	}
 

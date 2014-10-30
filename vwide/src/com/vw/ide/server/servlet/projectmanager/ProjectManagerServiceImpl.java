@@ -144,6 +144,11 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		if (usi == null) {
 			return res;
 		}
+		if (description.getProjectFiles().contains(toAdd)) {
+			res.setRetCode(RequestProjectDeletionResult.GENERAL_FAIL);
+			res.setResult("File '" + toAdd.getAbsolutePath() + "/" + toAdd.getName() + "' has already been added to project '" + description.getProjectName() + "'");
+			return res;
+		}
 		DirBrowserImpl browser = (DirBrowserImpl)ServiceLocator.instance().locate(DirBrowserImpl.ID);
 		if (browser == null) {
 			res.setRetCode(RequestProjectDeletionResult.GENERAL_FAIL);
@@ -166,6 +171,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		if (!toAdd.isDir()) {
 			usi.setProjectIdSelected(description);
 			usi.addFileToOpenedFiles(toAdd);
+		}
+		if (logger.isInfoEnabled()) {
+			logger.debug("User '" + description.getUserName() + "' added item '" + toAdd + "' to project '" + description.getProjectName() + "'");
 		}
 		return res;
 	}
@@ -198,6 +206,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		if (r.getRetCode() != RequestSerializationOperationResult.GENERAL_OK) {
 			res.setRetCode(r.getRetCode());
 			res.setResult(r.getResult());
+		}
+		if (logger.isInfoEnabled()) {
+			logger.debug("User '" + description.getUserName() + "' updated project '" + description.getProjectName() + "'");
 		}
 		return res;
 	}
@@ -257,12 +268,13 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			res.setResult("Remote browser service wasn't found");
 			return res;
 		}
-		RequestResult r = browser.deleteFile(description.getUserName(), toRemove.getAbsolutePath(), null);
+		RequestResult r = browser.deleteFile(description.getUserName(), toRemove.getAbsolutePath(), toRemove.getName(), null);
 		if (r.getRetCode() != RequestResult.GENERAL_OK) {
 			res.setResult(r.getResult());
 			res.setRetCode(r.getRetCode());
 			return res;
 		}
+		description.getProjectFiles().remove(toRemove);
 		r = updateProject(description);
 		if (r.getRetCode() != RequestResult.GENERAL_OK) {
 			res.setResult(r.getResult());
@@ -271,6 +283,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		}
 		usi.setProjectIdSelected(description);
 		usi.removeFileFromOpenedFiles(toRemove);
+		if (logger.isInfoEnabled()) {
+			logger.debug("User '" + description.getUserName() + "' removed item '" + toRemove + "' from project '" + description.getProjectName() + "'");
+		}
 		return res;
 	}
 
@@ -372,7 +387,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		}
 		content += "interpreter.ring.visitor=com.vw.lang.conflictring.visitor.VWMLConflictRingVisitor\r\n";
 		RequestDirOperationResult res = browser.createFile(description.getUserName(),
-															description.getProjectPath() + "/" + description.getMainModuleName() + "/interpreter",
+															getProjectOperationalDir(description) + "/interpreter",
 															INTERPRETER_CONF_FILE,
 															content);
 		if (res.getRetCode() != RequestDirOperationResult.GENERAL_OK) {

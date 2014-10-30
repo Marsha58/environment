@@ -3,7 +3,6 @@ package com.vw.ide.client.devboardext;
 import java.util.Arrays;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -26,7 +25,6 @@ import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.FlowController;
-import com.vw.ide.client.dialog.about.AboutDialog;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -37,33 +35,13 @@ import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
 import com.vw.ide.client.ui.windowspanel.WindowsPanelView;
-import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
 public class DevelopmentBoard extends ResizeComposite implements IsWidget, PresenterViewerLink {
 
-	/**
-	 * Fired when 'Project -> New' menu item selected
-	 * 
-	 * @author Oleg
-	 * 
-	 */
-	public static class AboutCommand implements ScheduledCommand {
-
-		public AboutCommand() {
-		}
-
-		public void execute() {
-			AboutDialog d = new AboutDialog();
-			d.show(s_AboutCaption, null, 0, 0);
-		}
-	}
-
 	private static DevelopmentBoardUiBinder uiBinder = GWT.create(DevelopmentBoardUiBinder.class);
 
-	private static String s_AboutCaption = "About";
-	
 	@UiField
 	SimpleContainer mainContainer = new SimpleContainer();
 	
@@ -212,12 +190,13 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		}
 	}
 	
-	public void deleteFileItemId(ProjectItemInfo itemInfo) {
+	public void deleteFileItemFromScrollMenu(ProjectItemInfo itemInfo) {
 		topPanel.delItemFromScrollMenu(itemInfo);	
 	}
 
 	public void addNewFileTabItem(ProjectItemInfo itemInfo) {
 		TabItemConfig tabItemConfig = new TabItemConfig(itemInfo.getAssociatedData().getName());
+		tabItemConfig.setClosable(true);
 		FileSheet newFileSheet = new FileSheet(presenter, itemInfo);
 		newFileSheet.constructEditor(itemInfo.getAssociatedData().getContent(),
 									FileItemInfo.recognizeFileType(itemInfo.getAssociatedData().getName()));
@@ -227,15 +206,42 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		addFileItemToScrollMenu(itemInfo);
 		itemInfo.setAlreadyOpened(true);
 	}
+
+	public void scrollToTab(ProjectItemInfo itemInfo) {
+		if (itemInfo.getFileSheet() != null) {
+			editor.getTabPanel().setActiveWidget(itemInfo.getFileSheet());
+			editor.getTabPanel().scrollToTab(itemInfo.getFileSheet(), true);
+		}
+	}
+
+	public void renameFileTabItem(ProjectItemInfo itemInfo, FileItemInfo toRename) {
+		getProjectPanel().renameTreeBranchView(itemInfo, toRename);
+		updateTabName(itemInfo);
+	}
+	
+	public void updateTabName(ProjectItemInfo itemInfo) {
+		FileSheet updatedFileSheet = itemInfo.getFileSheet();
+		if (updatedFileSheet != null) {
+			TabItemConfig conf = editor.getTabPanel().getConfig(updatedFileSheet);
+			conf.setText(itemInfo.getAssociatedData().getName());
+			editor.getTabPanel().update(updatedFileSheet, conf);
+			deleteFileItemFromScrollMenu(itemInfo);
+			addFileItemToScrollMenu(itemInfo);
+		}
+	}
+	
+	public void afterClosingTabName(ProjectItemInfo itemInfo) {
+		deleteFileItemFromScrollMenu(itemInfo);
+		if (editor.getTabPanel().getWidgetCount() == 0) {
+			setTextForEditorContentPanel(null);
+			getProjectPanel().selectParentOf(itemInfo);
+		}
+	}
 	
 	public void addFileItemToScrollMenu(ProjectItemInfo itemInfo) {
 		topPanel.addItemToScrollMenu(itemInfo);
 	}
 	
-	public void removeWidget(Widget widget2delete) {
-		editor.getTabPanel().remove(widget2delete);		
-	}
-
 	public void setTextForEditorContentPanel(String text) {
 		editorContentPanel.setHeadingText(text);
 	}
@@ -244,23 +250,10 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		return projectPanel;
 	}
 	
-	public void scrollToTab(ProjectItemInfo itemInfo) {
-		if (itemInfo.getFileSheet() != null) {
-			editor.getTabPanel().setActiveWidget(itemInfo.getFileSheet());
-			editor.getTabPanel().scrollToTab(itemInfo.getFileSheet(), true);
-		}
-	}
-	
 	public void requestUserProjects() {
 		projectPanel.requestUserProjects(FlowController.getLoggedAsUser());
 	}
 
-	public void updateEditorFileSheetName(FileSheet updatedFileSheet, String fileName) {
-		TabItemConfig conf = editor.getTabPanel().getConfig(updatedFileSheet);
-		conf.setText(Utils.extractJustFileName(fileName));
-		editor.getTabPanel().update(updatedFileSheet, conf);
-	}
-	
 	public void updateEditorPanelTheme(AceColorThemeChangedEvent event) {
 		for (int i = 0; i < editor.getTabPanel().getWidgetCount(); i++) {
 			FileSheet curFileSheet = (FileSheet)editor.getTabPanel().getWidget(i);
@@ -269,7 +262,22 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	}
 	
 	public void restoreView(UserStateInfo userState) {
-		
+		getProjectPanel().restoreView(userState);
+	}
+	
+	public void addProjectItemAndSelect(ProjectItemInfo parent, FileItemInfo toAdd) {
+		getProjectPanel().buildTreeBranchView(parent, toAdd);
+		getProjectPanel().selectByKey(toAdd.generateKey());
+	}
+
+	public void deleteProjectItem(ProjectItemInfo itemInfo) {
+		getProjectPanel().deleteBranchView(itemInfo);
+		deleteFileItemFromScrollMenu(itemInfo);
+		editor.getTabPanel().remove(itemInfo.getFileSheet());
+		if (editor.getTabPanel().getWidgetCount() == 0) {
+			setTextForEditorContentPanel(null);
+			getProjectPanel().selectParentOf(itemInfo);
+		}
 	}
 	
 	public void appendLog(String log) {

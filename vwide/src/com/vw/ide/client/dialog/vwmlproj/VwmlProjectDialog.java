@@ -31,6 +31,7 @@ import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectUpdateResult;
 import com.vw.ide.shared.servlet.projectmanager.specific.CompilerSwitchesDescription;
 import com.vw.ide.shared.servlet.projectmanager.specific.InterpreterDescription;
 
@@ -42,6 +43,12 @@ import com.vw.ide.shared.servlet.projectmanager.specific.InterpreterDescription;
  */
 public class VwmlProjectDialog extends VwmlDialogExt {
 
+	public static enum EditMode {
+		NEW,
+		EDIT_VWML_SETTINGS,
+		EDIT_ALL
+	}
+	
 	interface NewVwmlProjectDialogExtUiBinder extends UiBinder<Widget, VwmlProjectDialog> {
 	}
 
@@ -110,16 +117,22 @@ public class VwmlProjectDialog extends VwmlDialogExt {
 																vwmlJavaSettingsTab
 																};
 	
+	private EditMode editMode = EditMode.EDIT_ALL;
 	private static NewVwmlProjectDialogExtUiBinder uiBinder = GWT.create(NewVwmlProjectDialogExtUiBinder.class);
 	private static InterpeterProperties interpreterProps = GWT.create(InterpeterProperties.class);
 	private static CompilerModeProperties compilerModeProps = GWT.create(CompilerModeProperties.class);
 	
-	public VwmlProjectDialog(ProjectDescription projectDescription, Integer hashId) {
+	public VwmlProjectDialog(ProjectDescription projectDescription, Integer hashId, EditMode editMode) {
 		this.projectDescription = (projectDescription == null) ? new ProjectDescription() : projectDescription;
+		this.editMode = editMode;
 		super.setWidget(uiBinder.createAndBindUi(this));
 		initializationWidgets();
 		for(int i = 0; i < tabContainer.getWidgetCount(); i++) {
 			tabs[i].setWidget(tabContainer.getWidget(i));
+		}
+		if (editMode == EditMode.EDIT_VWML_SETTINGS) {
+			browseVwmlProjPath.disable();
+			browseJavaProjPath.disable();
 		}
 	}
 
@@ -132,12 +145,27 @@ public class VwmlProjectDialog extends VwmlDialogExt {
 		public void handle(RequestProjectCreationResult result) {
 			if (result.getRetCode().intValue() != 0) {
 				String messageAlert = "The operation '" + result.getOperation()
-						+ "' failed.\r\nResult'" + result.getResult() + "'";
+						+ "' failed.\r\nResult '" + result.getResult() + "'";
 				AlertMessageBox alertMessageBox = new AlertMessageBox(
 						"Warning", messageAlert);
 				alertMessageBox.show();
-			} else {
-				((DevelopmentBoardPresenter) presenter).fireEvent(new GetDirContentEvent());
+			}
+		}
+	}
+
+	public class ProjectUpdateResult extends ResultCallback<RequestProjectUpdateResult> {
+
+		public ProjectUpdateResult() {
+		}
+
+		@Override
+		public void handle(RequestProjectUpdateResult result) {
+			if (result.getRetCode().intValue() != 0) {
+				String messageAlert = "The operation '" + result.getOperation()
+						+ "' failed.\r\nResult '" + result.getResult() + "'";
+				AlertMessageBox alertMessageBox = new AlertMessageBox(
+						"Warning", messageAlert);
+				alertMessageBox.show();
 			}
 		}
 	}
@@ -174,7 +202,12 @@ public class VwmlProjectDialog extends VwmlDialogExt {
 			super.onButtonPressed(textButton);
 			projectDescription.setUserName(getLoggedAsUser());
 			System.out.println(projectDescription);
-			ProjectManagerServiceBroker.requestForProjectCreation(projectDescription, new ProjectCreationResult());
+			if (editMode == EditMode.NEW) {
+				ProjectManagerServiceBroker.requestForProjectCreation(projectDescription, new ProjectCreationResult());
+			}
+			else {
+				ProjectManagerServiceBroker.requestForUpdatingProject(projectDescription, new ProjectUpdateResult());
+			}
 			hide();
 		}
 		else {
@@ -184,6 +217,7 @@ public class VwmlProjectDialog extends VwmlDialogExt {
 	
 	private void initializationWidgets() {
 		for(VwmlProjTab tab : tabs) {
+			tab.setEditMode(editMode);
 			tab.initWidgets();
 		}
 		for(VwmlProjTab tab : tabs) {

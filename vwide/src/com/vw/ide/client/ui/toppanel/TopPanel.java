@@ -276,7 +276,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 	}  
 	
 	public void addItemToScrollMenu(ProjectItemInfo itemInfo) {
-		MenuItem mi = new MenuItem(itemInfo.getAssociatedData().getAbsolutePath());
+		MenuItem mi = new MenuItem(itemInfo.getAssociatedData().getAbsolutePath() + "/" + itemInfo.getAssociatedData().getName());
 		mi.setData("fileId", itemInfo);
 		scrollMenu.add(mi);
 	}

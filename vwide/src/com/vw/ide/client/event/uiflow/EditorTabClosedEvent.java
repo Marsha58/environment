@@ -37,6 +37,6 @@ public class EditorTabClosedEvent extends GwtEvent<EditorTabClosedHandler> {
 
 	@Override
 	protected void dispatch(EditorTabClosedHandler handler) {
-		handler.onEditorTabClosed(event);
+		handler.onEditorTabClosed(this);
 	}
 }

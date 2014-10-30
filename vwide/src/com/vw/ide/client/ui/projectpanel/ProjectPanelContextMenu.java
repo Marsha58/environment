@@ -10,6 +10,7 @@ import com.vw.ide.client.Resources;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
+import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
@@ -20,6 +21,7 @@ public class ProjectPanelContextMenu extends Menu{
 	private MenuItem delFile;
 	private MenuItem newProject;
 	private MenuItem importProject;
+	private MenuItem editProject;
 	private MenuItem delProject;
 	private MenuItem newFolder;
 	public Presenter presenter;
@@ -36,7 +38,6 @@ public class ProjectPanelContextMenu extends Menu{
 			}
 		}
 	};  
-	
 	
 	public ProjectPanelContextMenu() {
 		
@@ -65,7 +66,7 @@ public class ProjectPanelContextMenu extends Menu{
 		
 		delFile = new MenuItem();
 		delFile.setItemId(OperationTypes.DELETE_FILE.getName());
-		delFile.setText("Delete selected file");
+		delFile.setText("Delete selected file/folder");
 		delFile.setIcon(Resources.IMAGES.delete_edit_en());
 		delFile.addSelectionHandler(selectionHandler);
 		this.add(delFile);		
@@ -82,6 +83,16 @@ public class ProjectPanelContextMenu extends Menu{
 
 		this.add(new SeparatorMenuItem());
 
+		editProject = new MenuItem();
+		editProject.setItemId(OperationTypes.EDIT_PROJECT.getName());
+		editProject.setText("Edit project");
+		editProject.setIcon(Resources.IMAGES.rename_file_en());
+		editProject.addSelectionHandler(selectionHandler);
+		editProject.disable();
+		this.add(editProject);
+
+		this.add(new SeparatorMenuItem());
+		
 		newProject = new MenuItem();
 		newProject.setItemId(OperationTypes.NEW_PROJECT.getName());
 		newProject.setText("New project");
@@ -108,42 +119,56 @@ public class ProjectPanelContextMenu extends Menu{
 		
 	}
 
-// doesn't implemented yet	
-	public boolean checkIsFileProXml(FileItemInfo fileItemInfo) {
-		  return true;
-	}		
-	
-	
-	public void checkEnabling(FileItemInfo fileItemInfo) {
-	  Boolean isNewFileEnabled = true;	
-	  Boolean isNewProjectEnabled = true;	
-	  Boolean isDelFileEnabled = true;	
-	  Boolean isDelProjectEnabled = true;	
-		
-	  if(fileItemInfo != null) {
-		  if(FileItemInfo.recognizeFileType(fileItemInfo.getName()) == FilesTypesEnum.XML) {
-			  isDelFileEnabled = !checkIsFileProXml(fileItemInfo);
-		  } else {
+	public void checkEnabling(ProjectItemInfo projectItemInfo) {
+	  Boolean isNewFileEnabled = false;
+	  Boolean isImportFileEnabled = false;
+	  Boolean isImportProjectEnabled = false;
+	  Boolean isNewProjectEnabled = false;	
+	  Boolean isDelFileEnabled = false;	
+	  Boolean isDelProjectEnabled = false;
+	  Boolean isNewFolderEnabled = false;
+	  Boolean isRenameFileEnabled = false;
+	  Boolean isEditProjectEnabled = false;
+	  
+	  if (projectItemInfo != null) {
+		  if (projectItemInfo.isMarkAsUserRoot()) {
+			  isNewProjectEnabled = true;
+			  isImportProjectEnabled = true;
+		  }
+		  else
+		  if (projectItemInfo.isMarkAsProject()) {
+			  isNewFileEnabled = true;	
+			  isDelProjectEnabled = true;
+			  isImportFileEnabled = true;
+			  isNewFolderEnabled = true;
+			  isEditProjectEnabled = true;
+		  }
+		  else {
+			  FileItemInfo fileItemInfo = projectItemInfo.getAssociatedData();
 			  if (fileItemInfo.isDir()) {
+				  isNewFileEnabled = true;
+				  isImportFileEnabled = true;
+				  isNewFolderEnabled = true;
+			  }
+			  else
+			  if (!fileItemInfo.isDir()) {
+				  isDelFileEnabled = true;
+				  isRenameFileEnabled = true;
+			  }
+			  if (FileItemInfo.recognizeFileType(fileItemInfo.getName()) == FilesTypesEnum.VWML_PROJ) {
 				  isDelFileEnabled = false;
-			  } else {
-				  isDelProjectEnabled = false;
 			  }
 		  }
-	  } else {
-		  isNewFileEnabled = false;	
-		  isNewProjectEnabled = true;	
-		  isDelFileEnabled = false;	
-		  isDelProjectEnabled = false;	
 	  }
-	  
-	  
 	  newFile.setEnabled(isNewFileEnabled);
 	  newProject.setEnabled(isNewProjectEnabled);
-
 	  delFile.setEnabled(isDelFileEnabled);
 	  delProject.setEnabled(isDelProjectEnabled);
-	  
+	  importProject.setEnabled(isImportProjectEnabled);
+	  newFolder.setEnabled(isNewFolderEnabled);
+	  importFile.setEnabled(isImportFileEnabled);
+	  renameFile.setEnabled(isRenameFileEnabled);
+	  editProject.setEnabled(isEditProjectEnabled);
 	}
 	
 	public void associatePresenter(Presenter presenter) {

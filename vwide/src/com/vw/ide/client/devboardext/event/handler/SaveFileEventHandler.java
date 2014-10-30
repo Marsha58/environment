@@ -3,8 +3,8 @@ package com.vw.ide.client.devboardext.event.handler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
-import com.vw.ide.client.devboardext.service.browser.callbacks.AnyFileOperationResultCallback;
-import com.vw.ide.client.devboardext.service.browser.callbacks.HandlerOnFileOpertaion;
+import com.vw.ide.client.devboardext.service.browser.callbacks.BrowserAnyFileOperationResultCallback;
+import com.vw.ide.client.devboardext.service.browser.callbacks.custom.handler.HandlerOnFileOpertaion;
 import com.vw.ide.client.event.handler.SaveFileHandler;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -46,12 +46,12 @@ public class SaveFileEventHandler extends Presenter.PresenterEventHandler implem
 	
 	protected void process(DevelopmentBoardPresenter presenter, SaveFileEvent event) {
 		FileSheet currentWidget = presenter.getView().getActiveFileSheetWidget();
-		String sFullName = currentWidget.getItemInfo().getAssociatedData().getAbsolutePath();
 		DirBrowserServiceBroker.requestForFileSaving(FlowController.getLoggedAsUser(),
-													sFullName,
+													currentWidget.getItemInfo().getAssociatedData().getAbsolutePath(),
+													currentWidget.getItemInfo().getAssociatedData().getName(),
 													null,
 													null,
 													currentWidget.getAceEditor().getText(),
-													new AnyFileOperationResultCallback(presenter, new HandlerOnSaveFile(presenter, currentWidget.getItemInfo())));
+													new BrowserAnyFileOperationResultCallback(presenter, new HandlerOnSaveFile(presenter, currentWidget.getItemInfo())));
 	}	
 }

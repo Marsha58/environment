@@ -6,11 +6,11 @@ import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.shared.servlet.userstate.RequestUpdateUserStateResult;
 
-public class UpdatingUserStateResultCallback extends ResultCallback<RequestUpdateUserStateResult> {
+public class UserStateUpdatingResultCallback extends ResultCallback<RequestUpdateUserStateResult> {
 
 	private DevelopmentBoardPresenter owner;
 	
-	public UpdatingUserStateResultCallback(DevelopmentBoardPresenter owner) {
+	public UserStateUpdatingResultCallback(DevelopmentBoardPresenter owner) {
 		this.owner = owner;
 	}
 	

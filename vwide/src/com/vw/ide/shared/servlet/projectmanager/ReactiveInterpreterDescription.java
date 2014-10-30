@@ -10,6 +10,10 @@ import com.vw.ide.shared.servlet.projectmanager.specific.InterpreterDescription;
 @SuppressWarnings("serial")
 public class ReactiveInterpreterDescription extends InterpreterDescription {
 
+	public ReactiveInterpreterDescription() {
+		super(InterpreterDescription.REACTIVE);
+	}
+	
 	public ReactiveInterpreterDescription(String name) {
 		super(name);
 	}

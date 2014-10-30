@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 /**
  * Some aux. methods
  * @author Oleg
@@ -152,4 +153,8 @@ public class Utils {
 		return output;
 	}	
 	
+	
+	public static String createFullProjectPath(ProjectDescription projectDescription) {
+		return projectDescription.getProjectPath() + "/" + projectDescription.getMainModuleName();
+	}
 }

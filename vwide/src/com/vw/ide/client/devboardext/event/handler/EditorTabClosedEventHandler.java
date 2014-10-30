@@ -1,13 +1,11 @@
 package com.vw.ide.client.devboardext.event.handler;
 
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
 import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
-import com.vw.ide.client.devboardext.service.userstate.callbacks.GettingUserStateResultCallback;
-import com.vw.ide.client.devboardext.service.userstate.callbacks.UpdatingUserStateResultCallback;
-import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateHandler;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateGettingResultCallback;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateUpdatingResultCallback;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.custom.handler.UserStateHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -21,9 +19,11 @@ public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler
 	private static class HandleUserStateOnClosingEditorTab implements UserStateHandler {
 
 		private ProjectItemInfo itemInfo;
+		private DevelopmentBoardPresenter presenter;
 		
-		public HandleUserStateOnClosingEditorTab(ProjectItemInfo itemInfo) {
+		public HandleUserStateOnClosingEditorTab(DevelopmentBoardPresenter presenter, ProjectItemInfo itemInfo) {
 			this.itemInfo = itemInfo;
+			this.presenter = presenter;
 		}
 		
 		@Override
@@ -31,9 +31,10 @@ public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler
 			userState.setFileIdSelected(null);
 			userState.removeFileFromOpenedFiles(itemInfo.getAssociatedData());
 			itemInfo.setAlreadyOpened(false);
+			presenter.getView().afterClosingTabName(itemInfo);
 			RemoteUserStateServiceBroker.requestForUpdateUserState(FlowController.getLoggedAsUser(),
 																	userState,
-																	new UpdatingUserStateResultCallback(null));
+																	new UserStateUpdatingResultCallback(presenter));
 		}
 	}
 	
@@ -43,7 +44,7 @@ public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler
 	}
 
 	@Override
-	public void onEditorTabClosed(BeforeCloseEvent<Widget> event) {
+	public void onEditorTabClosed(EditorTabClosedEvent event) {
 		if (getPresenter() != null) {
 			getPresenter().delegate(event);
 		}
@@ -51,9 +52,9 @@ public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler
 	
 	private void process(DevelopmentBoardPresenter presenter, EditorTabClosedEvent event) {
 		FileSheet fileSheet = (FileSheet)event.getEvent().getItem();
-		presenter.getView().deleteFileItemId(fileSheet.getItemInfo());
+		presenter.getView().deleteFileItemFromScrollMenu(fileSheet.getItemInfo());
 		RemoteUserStateServiceBroker.requestForGettingUserState(FlowController.getLoggedAsUser(),
-																new GettingUserStateResultCallback(presenter, new HandleUserStateOnClosingEditorTab(fileSheet.getItemInfo())));
+																new UserStateGettingResultCallback(presenter, new HandleUserStateOnClosingEditorTab(presenter, fileSheet.getItemInfo())));
 	}
 }
 

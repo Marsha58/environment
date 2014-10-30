@@ -1,9 +1,8 @@
 package com.vw.ide.shared.servlet.userstate;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
-
-import com.google.gwt.dev.util.collect.HashSet;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 

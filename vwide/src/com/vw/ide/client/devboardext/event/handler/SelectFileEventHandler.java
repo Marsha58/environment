@@ -1,38 +1,82 @@
 package com.vw.ide.client.devboardext.event.handler;
 
 import com.google.gwt.event.shared.GwtEvent;
+import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
-import com.vw.ide.client.devboardext.service.browser.callbacks.DirOperationFileReadingResultCallback;
-import com.vw.ide.client.devboardext.service.userstate.callbacks.GettingUserStateResultCallback;
-import com.vw.ide.client.devboardext.service.userstate.callbacks.UpdatingUserStateResultCallback;
-import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateHandler;
+import com.vw.ide.client.devboardext.service.browser.callbacks.BrowserDirOperationFileReadingResultCallback;
+import com.vw.ide.client.devboardext.service.browser.callbacks.custom.handler.HandlerOnDirOperation;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateGettingResultCallback;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateUpdatingResultCallback;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.custom.handler.UserStateHandler;
 import com.vw.ide.client.event.handler.SelectFileHandler;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
 import com.vw.ide.client.service.remote.userstate.RemoteUserStateServiceBroker;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
+import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
 public class SelectFileEventHandler extends Presenter.PresenterEventHandler implements SelectFileHandler {
+
+	private static class UpdateUserStateOnReadOperation implements HandlerOnDirOperation {
+
+		private DevelopmentBoardPresenter presenter;
+		private ProjectItemInfo projectItemInfo;
+		private UserStateInfo userState;
+		
+		public UpdateUserStateOnReadOperation(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo, UserStateInfo userState) {
+			this.presenter = presenter;
+			this.projectItemInfo = projectItemInfo;
+			this.userState = userState;
+		}
+		
+		@Override
+		public void handle(RequestDirOperationResult result) {
+			if (result.getRetCode().intValue() != 0) {
+				String messageAlert = "The operation '" + result.getOperation()
+									+ "' failed.\r\nResult'" + result.getResult() + "'";
+				AlertMessageBox alertMessageBox = new AlertMessageBox("Warning", messageAlert);
+				alertMessageBox.show();
+			} 
+			else {
+				if (!projectItemInfo.isAlreadyOpened()) {
+					projectItemInfo.getAssociatedData().setContent(result.getTextFile());
+					presenter.getView().addNewFileTabItem(projectItemInfo);
+					userState.addFileToOpenedFiles(projectItemInfo.getAssociatedData());
+					RemoteUserStateServiceBroker.requestForUpdateUserState(
+													FlowController.getLoggedAsUser(),
+													userState,
+													new UserStateUpdatingResultCallback(presenter));
+				}
+			}
+		}
+		
+	}
 	
 	private static class UpdateUserStateOnSelection implements UserStateHandler {
 
 		private ProjectItemInfo projectItemInfo;
+		private DevelopmentBoardPresenter presenter;
 		
-		public UpdateUserStateOnSelection(ProjectItemInfo projectItemInfo) {
+		public UpdateUserStateOnSelection(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
 			this.projectItemInfo = projectItemInfo;
+			this.presenter = presenter;
 		}
 		
 		@Override
 		public void handle(UserStateInfo userState) {
 			userState.setFileIdSelected(projectItemInfo.getAssociatedData());
 			userState.setProjectIdSelected(projectItemInfo.getProjectDescription());
-			RemoteUserStateServiceBroker.requestForUpdateUserState(
-										FlowController.getLoggedAsUser(),
-										userState,
-										new UpdatingUserStateResultCallback(null));
+			DirBrowserServiceBroker.requestForReadingFile(
+					FlowController.getLoggedAsUser(),
+					projectItemInfo.getAssociatedData().getAbsolutePath(),
+					projectItemInfo.getAssociatedData().getName(),
+					null,
+					null,
+					new BrowserDirOperationFileReadingResultCallback((DevelopmentBoardPresenter)presenter,
+																	new UpdateUserStateOnReadOperation(presenter, projectItemInfo, userState)));
 		}
 	}
 	
@@ -40,13 +84,8 @@ public class SelectFileEventHandler extends Presenter.PresenterEventHandler impl
 	public void handler(Presenter presenter, GwtEvent<?> event) {
 		ProjectItemInfo projectItemInfo = ((SelectFileEvent)event).getFileItemInfo();
 		RemoteUserStateServiceBroker.requestForGettingUserState(FlowController.getLoggedAsUser(),
-										new GettingUserStateResultCallback((DevelopmentBoardPresenter)presenter, new UpdateUserStateOnSelection(projectItemInfo)));
-		DirBrowserServiceBroker.requestForReadingFile(
-										FlowController.getLoggedAsUser(),
-										projectItemInfo.getAssociatedData().getAbsolutePath(),
-										null,
-										null,
-										new DirOperationFileReadingResultCallback((DevelopmentBoardPresenter)presenter, projectItemInfo));
+										new UserStateGettingResultCallback((DevelopmentBoardPresenter)presenter,
+																			new UpdateUserStateOnSelection((DevelopmentBoardPresenter)presenter, projectItemInfo)));
 	}
 
 	@Override

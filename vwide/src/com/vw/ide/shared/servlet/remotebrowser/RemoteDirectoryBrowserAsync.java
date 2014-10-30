@@ -67,7 +67,7 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param projectId
 	 * @param fileId
 	 */
-	public void saveFile(String user, String fileName, Long projectId, Long fileId, String content,  AsyncCallback<RequestFileOperationResult> callback);
+	public void saveFile(String user, String path, String fileName, Long projectId, Long fileId, String content,  AsyncCallback<RequestFileOperationResult> callback);
 	
 	/**
 	 * Deleting file
@@ -75,7 +75,7 @@ public interface RemoteDirectoryBrowserAsync {
 	 * @param fileName
 	 * @param fileId
 	 */
-	public void deleteFile(String user, String fileName, Long fileId, 	AsyncCallback<RequestFileOperationResult> callback);
+	public void deleteFile(String user, String path, String fileName, Long fileId, 	AsyncCallback<RequestFileOperationResult> callback);
 
 
 	/**

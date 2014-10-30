@@ -42,7 +42,8 @@ public class EditorPanel extends Composite {
 			@Override
 			public void onBeforeSelection(BeforeSelectionEvent<Widget> event) {
 				FileSheet curFileSheet = (FileSheet) event.getItem();
-				((DevelopmentBoardPresenter)presenter).getView().setTextForEditorContentPanel(curFileSheet.getFilePath() + "\\" + curFileSheet.getFileName());
+				((DevelopmentBoardPresenter)presenter).getView().setTextForEditorContentPanel(curFileSheet.getItemInfo().getAssociatedData().getAbsolutePath() + "/" + curFileSheet.getItemInfo().getAssociatedData().getName());
+				((DevelopmentBoardPresenter)presenter).getView().getProjectPanel().select(curFileSheet.getItemInfo());
 			}
 		});
 		
@@ -58,7 +59,7 @@ public class EditorPanel extends Composite {
 			@Override
 			public void onResize(ResizeEvent event) {
 				 int iPanelHeight = event.getHeight();
-				 for(int i=0; i< tabPanel.getWidgetCount(); i ++) {
+				 for(int i = 0; i < tabPanel.getWidgetCount(); i++) {
 					 Widget widget = tabPanel.getWidget(i);
 					 if (widget instanceof FileSheet) {
 						 widget.setHeight(String.valueOf(iPanelHeight) + "px");
@@ -74,10 +75,12 @@ public class EditorPanel extends Composite {
 
 	public void setFileEditedState(Widget associatedTabWidget, Boolean isEdited) {
 		String sTitle = tabPanel.getConfig(associatedTabWidget).getText();
-		if (sTitle.length()>1) {
-			if((sTitle.charAt(0) != '*')&&isEdited) {
+		if (sTitle.length() > 1) {
+			if((sTitle.charAt(0) != '*') && isEdited) {
 				sTitle = "*" + sTitle;
-			} else if((sTitle.charAt(0) == '*')&&(!isEdited)) {
+			}
+			else
+			if ((sTitle.charAt(0) == '*')&&(!isEdited)) {
 				sTitle = sTitle.substring(1);
 			}
 			tabPanel.getConfig(associatedTabWidget).setText(sTitle);

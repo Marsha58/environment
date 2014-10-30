@@ -10,6 +10,10 @@ import com.vw.ide.shared.servlet.projectmanager.specific.InterpreterDescription;
 @SuppressWarnings("serial")
 public class SequentialInterpreterDescription extends InterpreterDescription {
 
+	public SequentialInterpreterDescription() {
+		super(InterpreterDescription.SEQUENTIAL);
+	}
+	
 	public SequentialInterpreterDescription(String name) {
 		super(name);
 	}

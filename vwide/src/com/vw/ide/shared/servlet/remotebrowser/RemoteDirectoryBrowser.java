@@ -74,7 +74,7 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 * @param fileId
 	 * @return
 	 */
-	RequestFileOperationResult deleteFile(String user, String fileName,	Long fileId);
+	RequestFileOperationResult deleteFile(String user, String path, String fileName,	Long fileId);
 
 	/**
 	 * Save file
@@ -85,7 +85,7 @@ public interface RemoteDirectoryBrowser extends RemoteService {
 	 * @param content
 	 * @return
 	 */
-	RequestFileOperationResult saveFile(String user, String fileName,	Long projectId, Long fileId, String content);
+	RequestFileOperationResult saveFile(String user, String path, String fileName, Long projectId, Long fileId, String content);
 
 	/**
 	 * Closes file

@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.vw.ide.client.utils.Utils;
 import com.vw.ide.server.servlet.IService;
 import com.vw.ide.server.servlet.locator.ServiceLocator;
 import com.vw.ide.server.servlet.userstate.UserStateServiceImpl;
@@ -240,14 +239,15 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 	}
 
 	@Override
-	public RequestFileOperationResult deleteFile(String user, String fileName, Long fileId) {
+	public RequestFileOperationResult deleteFile(String user, String path, String fileName, Long fileId) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
+		String fullPathName = path + "/" + fileName;
 		res.setFileId(fileId);
 		res.setOperation("deleting file");
-		res.setFileName(fileName);
+		res.setFileName(fullPathName);
 		res.setRetCode(0);
 		try{
-	        File fileTemp = new File(fileName);
+	        File fileTemp = new File(fullPathName);
 	          if (fileTemp.exists()){
 	             fileTemp.delete();
 	          }   
@@ -262,22 +262,22 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 	public RequestDirOperationResult readFile(String user, String parent, String fileName, Long projectId, Long fileId) {
 		UserStateInfo userStateInfo;
 		RequestDirOperationResult res = new RequestDirOperationResult();
-		
 		userStateInfo = locateUserStateService().getUserStateInfo(user);
 		if (userStateInfo == null) {
 			userNotFoundReport(res, user, "read_file");
 			return res;
 		}
-		FileItemInfo fileItemInfo = new FileItemInfo(Utils.extractJustFileName(fileName),Utils.extractJustPath(fileName),false);
+		String fullPathName = parent + "/" + fileName;
+		FileItemInfo fileItemInfo = new FileItemInfo(fileName, parent, false);
 		fileItemInfo.setFileId(fileId);
 		fileItemInfo.setProjectId(projectId);
 		res.setProjectId(projectId);
 		res.setFileId(fileId);
 		res.setOperation("reading file");
-		res.setPath(fileName);
+		res.setPath(fullPathName);
 		res.setRetCode(0);
 		try {
-			res.setTextFile(openFile(fileName));
+			res.setTextFile(openFile(fullPathName));
 		}
 		catch(Exception ex) {
 			res.setResult(ex.getMessage());
@@ -287,9 +287,10 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 	}
 
 	@Override
-	public RequestFileOperationResult saveFile(String user, String fileName, Long projectId, Long fileId, String content) {
+	public RequestFileOperationResult saveFile(String user, String path, String fileName, Long projectId, Long fileId, String content) {
 		RequestFileOperationResult res = new RequestFileOperationResult();
-		res.setFileName(fileName);
+		String fullPathName = path + "/" + fileName;
+		res.setFileName(fullPathName);
 		res.setFileId(fileId);
 		res.setOperation("saving file");
 		res.setRetCode(0);
@@ -297,7 +298,7 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		Writer writer = null;
 		
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "utf-8"));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullPathName), "utf-8"));
 			writer.write(content);
 		}
 		catch(IOException ex) {

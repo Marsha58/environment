@@ -2,6 +2,7 @@ package com.vw.ide.client.devboardext.event.handler;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.sencha.gxt.core.client.util.Format;
+import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.box.PromptMessageBox;
 import com.vw.ide.client.FlowController;
@@ -14,10 +15,12 @@ import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 
 public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler implements ProjectMenuHandler {
 	
 	private static String s_newVwmlProjectCaption = "New VWML project";
+	private static String s_vwmlProjectCaption = "VWML project";
 
 	@Override
 	public void handler(Presenter presenter, GwtEvent<?> event) {
@@ -38,6 +41,9 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 			switch (menuId) {
 			case "new_project":
 				makeProjectNew(presenter);
+				break;
+			case "edit_project":
+				editProjectProps(presenter);
 				break;
 			case "delete_project":
 				doDelCurrentProject(presenter, presenter.getSelectedItemInTheProjectTree());
@@ -64,13 +70,28 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 	}
 
 	private void makeProjectNew(DevelopmentBoardPresenter presenter) {
-		VwmlProjectDialog d = new VwmlProjectDialog(null, null);
+		VwmlProjectDialog d = new VwmlProjectDialog(null, null, VwmlProjectDialog.EditMode.NEW);
 		d.setLoggedAsUser(FlowController.getLoggedAsUser());
 		d.associatePresenter(presenter);
 		d.setSize("480", "350");
 		d.showCenter(s_newVwmlProjectCaption, null);
 	}
 
+	private void editProjectProps(DevelopmentBoardPresenter presenter) {
+		if (presenter.getSelectedItemInTheProjectTree() != null) {
+	 		ProjectDescription projectDescription = presenter.getSelectedItemInTheProjectTree().getProjectDescription();
+			VwmlProjectDialog d = new VwmlProjectDialog(projectDescription, null, VwmlProjectDialog.EditMode.EDIT_VWML_SETTINGS);
+			d.setLoggedAsUser(FlowController.getLoggedAsUser());
+			d.associatePresenter(presenter);
+			d.setSize("480", "350");
+			d.showCenter(s_vwmlProjectCaption, null);
+		}
+		else {
+			AlertMessageBox box = new AlertMessageBox("Warning", "Please do project selection");
+			box.show();
+		}
+	}
+	
 	private void doDelCurrentProject(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
 		String msg = Format.substitute(
 				"Are you sure you want to delete project '{0}'?",

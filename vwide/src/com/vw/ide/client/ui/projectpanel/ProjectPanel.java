@@ -45,9 +45,11 @@ import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
 import com.vw.ide.client.ui.toppanel.FileSheet;
+import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.projectmanager.RequestUserAvailableProjectResult;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
 /**
  * A composite that contains the shortcut stack panel on the left side. The
@@ -69,6 +71,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		private boolean markAsProject = false;
 		private boolean alreadyOpened = false;
 		private boolean isEdited = false;
+		private boolean markAsUserRoot = false;
 		
 		@Override
 		public List<? extends com.sencha.gxt.data.shared.TreeStore.TreeNode<ProjectItemInfo>> getChildren() {
@@ -128,13 +131,21 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 			this.isEdited = isEdited;
 		}
 
+		public boolean isMarkAsUserRoot() {
+			return markAsUserRoot;
+		}
+
+		public void setMarkAsUserRoot(boolean markAsUserRoot) {
+			this.markAsUserRoot = markAsUserRoot;
+		}
+
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
 			result = prime
 					* result
-					+ ((associatedData == null) ? 0 : associatedData.getRelPath().hashCode());
+					+ ((associatedData == null) ? 0 : associatedData.generateKey().hashCode());
 			return result;
 		}
 
@@ -150,7 +161,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 			if (associatedData == null) {
 				if (other.associatedData != null)
 					return false;
-			} else if (!associatedData.getRelPath().equals(other.associatedData.getRelPath()))
+			} else if (!associatedData.generateKey().equals(other.associatedData.generateKey()))
 				return false;
 			return true;
 		}
@@ -159,7 +170,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	class KeyProvider implements ModelKeyProvider<ProjectItemInfo> {
 		@Override
 		public String getKey(ProjectItemInfo item) {
-			return item.getAssociatedData().getRelPath();
+			return item.getAssociatedData().generateKey();
 		}
 	}
 
@@ -244,30 +255,86 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		buildContextMenu();
 	}
 
-	public void buildContextMenu() {
+	public void requestUserProjects(String user) {
+		ProjectManagerServiceBroker.requestForAvailableProjects(user, new AvailableProjectsResultCallback(this));
+	}
+
+	public void restoreView(UserStateInfo state) {
+		for(FileItemInfo f : state.getOpenedFiles()) {
+			selectByKey(f.generateKey());
+		}
+		if (state.getFileIdSelected() != null && state.getFileIdSelected().getRelPath() != null) {
+			selectByKey(state.getFileIdSelected().generateKey());
+		}
+	}
+
+	public void buildTreeBranchView(ProjectItemInfo parent, FileItemInfo fi) {
+		ProjectItemInfo p = buildTreeBranch(parent.getProjectDescription(), parent, fi);
+		if (p != null) {
+			ProjectItemInfo pi = new ProjectItemInfo();
+			pi.setProjectDescription(parent.getProjectDescription());
+			pi.setAssociatedData(fi);
+			String fullPath = Utils.createFullProjectPath(parent.getProjectDescription());
+			String relPath = fi.getAbsolutePath().substring(fullPath.length());
+			fi.setRelPath(relPath);
+			store.add(p, pi);
+		}
+	}
+
+	public void deleteBranchView(ProjectItemInfo parent) {
+		store.remove(parent);
+	}
+
+	public void renameTreeBranchView(ProjectItemInfo parent, FileItemInfo fi) {
+		ProjectItemInfo p = store.findModel(parent);
+		if (p != null) {
+			p.setAssociatedData(fi);
+		}
+		store.update(p);
+		if (fi.isDir()) {
+			updateFoldersAfterRenaming(p);
+		}
+	}
+	
+	public void selectParentOf(ProjectItemInfo itemInfo) {
+		ProjectItemInfo p = store.getParent(itemInfo);
+		if (p != null) {
+			projectsField.getSelectionModel().select(p, true);
+		}
+	}
+
+	public void select(ProjectItemInfo itemInfo) {
+		projectsField.getSelectionModel().select(itemInfo, true);
+	}
+
+	public void selectByKey(String key) {
+		ProjectItemInfo p = store.findModelWithKey(key);
+		if (p != null) {
+			select(p);
+		}
+	}
+
+	protected void buildContextMenu() {
 		contextMenu = new ProjectPanelContextMenu(); 
-		contextMenu.setWidth(160);
+		contextMenu.setWidth(170);
 		contextMenu.addBeforeShowHandler(new BeforeShowHandler(){
 			@Override
 			public void onBeforeShow(BeforeShowEvent event) {
 				contextMenu.associatePresenter(getAssociatedPresenter());
 				if (treeSelectedItem != null) {
-					contextMenu.checkEnabling(treeSelectedItem.getAssociatedData());
+					contextMenu.checkEnabling(treeSelectedItem);
 				}
 			}
 		});
 		projectsField.setContextMenu(contextMenu);
 	}
-
-	public void requestUserProjects(String user) {
-		ProjectManagerServiceBroker.requestForAvailableProjects(user, new AvailableProjectsResultCallback(this));
-	}
-
+	
 	protected void makeTree(RequestUserAvailableProjectResult projects) {
 		if (store.getRootCount() == 0) {
 			store.add(makeUserRoot(presenter.getLoggedAsUser()));
 		}
-		ProjectItemInfo root = store.findModelWithKey(presenter.getLoggedAsUser());
+		ProjectItemInfo root = store.findModelWithKey(FileItemInfo.generateKeyFrom(presenter.getLoggedAsUser(), presenter.getLoggedAsUser()));
+		root.setMarkAsUserRoot(true);
 		for(ProjectDescription description : projects.getAvailableProjects()) {
 			ProjectItemInfo projectRoot = makeProjectRoot(description, description.getMainModuleName());
 			projectRoot.setMarkAsProject(true);
@@ -278,19 +345,13 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	
 	private void buildProjectTreeBranchView(ProjectItemInfo projectRoot) {
 		for(FileItemInfo fi : projectRoot.getProjectDescription().getProjectFiles()) {
-			ProjectItemInfo p = buildTreeBranch(projectRoot.getProjectDescription(), projectRoot, fi);
-			if (p != null) {
-				ProjectItemInfo pi = new ProjectItemInfo();
-				pi.setProjectDescription(projectRoot.getProjectDescription());
-				pi.setAssociatedData(fi);
-				store.add(p, pi);
-			}
+			buildTreeBranchView(projectRoot, fi);
 		}
 	}
 	
 	private ProjectItemInfo buildTreeBranch(ProjectDescription projectDescription, ProjectItemInfo projectItem, FileItemInfo fileInfo) {
 		ProjectItemInfo p = null;
-		String projectFullPath = projectDescription.getProjectPath() + "/" + projectDescription.getMainModuleName();
+		String projectFullPath = Utils.createFullProjectPath(projectDescription);
 		if (fileInfo.getAbsolutePath().equals(projectFullPath)) {
 			p = projectItem;
 		}
@@ -336,6 +397,18 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 			r = buildTreeBranchImpl(projectDescription, pi, splittedPath, fileInfo, ++depth);
 		}
 		return r;
+	}
+
+	private void updateFoldersAfterRenaming(ProjectItemInfo parent) {
+		List<ProjectItemInfo> items = store.getAllChildren(parent);
+		if (items != null && items.size() != 0) {
+			for(ProjectItemInfo item : items) {
+				item.getAssociatedData().setAbsolutePath(parent.getAssociatedData().getAbsolutePath() + "/" + item.getAssociatedData().getName());
+				item.getAssociatedData().setAbsolutePath(parent.getAssociatedData().getRelPath() + "/" + item.getAssociatedData().getName());
+				store.update(item);
+				updateFoldersAfterRenaming(item);
+			}
+		}
 	}
 	
 	private static ProjectItemInfo makeUserRoot(String name) {

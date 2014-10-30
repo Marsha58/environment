@@ -10,8 +10,10 @@ import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectDel
 import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRemoveFileResultCallback;
 import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRenameFileResultCallback;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
+import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
+import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
@@ -36,7 +38,7 @@ public class DevelopmentBoardDialogHandlers {
 			if (s.equalsIgnoreCase("YES")) {
 				ProjectManagerServiceBroker.requestForDeletingProject(
 										  owner.getSelectedItemInTheProjectTree().getProjectDescription(),
-										  new ProjectDeletionResultCallback(owner));
+										  new ProjectDeletionResultCallback(owner, owner.getSelectedItemInTheProjectTree()));
 			}
 		}
 	};
@@ -55,7 +57,7 @@ public class DevelopmentBoardDialogHandlers {
 			if (s.equalsIgnoreCase("YES") && owner.getSelectedItemInTheProjectTree() != null) {
 				ProjectManagerServiceBroker.requestForRemovingFileFromProject(owner.getSelectedItemInTheProjectTree().getProjectDescription(),
 																			  owner.getSelectedItemInTheProjectTree().getAssociatedData(),
-																			  new ProjectRemoveFileResultCallback(owner));
+																			  new ProjectRemoveFileResultCallback(owner, owner.getSelectedItemInTheProjectTree()));
 			}
 		}
 	}
@@ -79,13 +81,16 @@ public class DevelopmentBoardDialogHandlers {
 		}
 		
 		private void createFileAndAddToProject(String fileName) {
+			if (!fileName.contains(".")) {
+				fileName += "." + FilesTypesEnum.VWML;
+			}
 			ProjectItemInfo projectItemInfo = owner.getSelectedItemInTheProjectTree();
 			String path = deducePathByProjectItem(projectItemInfo);
 			FileItemInfo fileInfo = new FileItemInfo(fileName, path, false);
 			ProjectManagerServiceBroker.requestForAddingFileToProject(FlowController.getLoggedAsUser(),
 					projectItemInfo.getProjectDescription(),
 					fileInfo,
-					new ProjectAddFileResultCallback(owner));
+					new ProjectAddFileResultCallback(owner, projectItemInfo, fileInfo));
 		}
 	}
 
@@ -114,7 +119,7 @@ public class DevelopmentBoardDialogHandlers {
 			ProjectManagerServiceBroker.requestForAddingFileToProject(FlowController.getLoggedAsUser(),
 					projectItemInfo.getProjectDescription(),
 					fileInfo,
-					new ProjectAddFileResultCallback(owner));
+					new ProjectAddFileResultCallback(owner, projectItemInfo, fileInfo));
 		}		
 	}
 
@@ -142,7 +147,7 @@ public class DevelopmentBoardDialogHandlers {
 			ProjectManagerServiceBroker.requestForAddingFileToProject(FlowController.getLoggedAsUser(),
 					projectItemInfo.getProjectDescription(),
 					fileInfo,
-					new ProjectAddFileResultCallback(owner));
+					new ProjectAddFileResultCallback(owner, projectItemInfo, fileInfo));
 		}		
 	}
 
@@ -197,20 +202,20 @@ public class DevelopmentBoardDialogHandlers {
 		private static void renameFile(DevelopmentBoardPresenter owner, String newFileName, String content) {
 			ProjectItemInfo projectItemInfo = owner.getSelectedItemInTheProjectTree();
 			String path = deducePathByProjectItem(projectItemInfo);
-			FileItemInfo newFileInfo = new FileItemInfo(newFileName, path, false);
+			FileItemInfo newFileInfo = new FileItemInfo(newFileName, path, projectItemInfo.getAssociatedData().isDir());
 			newFileInfo.setContent(content);
 			ProjectManagerServiceBroker.requestForRenamingFileOnProject(
 							projectItemInfo.getProjectDescription(),
 							projectItemInfo.getAssociatedData(),
 							newFileInfo,
-							new ProjectRenameFileResultCallback(owner));
+							new ProjectRenameFileResultCallback(owner, projectItemInfo, newFileInfo));
 		}
 	}
 	
 	protected static String deducePathByProjectItem(ProjectItemInfo projectItemInfo) {
 		String path = null;
 		if (projectItemInfo.isMarkAsProject()) {
-			path = projectItemInfo.getProjectDescription().getProjectPath() + "/" + projectItemInfo.getProjectDescription().getMainModuleName();
+			path = Utils.createFullProjectPath(projectItemInfo.getProjectDescription());
 		}
 		else {
 			path = projectItemInfo.getAssociatedData().getAbsolutePath();

@@ -191,7 +191,7 @@
 			<container:east layoutData="{eastDataTP}">
 				<toolbar:ToolBar borders="false">
 
-					<button:TextButton text="Scrolling Menu">
+					<button:TextButton text="Opened files">
 						<button:menu>
 							<menu:Menu ui:field="scrollMenu" maxHeight="500" minWidth="400"/>
 						</button:menu>

@@ -6,11 +6,11 @@ import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.shared.servlet.remotebrowser.RequestDirOperationResult;
 
-public class AnyDirOperationResultCallback extends ResultCallback<RequestDirOperationResult> {
+public class BrowserAnyDirOperationResultCallback extends ResultCallback<RequestDirOperationResult> {
 
 	private DevelopmentBoardPresenter owner = null;
 
-	public AnyDirOperationResultCallback(DevelopmentBoardPresenter owner) {
+	public BrowserAnyDirOperationResultCallback(DevelopmentBoardPresenter owner) {
 		this.owner = owner;
 	}
 	
@@ -18,7 +18,7 @@ public class AnyDirOperationResultCallback extends ResultCallback<RequestDirOper
 	public void handle(RequestDirOperationResult result) {
 		if (result.getRetCode().intValue() != 0) {
 			String messageAlert = "The operation '" + result.getOperation()
-					+ "' failed.\r\nResult'" + result.getResult() + "'";
+					+ "' failed.\r\nResult '" + result.getResult() + "'";
 			AlertMessageBox alertMessageBox = new AlertMessageBox(
 					"Warning", messageAlert);
 			alertMessageBox.show();

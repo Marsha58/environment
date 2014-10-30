@@ -48,6 +48,10 @@ public class VwmlJavaSettingsTab extends VwmlProjTab {
 	
 	@Override
 	public void setup() {
+		if (getEditMode() == VwmlProjectDialog.EditMode.EDIT_VWML_SETTINGS) {
+			owner.getTfJavaPackageName().disable();
+			owner.getTfJavaSourcePath().disable();
+		}
 		setupTargetLangSourcePath();
 		setupJavaPackage();
 	}

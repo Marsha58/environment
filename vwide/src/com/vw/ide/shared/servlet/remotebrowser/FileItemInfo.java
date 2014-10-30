@@ -158,6 +158,16 @@ public class FileItemInfo implements Serializable {
 		this.content = content;
 	}
 
+	public String generateKey() {
+		String r1 = (this.getRelPath() != null) ? this.getRelPath() : "";
+		String r2 = getName();
+		return generateKeyFrom(r1, r2);
+	}
+	
+	public static String generateKeyFrom(String r1, String r2) {
+		return r1 + "_" + r2;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

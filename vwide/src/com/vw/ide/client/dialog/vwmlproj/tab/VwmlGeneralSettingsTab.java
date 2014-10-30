@@ -109,6 +109,13 @@ public class VwmlGeneralSettingsTab extends VwmlProjTab {
 				owner.getProjectDescription().setDescr(owner.getTfVWMLDescr().getText());
 			}
 		});
+		if (getEditMode() == VwmlProjectDialog.EditMode.EDIT_VWML_SETTINGS) {
+			owner.getTfVWMLProjectPath().disable();
+			owner.getTfVWMLProjectName().disable();
+			owner.getTfVWMLMainModule().disable();
+			owner.getTfVWMLDescr().disable();
+			owner.getTfVWMLAuthor().disable();
+		}
 	}
 	
 	public void setup() {

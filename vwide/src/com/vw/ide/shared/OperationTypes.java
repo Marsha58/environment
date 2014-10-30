@@ -3,6 +3,7 @@ package com.vw.ide.shared;
 public enum OperationTypes {
    NEW_FOLDER("new_folder"),	
    NEW_PROJECT("new_project"),
+   EDIT_PROJECT("edit_project"),
    IMPORT_PROJECT("import_project"),
    DELETE_PROJECT("delete_project"),
    NEW_FILE("new_file"),

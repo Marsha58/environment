@@ -16,8 +16,8 @@ import com.vw.ide.client.devboardext.event.handler.ProjectMenuEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SaveFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SelectFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ServerLogEventHandler;
-import com.vw.ide.client.devboardext.service.userstate.callbacks.GettingUserStateResultCallback;
-import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateHandler;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateGettingResultCallback;
+import com.vw.ide.client.devboardext.service.userstate.callbacks.custom.handler.UserStateHandler;
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
 import com.vw.ide.client.event.handler.FileEditedHandler;
@@ -96,7 +96,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		container.clear();
 		container.add(view.asWidget());
 		RemoteUserStateServiceBroker.requestForGettingUserState(getLoggedAsUser(),
-																new GettingUserStateResultCallback(this, new RestoreUserDevelopmentEnvironment(this)));
+																new UserStateGettingResultCallback(this, new RestoreUserDevelopmentEnvironment(this)));
 	}
 
 	@Override
