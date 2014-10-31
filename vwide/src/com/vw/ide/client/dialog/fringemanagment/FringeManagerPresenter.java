@@ -1,25 +1,13 @@
 package com.vw.ide.client.dialog.fringemanagment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.editor.client.Editor.Path;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.sencha.gxt.core.client.ValueProvider;
-import com.sencha.gxt.data.shared.ListStore;
-import com.sencha.gxt.data.shared.ModelKeyProvider;
-import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
-import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
-import com.sencha.gxt.widget.core.client.grid.ColumnModel;
-import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.vw.ide.client.dialog.fringemanagment.event.handler.GetCategoriesEventHandler;
 import com.vw.ide.client.dialog.fringemanagment.event.handler.GetFringesEventHandler;
 import com.vw.ide.client.event.handler.GetCategoriesHandler;
@@ -148,6 +136,13 @@ public class FringeManagerPresenter extends Presenter {
 	}
 	
 	private void updateFringeList(Fringe[] fringes) {
+		for (int i = 0; i < fringes.length; i++) {
+			if(getView().listStoreFringes.findModelWithKey(fringes[i].getId().toString()) == null) {
+				getView().listStoreFringes.add(fringes[i]);
+			} else {
+				getView().listStoreFringes.update(fringes[i]);
+			}
+		}		
 	}
 	
 

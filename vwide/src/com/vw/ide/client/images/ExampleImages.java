@@ -173,6 +173,10 @@ public interface ExampleImages extends ClientBundle {
   ImageResource delete_edit_en();
 
   @Source("enabled//signed-off.png")
-  ImageResource rename_file_en();  
+  ImageResource rename_file_en();
+
+  @Source("enabled//copy_edit.gif")
+  ImageResource copy_edit_en();  
+
   
 }

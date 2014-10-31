@@ -13,7 +13,13 @@ public enum OperationTypes {
    RENAME_FILE("rename_file"),
    SAVE_ALL_FILES("save_all_files"),
    CLEAR_CONSOLE_WINDOW("clear_console_window"),
-   INSERT_FRINGE("insert_fringe");
+   INSERT_FRINGE("insert_fringe"),
+   ADD_CATEGORY("add_category"),
+   EDIT_CATEGORY("edit_category"),
+   DELETE_CATEGORY("delete_category"),
+   ADD_FRINGE("add_fringe"),
+   EDIT_FRINGE("edit_fringe"),
+   DELETE_FRINGE("delete_fringe");
    
 	private final String name;
 	
