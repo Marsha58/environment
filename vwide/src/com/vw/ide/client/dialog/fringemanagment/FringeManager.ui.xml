@@ -97,7 +97,7 @@
 										<button:TextButton ui:field="buttonEditCategory" text="edit" width="60" />
 									</container:child>
 									<container:child layoutData="{boxLayoutDataMargins0}">
-										<button:TextButton text="delete" width="60" />
+										<button:TextButton ui:field="buttonDeleteCategory" text="delete" width="60" />
 									</container:child>
 								</container:HBoxLayoutContainer>
 							</container:south>
@@ -117,16 +117,20 @@
 								<container:HBoxLayoutContainer
 									padding="{padding5}" hBoxLayoutAlign="MIDDLE" pack="END">
 									<container:child layoutData="{boxLayoutDataMargins0500}">
-										<button:TextButton text="add" width="60" />
+										<button:TextButton ui:field="buttonRefreshFringe" 
+											text="refresh" width="60" />
+									</container:child>									
+									<container:child layoutData="{boxLayoutDataMargins0500}">
+										<button:TextButton ui:field="buttonAddFringe" text="add" width="60" />
 									</container:child>
 									<container:child layoutData="{boxLayoutDataMargins0500}">
-										<button:TextButton text="move" width="60" />
+										<button:TextButton ui:field="buttonMoveFringe" text="move" width="60" />
 									</container:child>
 									<container:child layoutData="{boxLayoutDataMargins0500}">
-										<button:TextButton text="rename" width="60" />
+										<button:TextButton ui:field="buttonEditFringe" text="edit" width="60" />
 									</container:child>
 									<container:child layoutData="{boxLayoutDataMargins0}">
-										<button:TextButton text="delete" width="60" />
+										<button:TextButton ui:field="buttonDeleteFringe" text="delete" width="60" />
 									</container:child>
 								</container:HBoxLayoutContainer>
 							</container:south>

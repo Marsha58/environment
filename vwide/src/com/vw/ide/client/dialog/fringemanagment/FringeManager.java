@@ -16,8 +16,8 @@ import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
-import com.sencha.gxt.widget.core.client.event.CancelEditEvent;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
+import com.sencha.gxt.widget.core.client.event.CancelEditEvent;
 import com.sencha.gxt.widget.core.client.event.CancelEditEvent.CancelEditHandler;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent.CompleteEditHandler;
@@ -27,23 +27,20 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.event.ShowEvent;
 import com.sencha.gxt.widget.core.client.event.ShowEvent.ShowHandler;
+import com.sencha.gxt.widget.core.client.form.IntegerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
-import com.sencha.gxt.widget.core.client.grid.CellSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
 import com.sencha.gxt.widget.core.client.grid.GridSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.GridView;
 import com.sencha.gxt.widget.core.client.grid.editing.GridEditing;
-import com.sencha.gxt.widget.core.client.grid.editing.GridInlineEditing;
 import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
 import com.vw.ide.client.dialog.VwmlDialogExt;
 import com.vw.ide.client.event.uiflow.GetCategoriesEvent;
 import com.vw.ide.client.event.uiflow.GetFringesEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
-import com.vw.ide.client.ui.windowspanel.WindowsPanelContextMenu;
 import com.vw.ide.shared.servlet.fringes.model.Category;
 import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
@@ -59,6 +56,7 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public static final String CANCEL_ID = "CANCEL_ID";
 
 	private CategoryContextMenu contextMenuCategory;
+	private FringeContextMenu contextMenuFringe;
 	
 	@UiField
 	TextButton buttonAddCategory;
@@ -83,8 +81,16 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 	// final GridEditing<Category> editingCategory = new
 	// GridInlineEditing<Category>(gridCategories);
-	final GridEditing<Category> editingCategory = new GridRowEditing<Category>(gridCategories);
+	private final GridEditing<Category> editingCategory = new GridRowEditing<Category>(gridCategories);
+	private final GridEditing<Fringe> editingFringe = new GridRowEditing<Fringe>(gridFringes);
 
+	private Integer categoryId = 2;
+	private Integer fringeId = 2;
+	
+	private Category selectedCategory = null;
+	private Fringe selectedFringe = null;
+	
+	
 	interface FringManagerUiBinder extends UiBinder<Widget, FringeManager> {
 	}
 
@@ -92,13 +98,9 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public interface CategoryProperties extends PropertyAccess<Category> {
 		@Path("id")
 		ModelKeyProvider<Category> key();
-
 		ValueProvider<Category, Integer> id();
-
 		ValueProvider<Category, String> name();
-
 		ValueProvider<Category, String> icon();
-
 		ValueProvider<Category, String> description();
 	}
 
@@ -106,22 +108,16 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public interface FringeProperties extends PropertyAccess<Fringe> {
 		@Path("id")
 		ModelKeyProvider<Fringe> key();
-
 		ValueProvider<Fringe, Integer> id();
-
 		ValueProvider<Fringe, String> name();
-
 		ValueProvider<Fringe, String> path();
-
 		ValueProvider<Fringe, Integer> categoryId();
-
 		ValueProvider<Fringe, String> description();
 	}
 
 	TextButton buttonSave = new TextButton("Save");
 	TextButton buttonCancel = new TextButton("Cancel");
 
-	private Category selectedCategory = null;
 
 	public FringeManager() {
 		createCategoryUi();
@@ -132,6 +128,8 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 		buildContextMenuCategory();
 		editingCategory.setEditableGrid(null);
+		buildContextMenuFringe();
+		editingFringe.setEditableGrid(null);
 
 		// gridCategories.setSelectionModel(new CellSelectionModel<Category>());
 		gridCategories.setSelectionModel(new GridSelectionModel<Category>());
@@ -163,6 +161,32 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			
 		});
 		
+		gridFringes.addRowClickHandler(new RowClickHandler() {
+
+			@Override
+			public void onRowClick(RowClickEvent event) {
+				int rowIndex = event.getRowIndex();
+				selectedFringe = listStoreFringes.get(rowIndex);
+			}
+		});
+		
+		editingFringe.addCompleteEditHandler(new CompleteEditHandler<Fringe>() {
+
+			@Override
+			public void onCompleteEdit(CompleteEditEvent<Fringe> event) {
+				editingFringe.setEditableGrid(null);
+			}
+		});
+		
+		editingFringe.addCancelEditHandler(new CancelEditHandler<Fringe>() {
+
+			@Override
+			public void onCancelEdit(CancelEditEvent<Fringe> event) {
+				editingFringe.setEditableGrid(null);
+			}
+			
+		});		
+		
 
 		addShowHandler(new ShowHandler() {
 
@@ -181,26 +205,30 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		// gridViewCategories.setAutoExpandColumn(columnModelCategories.getColumn(0));
 	}
 
-	private ColumnConfig<Category, Integer> ccId;
-	private ColumnConfig<Category, String> ccName;
-	private ColumnConfig<Category, String> ccIcon;
+	private ColumnConfig<Category, Integer> ccCategoryId;
+	private ColumnConfig<Category, String> ccCategoryName;
+	private ColumnConfig<Category, String> ccCategoryIcon;
+	private ColumnConfig<Category, String> ccCategoryDescription;
 
 	private ColumnModel<Category> initColumnModelCategory() {
 		// Create the configurations for each column in the grid
 		List<ColumnConfig<Category, ?>> ccs = new ArrayList<ColumnConfig<Category, ?>>();
 
-		ccId = new ColumnConfig<Category, Integer>(categoryProperties.id(), 20, "Id");
-		ccs.add(ccId);
+		ccCategoryId = new ColumnConfig<Category, Integer>(categoryProperties.id(), 20, "Id");
+		ccs.add(ccCategoryId);
 
-		ccName = new ColumnConfig<Category, String>(categoryProperties.name(), 70, "Name");
-		ccs.add(ccName);
-		editingCategory.addEditor(ccName, new TextField());
+		ccCategoryName = new ColumnConfig<Category, String>(categoryProperties.name(), 80, "Name");
+		ccs.add(ccCategoryName);
+		editingCategory.addEditor(ccCategoryName, new TextField());
 
-		ccIcon = new ColumnConfig<Category, String>(categoryProperties.icon(), 50, "Icon");
-		ccs.add(ccIcon);
-		editingCategory.addEditor(ccIcon, new TextField());
+		ccCategoryIcon = new ColumnConfig<Category, String>(categoryProperties.icon(), 70, "Icon");
+		ccs.add(ccCategoryIcon);
+		editingCategory.addEditor(ccCategoryIcon, new TextField());
 
-		ccs.add(new ColumnConfig<Category, String>(categoryProperties.description(), 200, "Description"));
+		ccCategoryDescription = new ColumnConfig<Category, String>(categoryProperties.description(), 200, "Description");
+		ccs.add(ccCategoryDescription);
+		editingCategory.addEditor(ccCategoryDescription, new TextField());
+		
 		return new ColumnModel<Category>(ccs);
 	}
 
@@ -214,15 +242,33 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		listStoreFringes = initListStoreFringe();
 
 	}
+	
+	private ColumnConfig<Fringe, Integer> ccFringeId;
+	private ColumnConfig<Fringe, String> ccFringeName;
+	private ColumnConfig<Fringe, String> ccFringePath;
+	private ColumnConfig<Fringe, Integer> ccFringeCategoryId;
+	private ColumnConfig<Fringe, String> ccFringeDescription;
+	
 
 	private ColumnModel<Fringe> initColumnModelFringe() {
 		// Create the configurations for each column in the grid
 		List<ColumnConfig<Fringe, ?>> ccs = new ArrayList<ColumnConfig<Fringe, ?>>();
-		ccs.add(new ColumnConfig<Fringe, Integer>(fringeProperties.id(), 20, "Id"));
-		ccs.add(new ColumnConfig<Fringe, String>(fringeProperties.name(), 70, "Name"));
-		ccs.add(new ColumnConfig<Fringe, String>(fringeProperties.path(), 100, "Path"));
-		ccs.add(new ColumnConfig<Fringe, Integer>(fringeProperties.categoryId(), 70, "Category Id"));
-		ccs.add(new ColumnConfig<Fringe, String>(fringeProperties.description(), 200, "Description"));
+		ccFringeId = new ColumnConfig<Fringe, Integer>(fringeProperties.id(), 20, "Id"); 
+		ccs.add(ccFringeId);
+		editingFringe.addEditor(ccFringeId, new IntegerField());
+		ccFringeName = new ColumnConfig<Fringe, String>(fringeProperties.name(), 80, "Name");
+		ccs.add(ccFringeName);
+		editingFringe.addEditor(ccFringeName, new TextField());
+		ccFringePath = new ColumnConfig<Fringe, String>(fringeProperties.path(), 100, "Path");
+		ccs.add(ccFringePath);
+		editingFringe.addEditor(ccFringePath, new TextField());
+		ccFringeCategoryId = new ColumnConfig<Fringe, Integer>(fringeProperties.categoryId(), 70, "Category Id");
+		ccs.add(ccFringeCategoryId);
+		editingFringe.addEditor(ccFringeCategoryId, new IntegerField());
+		ccFringeDescription = new ColumnConfig<Fringe, String>(fringeProperties.description(), 200, "Description");
+		ccs.add(ccFringeDescription);
+		editingFringe.addEditor(ccFringeDescription, new TextField());
+
 		return new ColumnModel<Fringe>(ccs);
 	}
 
@@ -261,15 +307,40 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		return this.presenter;
 	}
 
-	protected void createEditingCategory() {
-
+	public GridEditing<Category> getEditingCategory() {
+		return editingCategory;
 	}
 
-	@UiHandler({ "buttonRefreshCategory" })
-	public void onButtonRefreshCategoryClick(SelectEvent event) {
-		
-		presenter.fireEvent(new GetCategoriesEvent());
+	public ListStore<Category> getListStoreCategories() {
+		return listStoreCategories;
 	}
+	
+	public Grid<Category> getGridCategories() {
+		return gridCategories;
+	}
+
+	public Category getSelectedCategory() {
+		return selectedCategory; 
+	}	
+
+	public GridEditing<Fringe> getEditingFringe() {
+		return editingFringe;
+	}
+
+	public ListStore<Fringe> getListStoreFringes() {
+		return listStoreFringes;
+	}
+	
+	public Grid<Fringe> getGridFringes() {
+		return gridFringes;
+	}
+	
+	public Fringe getSelectedFringe() {
+		return selectedFringe; 
+	}
+	
+	
+
 	
 	
 	public void buildContextMenuCategory() {
@@ -283,38 +354,89 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		});
 		gridCategories.setContextMenu(contextMenuCategory);
 	}		
-	
-	private Integer categoryId = 2;
 
+	public void buildContextMenuFringe() {
+		contextMenuFringe = new FringeContextMenu();
+		contextMenuFringe.setWidth(80);
+		contextMenuFringe.addBeforeShowHandler(new BeforeShowHandler() {
+			@Override
+			public void onBeforeShow(BeforeShowEvent event) {
+				contextMenuFringe.associatePresenter(getAssociatedPresenter());
+			}
+		});
+		gridFringes.setContextMenu(contextMenuFringe);
+	}		
+
+	
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer value) {
+		categoryId = value;
+	}
+	
+	public Integer getNewCategoryId() {
+		return ++categoryId;
+	}
+	
+	public Integer getFringeId() {
+		return fringeId;
+	}
+	
+	public void setFringeId(Integer value) {
+		fringeId = value;
+	}
+	
+
+	public Integer getNewFringeId() {
+		return ++fringeId;
+	}	
+	
+	@UiHandler({ "buttonRefreshCategory" })
+	public void onButtonRefreshCategoryClick(SelectEvent event) {
+		presenter.fireEvent(new GetCategoriesEvent());
+	}
 
 	@UiHandler({ "buttonAddCategory" })
 	public void onButtonAddCategoryClick(SelectEvent event) {
-		Category newCategory = new Category();
-		newCategory.setId(++categoryId);
-		newCategory.setName("New category 1");
-		newCategory.setIcon("*.png");
-
-		editingCategory.cancelEditing();
-		listStoreCategories.add(0, newCategory);
-
-		editingCategory.setEditableGrid(gridCategories);
-
-		int row = listStoreCategories.indexOf(newCategory);
-		editingCategory.startEditing(new GridCell(row, 0));
+		presenter.doAddCategory();
 	}
 
 	@UiHandler({ "buttonEditCategory" })
 	public void onButtonEditCategoryClick(SelectEvent event) {
-
-		int row = listStoreCategories.indexOf(selectedCategory);
-		if (selectedCategory != null) {
-			editingCategory.setEditableGrid(gridCategories);
-			editingCategory.startEditing(new GridCell(row, 0));
-		}
-
+		presenter.doEditCategory();
 	}
 	
-		
+	@UiHandler({ "buttonDeleteCategory" })
+	public void onButtonDeleteCategoryClick(SelectEvent event) {
+		presenter.doDeleteCategory();
+	}		
+
+	@UiHandler({ "buttonRefreshFringe" })
+	public void onButtonRefreshFringeClick(SelectEvent event) {
+		presenter.fireEvent(new GetFringesEvent());
+	}
 	
+	@UiHandler({ "buttonAddFringe" })
+	public void onButtonAddFringeClick(SelectEvent event) {
+		presenter.doAddFringe();
+	}
+
+	@UiHandler({ "buttonEditFringe" })
+	public void onButtonEditFringeClick(SelectEvent event) {
+		presenter.doEditFringe();
+	}
+	
+	@UiHandler({ "buttonMoveFringe" })
+	public void onButtonMoveFringeClick(SelectEvent event) {
+		presenter.doMoveFringe();
+	}
+	
+	
+	@UiHandler({ "buttonDeleteFringe" })
+	public void onButtonDeleteFringeClick(SelectEvent event) {
+		presenter.doDeleteFringe();
+	}		
 
 }

@@ -7,7 +7,13 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.sencha.gxt.core.client.util.Format;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
+import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
+import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
+import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
 import com.vw.ide.client.dialog.fringemanagment.event.handler.GetCategoriesEventHandler;
 import com.vw.ide.client.dialog.fringemanagment.event.handler.GetFringesEventHandler;
 import com.vw.ide.client.event.handler.GetCategoriesHandler;
@@ -204,6 +210,93 @@ public class FringeManagerPresenter extends Presenter {
 		eventBus.removeHandler(GetFringesEvent.TYPE, (GetFringesHandler)dispatcher.get(GetFringesEvent.TYPE));
 	}
 	
+	
+	public void doAddCategory() {
+		Category newCategory = new Category();
+		newCategory.setId(getView().getNewCategoryId());
+		newCategory.setName("New category 1");
+		newCategory.setIcon("*.png");
+
+		getView().getEditingCategory().cancelEditing();
+		getView().getListStoreCategories().add(0, newCategory);
+
+		getView().getEditingCategory().setEditableGrid(getView().getGridCategories());
+
+		int row = getView().getListStoreCategories().indexOf(newCategory);
+		getView().getEditingCategory().startEditing(new GridCell(row, 0));
+	}
+	
+	
+	public void doEditCategory() {
+		int row = getView().getListStoreCategories().indexOf(getView().getSelectedCategory());
+		if (getView().getSelectedCategory() != null) {
+			getView().getEditingCategory().setEditableGrid(getView().getGridCategories());
+			getView().getEditingCategory().startEditing(new GridCell(row, 0));
+		}	
+	}
+	
+	public void doDeleteCategory() {
+		if (getView().getSelectedCategory() != null) {
+			String msg = Format.substitute("Are you sure you want to delete the category '{0}'?", getView().getSelectedCategory().getName());
+			ConfirmMessageBox box = new ConfirmMessageBox("Confirm", msg);
+	        box.addDialogHideHandler(new DialogHideHandler() {
+				@Override
+				public void onDialogHide(DialogHideEvent event) {
+					if (event.getHideButton().name().equalsIgnoreCase("YES")) {
+						getView().getListStoreCategories().remove(getView().getSelectedCategory());
+					};
+				}
+			});
+	        box.show();
+		}	
+	}
+	
+	
+	public void doAddFringe() {
+		Fringe newFringe = new Fringe();
+		newFringe.setId(getView().getNewCategoryId());
+		newFringe.setName("New fringe 1");
+		newFringe.setPath("/");
+
+		getView().getEditingFringe().cancelEditing();
+		getView().getListStoreFringes().add(0, newFringe);
+
+		getView().getEditingFringe().setEditableGrid(getView().getGridFringes());
+
+		int row = getView().getListStoreFringes().indexOf(newFringe);
+		getView().getEditingCategory().startEditing(new GridCell(row, 0));
+	}
+	
+	
+	public void doEditFringe() {
+		int row = getView().getListStoreFringes().indexOf(getView().getSelectedFringe());
+		if (getView().getSelectedFringe() != null) {
+			getView().getEditingFringe().setEditableGrid(getView().getGridFringes());
+			getView().getEditingFringe().startEditing(new GridCell(row, 0));
+		}	
+	}
+	
+	public void doMoveFringe() {
+		int row = getView().getListStoreFringes().indexOf(getView().getSelectedFringe());
+		if (getView().getSelectedFringe() != null) {
+		}	
+	}	
+	
+	public void doDeleteFringe() {
+		if (getView().getSelectedFringe() != null) {
+			String msg = Format.substitute("Are you sure you want to delete the fringe '{0}'?", getView().getSelectedFringe().getName());
+			ConfirmMessageBox box = new ConfirmMessageBox("Confirm", msg);
+	        box.addDialogHideHandler(new DialogHideHandler() {
+				@Override
+				public void onDialogHide(DialogHideEvent event) {
+					if (event.getHideButton().name().equalsIgnoreCase("YES")) {
+						getView().getListStoreFringes().remove(getView().getSelectedFringe());
+					};
+				}
+			});
+	        box.show();
+		}	
+	}		
 	
 	
 	public void doSaveChanges() {
