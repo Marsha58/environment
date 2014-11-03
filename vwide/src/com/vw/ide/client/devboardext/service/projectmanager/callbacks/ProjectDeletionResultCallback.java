@@ -27,7 +27,7 @@ public class ProjectDeletionResultCallback extends ResultCallback<RequestProject
 			alertMessageBox.show();
 		} 
 		else {
-			owner.getView().getProjectPanel().deleteBranchView(itemInfo);
+			owner.getView().getDeleteOperationBlock().deleteProjectItem(itemInfo);
 		}
 		owner.fireEvent(new ServerLogEvent(result));
 	}

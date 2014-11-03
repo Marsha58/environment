@@ -1,6 +1,5 @@
 package com.vw.ide.shared.servlet.projectmanager;
 
-import com.vw.ide.shared.servlet.RequestResult;
 
 /**
  * Result of removing file from the given project
@@ -8,6 +7,6 @@ import com.vw.ide.shared.servlet.RequestResult;
  *
  */
 @SuppressWarnings("serial")
-public class RequestProjectRemoveFileResult extends RequestResult {
+public class RequestProjectRemoveFileResult extends RequestProjectResult {
 
 }

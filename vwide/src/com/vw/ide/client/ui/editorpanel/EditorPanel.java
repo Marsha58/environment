@@ -88,13 +88,13 @@ public class EditorPanel extends Composite {
 		}
 	}
 	
-	protected Presenter getAssociatedPresenter() {
-		return this.presenter;
-	}
-
 	public TabPanel getTabPanel() {
 	   return tabPanel;
 	}	
+
+	protected Presenter getAssociatedPresenter() {
+		return this.presenter;
+	}
 	
 	private Widget constructUi() {
 		widget = uiBinder.createAndBindUi(this);

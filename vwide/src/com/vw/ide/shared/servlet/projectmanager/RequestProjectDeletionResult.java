@@ -1,6 +1,5 @@
 package com.vw.ide.shared.servlet.projectmanager;
 
-import com.vw.ide.shared.servlet.RequestResult;
 
 /**
  * Result on project deletion
@@ -8,6 +7,6 @@ import com.vw.ide.shared.servlet.RequestResult;
  *
  */
 @SuppressWarnings("serial")
-public class RequestProjectDeletionResult extends RequestResult {
+public class RequestProjectDeletionResult extends RequestProjectResult {
 
 }

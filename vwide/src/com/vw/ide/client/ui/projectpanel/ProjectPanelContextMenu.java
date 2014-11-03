@@ -110,7 +110,7 @@ public class ProjectPanelContextMenu extends Menu{
 		this.add(new SeparatorMenuItem());
 		
 		newFolder = new MenuItem();
-		newFolder.setItemId("idNewFolder");
+		newFolder.setItemId(OperationTypes.NEW_FOLDER.getName());
 		newFolder.setText("New folder");
 		newFolder.setIcon(Resources.IMAGES.folder());
 		newFolder.addSelectionHandler(selectionHandler);		
@@ -149,6 +149,8 @@ public class ProjectPanelContextMenu extends Menu{
 				  isNewFileEnabled = true;
 				  isImportFileEnabled = true;
 				  isNewFolderEnabled = true;
+				  isDelFileEnabled = true;
+				  isRenameFileEnabled = true;
 			  }
 			  else
 			  if (!fileItemInfo.isDir()) {

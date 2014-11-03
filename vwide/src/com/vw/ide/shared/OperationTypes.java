@@ -12,6 +12,7 @@ public enum OperationTypes {
    SAVE_FILE("save_file"),
    DELETE_FILE("delete_file"),
    RENAME_FILE("rename_file"),
+   RENAME_DIR("rename_dir"),
    READ_FILE("read_file"),
    SAVE_ALL_FILES("save_all_files");
    

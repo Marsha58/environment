@@ -115,7 +115,7 @@ public class DevelopmentBoardDialogHandlers {
 		private void createFolderAndAddToProject(String fileName) {
 			ProjectItemInfo projectItemInfo = owner.getSelectedItemInTheProjectTree();
 			String path = deducePathByProjectItem(projectItemInfo);
-			FileItemInfo fileInfo = new FileItemInfo(fileName, path, true);
+			FileItemInfo fileInfo = new FileItemInfo(fileName, path + "/" + fileName, true);
 			ProjectManagerServiceBroker.requestForAddingFileToProject(FlowController.getLoggedAsUser(),
 					projectItemInfo.getProjectDescription(),
 					fileInfo,
@@ -201,14 +201,17 @@ public class DevelopmentBoardDialogHandlers {
 		
 		private static void renameFile(DevelopmentBoardPresenter owner, String newFileName, String content) {
 			ProjectItemInfo projectItemInfo = owner.getSelectedItemInTheProjectTree();
-			String path = deducePathByProjectItem(projectItemInfo);
-			FileItemInfo newFileInfo = new FileItemInfo(newFileName, path, projectItemInfo.getAssociatedData().isDir());
+			FileItemInfo newFileInfo = new FileItemInfo(newFileName,
+										projectItemInfo.getAssociatedData().getAbsolutePath(),
+										projectItemInfo.getAssociatedData().isDir());
 			newFileInfo.setContent(content);
+			newFileInfo.setRelPath(projectItemInfo.getAssociatedData().getRelPath());
+			owner.getView().getRenameOperationBlock().renameItemAndUpdateProject(projectItemInfo, newFileInfo);
 			ProjectManagerServiceBroker.requestForRenamingFileOnProject(
 							projectItemInfo.getProjectDescription(),
 							projectItemInfo.getAssociatedData(),
 							newFileInfo,
-							new ProjectRenameFileResultCallback(owner, projectItemInfo, newFileInfo));
+							new ProjectRenameFileResultCallback(owner, projectItemInfo.getProjectDescription()));
 		}
 	}
 	

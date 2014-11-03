@@ -1,6 +1,7 @@
 package com.vw.ide.client.devboardext;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
@@ -25,6 +26,9 @@ import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.FlowController;
+import com.vw.ide.client.devboardext.operation.block.AddOperationBlock;
+import com.vw.ide.client.devboardext.operation.block.DeleteOperationBlock;
+import com.vw.ide.client.devboardext.operation.block.RenameOperationBlock;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -35,6 +39,7 @@ import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
 import com.vw.ide.client.ui.windowspanel.WindowsPanelView;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
@@ -72,10 +77,13 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	WindowsPanelView windows;
 
 	private Presenter presenter = null;
+	private RenameOperationBlock renameOperationBlock = new RenameOperationBlock(this);
+	private AddOperationBlock addOperationBlock = new AddOperationBlock(this);
+	private DeleteOperationBlock deleteOperationBlock = new DeleteOperationBlock(this);
 
 	interface DevelopmentBoardUiBinder extends UiBinder<SimpleContainer, DevelopmentBoard> {
 	}
-	
+
 	public DevelopmentBoard() {
 		ListStore<Theme> colors = new ListStore<Theme>(
 			new ModelKeyProvider<Theme>() {
@@ -175,7 +183,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		this.presenter = presenter;
 	}
 
-	protected Presenter getAssociatedPresenter() {
+	public Presenter getAssociatedPresenter() {
 		return presenter;
 	}
 	
@@ -192,35 +200,11 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 				topPanel.enableSaveAll(edited);
 			}
 			else {
-				boolean saveAllEnabled = false;
-				for(FileItemInfo fi : itemInfo.getProjectDescription().getProjectFiles()) {
-					if (getProjectPanel().isEdited(fi)) {
-						saveAllEnabled = true;
-						break;
-					}
-				}
-				topPanel.enableSaveAll(saveAllEnabled);
+				topPanel.enableSaveAll(getProjectPanel().isAnyEditedNotSavedFile(itemInfo.getProjectDescription()));
 			}
 		}
 	}
 	
-	public void deleteFileItemFromScrollMenu(ProjectItemInfo itemInfo) {
-		topPanel.delItemFromScrollMenu(itemInfo);	
-	}
-
-	public void addNewFileTabItem(ProjectItemInfo itemInfo) {
-		TabItemConfig tabItemConfig = new TabItemConfig(itemInfo.getAssociatedData().getName());
-		tabItemConfig.setClosable(true);
-		FileSheet newFileSheet = new FileSheet(presenter, itemInfo);
-		newFileSheet.constructEditor(itemInfo.getAssociatedData().getContent(),
-									FileItemInfo.recognizeFileType(itemInfo.getAssociatedData().getName()));
-		editor.getTabPanel().add(newFileSheet, tabItemConfig);
-		itemInfo.setFileSheet(newFileSheet);
-		scrollToTab(itemInfo);
-		addFileItemToScrollMenu(itemInfo);
-		itemInfo.setAlreadyOpened(true);
-	}
-
 	public void scrollToTab(ProjectItemInfo itemInfo) {
 		if (itemInfo.getFileSheet() != null) {
 			editor.getTabPanel().setActiveWidget(itemInfo.getFileSheet());
@@ -228,32 +212,23 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		}
 	}
 
-	public void renameFileTabItem(ProjectItemInfo itemInfo, FileItemInfo toRename) {
-		getProjectPanel().renameTreeBranchView(itemInfo, toRename);
-		updateTabName(itemInfo);
-	}
-	
-	public void updateTabName(ProjectItemInfo itemInfo) {
-		FileSheet updatedFileSheet = itemInfo.getFileSheet();
-		if (updatedFileSheet != null) {
-			TabItemConfig conf = editor.getTabPanel().getConfig(updatedFileSheet);
-			conf.setText(itemInfo.getAssociatedData().getName());
-			editor.getTabPanel().update(updatedFileSheet, conf);
-			deleteFileItemFromScrollMenu(itemInfo);
-			addFileItemToScrollMenu(itemInfo);
-		}
-	}
-	
 	public void afterClosingTabName(ProjectItemInfo itemInfo) {
-		deleteFileItemFromScrollMenu(itemInfo);
+		getTopPanel().delItemFromScrollMenu(itemInfo);
 		if (editor.getTabPanel().getWidgetCount() == 0) {
 			setTextForEditorContentPanel(null);
 			getProjectPanel().selectParentOf(itemInfo);
 		}
 	}
-	
-	public void addFileItemToScrollMenu(ProjectItemInfo itemInfo) {
-		topPanel.addItemToScrollMenu(itemInfo);
+
+	public void updateFileItemTabName(ProjectItemInfo itemInfo) {
+		FileSheet updatedFileSheet = itemInfo.getFileSheet();
+		if (updatedFileSheet != null) {
+			TabItemConfig conf = editor.getTabPanel().getConfig(updatedFileSheet);
+			conf.setText(itemInfo.getAssociatedData().getName());
+			getEditorPanel().getTabPanel().update(updatedFileSheet, conf);
+			getTopPanel().delItemFromScrollMenu(itemInfo);
+			getTopPanel().addItemToScrollMenu(itemInfo);
+		}
 	}
 	
 	public void setTextForEditorContentPanel(String text) {
@@ -264,10 +239,6 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		return projectPanel;
 	}
 	
-	public void requestUserProjects() {
-		projectPanel.requestUserProjects(FlowController.getLoggedAsUser());
-	}
-
 	public void updateEditorPanelTheme(AceColorThemeChangedEvent event) {
 		for (int i = 0; i < editor.getTabPanel().getWidgetCount(); i++) {
 			FileSheet curFileSheet = (FileSheet)editor.getTabPanel().getWidget(i);
@@ -279,23 +250,36 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		getProjectPanel().restoreView(userState);
 	}
 	
-	public void addProjectItemAndSelect(ProjectItemInfo parent, FileItemInfo toAdd) {
-		getProjectPanel().buildTreeBranchView(parent, toAdd);
-		getProjectPanel().selectByKey(toAdd.generateKey());
+	public TopPanel getTopPanel() {
+		return topPanel;
+	}
+	
+	public EditorPanel getEditorPanel() {
+		return editor;
+	}
+	
+	public RenameOperationBlock getRenameOperationBlock() {
+		return renameOperationBlock;
+	}
+	
+	public AddOperationBlock getAddOperationBlock() {
+		return addOperationBlock;
 	}
 
-	public void deleteProjectItem(ProjectItemInfo itemInfo) {
-		getProjectPanel().deleteBranchView(itemInfo);
-		deleteFileItemFromScrollMenu(itemInfo);
-		editor.getTabPanel().remove(itemInfo.getFileSheet());
-		if (editor.getTabPanel().getWidgetCount() == 0) {
-			setTextForEditorContentPanel(null);
-			getProjectPanel().selectParentOf(itemInfo);
-		}
+	public DeleteOperationBlock getDeleteOperationBlock() {
+		return deleteOperationBlock;
 	}
 	
 	public void appendLog(String log) {
 		windows.appendLog(log);		
+	}
+
+	public List<FileItemInfo> getUpdatedListOfFiles(ProjectDescription projectDescription) {
+		return getProjectPanel().getActualListOfFiles(projectDescription);
+	}
+
+	protected void requestUserProjects() {
+		projectPanel.requestUserProjects(FlowController.getLoggedAsUser());
 	}
 	
 	protected void associatePresenterWithSubpanels(Presenter presenter) {

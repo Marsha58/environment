@@ -4,20 +4,36 @@ import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.remote.ResultCallback;
-import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
+import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRenameFileResult;
-import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectUpdateResult;
 
 public class ProjectRenameFileResultCallback extends ResultCallback<RequestProjectRenameFileResult> {
 
-	private DevelopmentBoardPresenter owner;
-	private ProjectItemInfo itemInfo;
-	private FileItemInfo toRename;
+	public static class ProjectUpdateResult extends ResultCallback<RequestProjectUpdateResult> {
+
+		public ProjectUpdateResult() {
+		}
+
+		@Override
+		public void handle(RequestProjectUpdateResult result) {
+			if (result.getRetCode().intValue() != 0) {
+				String messageAlert = "The operation '" + result.getOperation()
+						+ "' failed.\r\nResult '" + result.getResult() + "'";
+				AlertMessageBox alertMessageBox = new AlertMessageBox(
+						"Warning", messageAlert);
+				alertMessageBox.show();
+			}
+		}
+	}
 	
-	public ProjectRenameFileResultCallback(DevelopmentBoardPresenter owner, ProjectItemInfo itemInfo, FileItemInfo toRename) {
+	private DevelopmentBoardPresenter owner;
+	private ProjectDescription description;
+	
+	public ProjectRenameFileResultCallback(DevelopmentBoardPresenter owner, ProjectDescription description) {
 		this.owner = owner;
-		this.itemInfo = itemInfo;
-		this.toRename = toRename;
+		this.description = description;
 	}
 
 	@Override
@@ -30,7 +46,7 @@ public class ProjectRenameFileResultCallback extends ResultCallback<RequestProje
 			alertMessageBox.show();
 		}
 		else {
-			owner.getView().renameFileTabItem(itemInfo, toRename);
+			ProjectManagerServiceBroker.requestForUpdatingProject(description, new ProjectUpdateResult());
 		}
 		owner.fireEvent(new ServerLogEvent(result));
 	}

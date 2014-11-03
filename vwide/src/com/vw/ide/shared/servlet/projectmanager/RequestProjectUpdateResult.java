@@ -1,6 +1,5 @@
 package com.vw.ide.shared.servlet.projectmanager;
 
-import com.vw.ide.shared.servlet.RequestResult;
 
 /**
  * Result on any operation related with given project
@@ -9,6 +8,6 @@ import com.vw.ide.shared.servlet.RequestResult;
  */
 
 @SuppressWarnings("serial")
-public class RequestProjectUpdateResult extends RequestResult {
+public class RequestProjectUpdateResult extends RequestProjectResult {
 	
 }

@@ -12,6 +12,7 @@ import com.vw.ide.client.devboardext.event.handler.EditorTabClosedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.FileEditedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.GetDirContentEventHandler;
 import com.vw.ide.client.devboardext.event.handler.LogoutEventHandler;
+import com.vw.ide.client.devboardext.event.handler.MoveFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ProjectMenuEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SaveFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SelectFileEventHandler;
@@ -32,6 +33,7 @@ import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.FileEditedEvent;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
+import com.vw.ide.client.event.uiflow.MoveFileEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
@@ -75,6 +77,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 			put(SelectFileEvent.TYPE, new SelectFileEventHandler());
 			put(SaveFileEvent.TYPE, new SaveFileEventHandler());
 			put(FileEditedEvent.TYPE, new FileEditedEventHandler());
+			put(MoveFileEvent.TYPE, new MoveFileEventHandler());
 			put(AceColorThemeChangedEvent.TYPE, new AceColorThemeChangedEventHandler());
 			put(EditorTabClosedEvent.TYPE, new EditorTabClosedEventHandler());
 			put(GetDirContentEvent.TYPE, new GetDirContentEventHandler());
@@ -126,6 +129,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.addHandler(LogoutEvent.TYPE, (LogoutHandler)dispatcher.get(LogoutEvent.TYPE));
 		eventBus.addHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.addHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
+		eventBus.addHandler(MoveFileEvent.TYPE, (MoveFileEventHandler)dispatcher.get(MoveFileEvent.TYPE));
 	}
 	
 	@Override
@@ -139,6 +143,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(LogoutEvent.TYPE, (LogoutHandler)dispatcher.get(LogoutEvent.TYPE));
 		eventBus.removeHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.removeHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
+		eventBus.removeHandler(MoveFileEvent.TYPE, (MoveFileEventHandler)dispatcher.get(MoveFileEvent.TYPE));
 	}
 	
 	public TopPanel getTopPanel() {

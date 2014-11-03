@@ -10,6 +10,7 @@ import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.server.servlet.IService;
 import com.vw.ide.server.servlet.locator.ServiceLocator;
 import com.vw.ide.server.servlet.remotebrowser.DirBrowserImpl;
+import com.vw.ide.server.servlet.remotebrowser.DirBrowserUtils;
 import com.vw.ide.server.servlet.userstate.UserStateServiceImpl;
 import com.vw.ide.shared.servlet.RequestResult;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
@@ -106,7 +107,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			}
 			logger.error("User '" + description.getUserName() + "' project '" + description.getProjectName() + "'; error '" + ex.getMessage() + "'");
 		}
-		res.setProjectDescription(description);
+		res.setDescription(description);
 		return res;
 	}
 	
@@ -132,6 +133,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			res.setResult(ex.getMessage());
 			res.setRetCode(-1);
 		}
+		res.setDescription(description);
 		return res;
 	}
 
@@ -155,12 +157,24 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			res.setResult("Remote browser service wasn't found");
 			return res;
 		}
-		RequestResult r = browser.createFile(description.getUserName(), toAdd.getAbsolutePath(), toAdd.getName(), toAdd.getContent());
+		RequestResult r = null;
+		if (!toAdd.isDir()) {
+			r = browser.createFile(description.getUserName(), toAdd.getAbsolutePath(), toAdd.getName(), toAdd.getContent());
+		}
+		else {
+			String[] compoundPath = toAdd.getName().split("[\\\\/]+");
+			if (compoundPath != null) {
+				toAdd.setName(compoundPath[compoundPath.length - 1]);
+			}
+			r = browser.createAbsoluteDir(description.getUserName(), toAdd.getAbsolutePath());
+		}
 		if (r.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
 			res.setResult(r.getResult());
 			res.setRetCode(r.getRetCode());
 			return res;
 		}
+		String projDir = getProjectOperationalDir(description);
+		correctFileItem(projDir, toAdd);
 		description.getProjectFiles().add(toAdd);
 		r = updateProject(description);
 		if (r.getRetCode() != RequestProjectUpdateResult.GENERAL_OK) {
@@ -172,6 +186,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			usi.setProjectIdSelected(description);
 			usi.addFileToOpenedFiles(toAdd);
 		}
+		res.setDescription(description);
 		if (logger.isInfoEnabled()) {
 			logger.debug("User '" + description.getUserName() + "' added item '" + toAdd + "' to project '" + description.getProjectName() + "'");
 		}
@@ -210,6 +225,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		if (logger.isInfoEnabled()) {
 			logger.debug("User '" + description.getUserName() + "' updated project '" + description.getProjectName() + "'");
 		}
+		res.setDescription(description);
 		return res;
 	}
 
@@ -246,6 +262,10 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 				ProjectDescription d = (ProjectDescription)r.getSerializiedObject();
 				if (d.getProjectFiles().size() == 0) {
 					d.getProjectFiles().add(d.getMainProjectFile());
+				}
+				String projDir = getProjectOperationalDir(d);
+				for(FileItemInfo f : d.getProjectFiles()) {
+					correctFileItem(projDir, f);
 				}
 				res.getAvailableProjects().add(d);
 			}
@@ -286,13 +306,54 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		if (logger.isInfoEnabled()) {
 			logger.debug("User '" + description.getUserName() + "' removed item '" + toRemove + "' from project '" + description.getProjectName() + "'");
 		}
+		res.setDescription(description);
 		return res;
 	}
 
 	@Override
 	public RequestProjectRenameFileResult renameFileFromProject(ProjectDescription description, FileItemInfo toRename, FileItemInfo newName) {
-		// TODO Auto-generated method stub
-		return null;
+		RequestProjectRenameFileResult res = new RequestProjectRenameFileResult();
+		res.setOperation("renaming file/directory");
+		res.setRetCode(RequestProjectDeletionResult.GENERAL_OK);
+		UserStateInfo usi = getUserStateInfo(description.getUserName(), res);
+		if (usi == null) {
+			return res;
+		}
+		DirBrowserImpl browser = (DirBrowserImpl)ServiceLocator.instance().locate(DirBrowserImpl.ID);
+		if (browser == null) {
+			res.setRetCode(RequestProjectDeletionResult.GENERAL_FAIL);
+			res.setResult("Remote browser service wasn't found");
+			return res;
+		}
+		RequestResult r = null;
+		if (!toRename.isDir()) {
+			r = browser.renameFile(description.getUserName(),
+									toRename.getAbsolutePath() + "/" + toRename.getName(),
+									null,
+									newName.getAbsolutePath() + "/" + newName.getName());
+		}
+		else {
+			String parentPath = DirBrowserUtils.extractParentPath(toRename.getAbsolutePath());
+			r = browser.renameDir(description.getUserName(), parentPath, toRename.getName(), newName.getName());
+		}
+		if (r.getRetCode() != RequestResult.GENERAL_OK) {
+			res.setResult(r.getResult());
+			res.setRetCode(r.getRetCode());
+			return res;
+		}
+		r = updateProject(description);
+		if (r.getRetCode() != RequestResult.GENERAL_OK) {
+			res.setResult(r.getResult());
+			res.setRetCode(r.getRetCode());
+			return res;
+		}
+		usi.setProjectIdSelected(description);
+		if (!toRename.isDir()) {
+			usi.removeFileFromOpenedFiles(toRename);
+			usi.addFileToOpenedFiles(newName);
+		}
+		res.setDescription(description);
+		return res;
 	}
 	
 	private String makeMainProjectFileName(String mainModuleName) {
@@ -304,8 +365,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		mainModuleName = mainModuleName + "." + FilesTypesEnum.VWML_PROJ;
 		return mainModuleName.toString().toLowerCase();
 	}
-	
-	
+		
 	private void createProjectLayout(DirBrowserImpl browser, ProjectDescription description) throws Exception {
 		String dirs[] = {
 				description.getJavaSrcPath(),
@@ -475,5 +535,15 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			return null;
 		}
 		return userStateResult.getUserStateInfo();
+	}
+	
+	private void correctFileItem(String projDir, FileItemInfo f) {
+		if (f.getRelPath() == null && f.getAbsolutePath() != null) {
+			String relPath = "";
+			if (!projDir.equals(f.getAbsolutePath())) {
+				relPath = f.getAbsolutePath().substring(projDir.length() + 1);
+			}
+			f.setRelPath(relPath);
+		}
 	}
 }

@@ -43,7 +43,7 @@ public class SelectFileEventHandler extends Presenter.PresenterEventHandler impl
 			else {
 				if (!projectItemInfo.isAlreadyOpened()) {
 					projectItemInfo.getAssociatedData().setContent(result.getTextFile());
-					presenter.getView().addNewFileTabItem(projectItemInfo);
+					presenter.getView().getAddOperationBlock().addNewFileTabItem(projectItemInfo);
 					userState.addFileToOpenedFiles(projectItemInfo.getAssociatedData());
 					RemoteUserStateServiceBroker.requestForUpdateUserState(
 													FlowController.getLoggedAsUser(),

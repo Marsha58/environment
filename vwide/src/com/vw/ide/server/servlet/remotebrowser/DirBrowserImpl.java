@@ -143,11 +143,12 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 
 	public RequestDirOperationResult removeDir(String user, String parent, String dir) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
-		res.setPath(dir);
+		String fullPath = parent + "/" + dir;
+		res.setPath(fullPath);
 		res.setRetCode(0);
 		res.setOperation("remove directory");
 		try {
-			purgeDirectory(new File(dir));
+			purgeDirectory(new File(fullPath));
 		}
 		catch(Exception ex) {
 			res.setResult(ex.getMessage());
@@ -358,6 +359,31 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		return res;
 	}
 
+	public RequestDirOperationResult renameDir(String user, String parentDir, String oldName, String newName) {
+		RequestDirOperationResult res = new RequestDirOperationResult();
+		UserStateInfo userStateInfo = locateUserStateService().getUserStateInfo(user);
+		if (userStateInfo == null) {
+			userNotFoundReport(res, user, "rename_dir");
+			return res;
+		}
+		res.setOperationType(OperationTypes.RENAME_DIR);
+	    File oldFile = new File(parentDir + "/" + oldName);
+	    File newFile = new File(parentDir + "/" + newName);
+	    if(!newFile.exists()) {
+	    	if (oldFile.renameTo(newFile)) {
+				res.setResult("File has been renamed");
+				res.setRetCode(0);
+	    	} else {
+				res.setResult("Error while renaming");
+				res.setRetCode(-1);
+	    	}
+		} else {
+			res.setResult("File with such name exists");
+			res.setRetCode(-2);
+		}
+		return res;
+	}
+	
 	private UserStateServiceImpl locateUserStateService() {
 		return (UserStateServiceImpl)ServiceLocator.instance().locate(UserStateServiceImpl.ID);
 	}

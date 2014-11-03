@@ -2,6 +2,7 @@ package com.vw.ide.client.devboardext.service.projectmanager.callbacks;
 
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
+import com.vw.ide.client.devboardext.service.projectmanager.ProjectManagerUtils;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
@@ -27,7 +28,9 @@ public class ProjectRemoveFileResultCallback extends ResultCallback<RequestProje
 			alertMessageBox.show();
 		} 
 		else {
-			owner.getView().deleteProjectItem(itemInfo);
+			owner.getView().getDeleteOperationBlock().deleteProjectItem(itemInfo);
+			ProjectManagerUtils.updateLocalProjectDescription(itemInfo.getProjectDescription(),
+															result.getDescription());
 		}
 		owner.fireEvent(new ServerLogEvent(result));
 	}

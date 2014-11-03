@@ -4,7 +4,7 @@ import com.google.gwt.event.shared.EventHandler;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 
 /**
- * Login handler
+ * Save file handler
  * @author OMelnyk
  *
  */

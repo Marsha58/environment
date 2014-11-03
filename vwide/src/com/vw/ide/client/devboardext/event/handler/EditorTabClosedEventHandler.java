@@ -52,7 +52,7 @@ public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler
 	
 	private void process(DevelopmentBoardPresenter presenter, EditorTabClosedEvent event) {
 		FileSheet fileSheet = (FileSheet)event.getEvent().getItem();
-		presenter.getView().deleteFileItemFromScrollMenu(fileSheet.getItemInfo());
+		presenter.getView().getTopPanel().delItemFromScrollMenu(fileSheet.getItemInfo());
 		RemoteUserStateServiceBroker.requestForGettingUserState(FlowController.getLoggedAsUser(),
 																new UserStateGettingResultCallback(presenter, new HandleUserStateOnClosingEditorTab(presenter, fileSheet.getItemInfo())));
 	}
