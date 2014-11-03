@@ -7,6 +7,9 @@ import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.resources.client.CssResource.NotStrict;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.sencha.gxt.core.client.GXT;
+import com.sencha.gxt.state.client.CookieProvider;
+import com.sencha.gxt.state.client.StateManager;
 import com.sencha.gxt.widget.core.client.container.Viewport;
 import com.vw.ide.client.service.factory.ServicesBrokerFactory;
 
@@ -17,7 +20,7 @@ public class Vwide implements EntryPoint {
 
     private static final HandlerManager eventBus = new HandlerManager(null);
     private static final FlowController mainController = new FlowController(eventBus);
-	
+    
     public Vwide() {
     	init();
     }
@@ -39,6 +42,7 @@ public class Vwide implements EntryPoint {
     }
   
 	public void onModuleLoad() {
+		StateManager.get().setProvider(new CookieProvider("/", null, null, GXT.isSecure())); 
 	    GWT.<GlobalResources>create(GlobalResources.class).css().ensureInjected();
 	    viewport = new Viewport();
 	    RootPanel.get().add(viewport);
@@ -49,4 +53,5 @@ public class Vwide implements EntryPoint {
 	protected void init() {
 	    ServicesBrokerFactory.instantiateAllServices(eventBus);
 	}
+	
 }

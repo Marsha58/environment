@@ -21,62 +21,73 @@
 package edu.ycp.cs.dh.acegwt.client.ace;
 
 /**
- * Enumeration for ACE editor themes.
- * Note that the corresponding .js file must be loaded
- * before a theme can be set.
+ * Enumeration for ACE editor themes. Note that the corresponding .js file must
+ * be loaded before a theme can be set.
  */
 public enum AceEditorTheme {
-	AMBIANCE("ambiance"),
-	CHAOS("chaos"),
-	CHROME("chrome"),
-	CLOUD9_DAY("cloud9_day"),
-	CLOUD9_NIGHT("cloud9_night"),
-	CLOUD9_NIGHT_LOW_COLOR("cloud9_night_low_color"),
-	CLOUDS("clouds"),
-	CLOUDS_MIDNIGHT("clouds_midnight"),
-	COBALT("cobalt"),
-	CRIMSON_EDITOR("crimson_editor"),
-	DAWN("dawn"),
-	DREAMWEAVER("dreamweaver"),
-	ECLIPSE("eclipse"),
-	GITHUB("github"),
-	IDLE_FINGERS("idle_fingers"),
-	KATZENMILCH("katzenmilch"),
-	KR_THEME("kr_theme"),
-	KR("kr"),
-	KUROIR("kuroir"),
-	MERBIVORE("merbivore"),
-	MERBIVORE_SOFT("merbivore_soft"),
-	MONO_INDUSTRIAL("mono_industrial"),
-	MONOKAI("monokai"),
-	PASTEL_ON_DARK("pastel_on_dark"),
-	SOLARIZED_DARK("solarized_dark"),
-	SOLARIZED_LIGHT("solarized_light"),
-	TERMINAL("terminal"),
-	TEXTMATE("textmate"),
-	TOMORROW_NIGHT_BLUE("tomorrow_night_blue"),
-	TOMORROW_NIGHT_BRIGHT("tomorrow_night_bright"),
-	TOMORROW_NIGHT_EIGHTIES("tomorrow_night_eighties"),
-	TOMORROW_NIGHT("tomorrow_night"),
-	TOMORROW("tomorrow"),
-	TWILIGHT("twilight"),
-	VIBRANT_INK("vibrant_ink"),
-	VWML_CHROME("vwml_chrome"),
-	VWML_CRIMSON_EDITOR("vwml_crimson_editor"),
-	VWML_IDLE_FINGERS("vwml_idle_fingers"),
-	VWML_XCODE("vwml_xcode"),
+	AMBIANCE("ambiance"), 
+	CHAOS("chaos"), 
+	CHROME("chrome"), 
+	CLOUD9_DAY("cloud9_day"), 
+	CLOUD9_NIGHT("cloud9_night"), 
+	CLOUD9_NIGHT_LOW_COLOR("cloud9_night_low_color"), 
+	CLOUDS("clouds"), 
+	CLOUDS_MIDNIGHT("clouds_midnight"), 
+	COBALT("cobalt"), 
+	CRIMSON_EDITOR("crimson_editor"), 
+	DAWN("dawn"), 
+	DREAMWEAVER("dreamweaver"), 
+	ECLIPSE("eclipse"), 
+	GITHUB("github"), 
+	IDLE_FINGERS("idle_fingers"), 
+	KATZENMILCH("katzenmilch"), 
+	KR_THEME("kr_theme"), 
+	KR("kr"), 
+	KUROIR("kuroir"), 
+	MERBIVORE("merbivore"), 
+	MERBIVORE_SOFT("merbivore_soft"), 
+	MONO_INDUSTRIAL("mono_industrial"), 
+	MONOKAI("monokai"), 
+	PASTEL_ON_DARK("pastel_on_dark"), 
+	SOLARIZED_DARK("solarized_dark"), 
+	SOLARIZED_LIGHT("solarized_light"), 
+	TERMINAL("terminal"), 
+	TEXTMATE("textmate"), 
+	TOMORROW_NIGHT_BLUE("tomorrow_night_blue"), 
+	TOMORROW_NIGHT_BRIGHT("tomorrow_night_bright"), 
+	TOMORROW_NIGHT_EIGHTIES("tomorrow_night_eighties"), 
+	TOMORROW_NIGHT("tomorrow_night"), 
+	TOMORROW("tomorrow"), 
+	TWILIGHT("twilight"), 
+	VIBRANT_INK("vibrant_ink"), 
+	VWML_CHROME("vwml_chrome"), 
+	VWML_CRIMSON_EDITOR("vwml_crimson_editor"), 
+	VWML_IDLE_FINGERS("vwml_idle_fingers"), 
+	VWML_XCODE("vwml_xcode"), 
 	XCODE("xcode");
-	
+
 	private final String name;
-	
+
 	private AceEditorTheme(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * @return the theme name (e.g., "eclipse")
 	 */
 	public String getName() {
 		return name;
 	}
+
+	public static AceEditorTheme fromString(String text) {
+		if (text != null) {
+			for (AceEditorTheme b : AceEditorTheme.values()) {
+				if (text.equalsIgnoreCase(b.name)) {
+					return b;
+				}
+			}
+		}
+		return null;
+	}
+
 }

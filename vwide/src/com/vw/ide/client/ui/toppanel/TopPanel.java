@@ -17,6 +17,7 @@ package com.vw.ide.client.ui.toppanel;
 
 import java.util.Arrays;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
@@ -40,6 +41,7 @@ import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.StringLabelProvider;
+import com.sencha.gxt.state.client.StateManager;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
@@ -83,6 +85,8 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 
 	private static String s_HelpAboutCaption = "About";
 	private static String s_newVwmlProjectCaption = "New VWML project";
+	
+	private AceEditorTheme storedAceEditorTheme = AceEditorTheme.VWML_IDLE_FINGERS;
 
 	public ComboBox<AceEditorTheme> comboATh;
 
@@ -178,11 +182,37 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 		// combo.getElement().getStyle().setFloat(Float.RIGHT);
 		comboATh.setWidth(200);
 		// comboATh.setEmptyText("Select a theme...");
-		comboATh.setValue(AceEditorTheme.VWML_IDLE_FINGERS);
+
+		
+
+		
+		StateManager.get().getProvider().getValue("storedAceEditorTheme", new Callback<String, Throwable>() {
+			
+			@Override
+			public void onSuccess(String result) {
+				try {
+					if (result != null) {
+						storedAceEditorTheme = AceEditorTheme.fromString(result);
+						comboATh.setValue(storedAceEditorTheme);						
+					}
+				} catch (Exception e) {
+					comboATh.setValue(AceEditorTheme.VWML_IDLE_FINGERS);
+				} 
+			}
+			
+			@Override
+			public void onFailure(Throwable reason) {
+				comboATh.setValue(storedAceEditorTheme);
+			}
+		});
+		
+		
+		
 		comboATh.addSelectionHandler(new SelectionHandler<AceEditorTheme>() {
 			@Override
 			public void onSelection(SelectionEvent<AceEditorTheme> event) {
 				// editor1.setTheme(event.getSelectedItem());
+				StateManager.get().getProvider().setValue("storedAceEditorTheme", event.getSelectedItem().getName());
 				presenter.fireEvent(new AceColorThemeChangedEvent(event));
 
 			}

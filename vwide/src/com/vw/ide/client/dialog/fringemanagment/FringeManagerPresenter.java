@@ -67,6 +67,7 @@ public class FringeManagerPresenter extends Presenter {
 				switch (result.getRetCode()) {
 					case 0:
 						presenter.updateCategoryList(result.getCategories());
+						presenter.updateCategoryLastUsedId(result.getLastUsedId());
 						break;
 					case -1:
 						messageAlert = "something wrong";
@@ -112,6 +113,7 @@ public class FringeManagerPresenter extends Presenter {
 				switch (result.getRetCode()) {
 					case 0:
 						presenter.updateFringeList(result.getFringes());
+						presenter.updateFringeLastUsedId(result.getLastUsedId());
 						break;
 					case -1:
 						messageAlert = "something wrong";
@@ -141,6 +143,11 @@ public class FringeManagerPresenter extends Presenter {
 		}
 	}
 	
+	private void updateCategoryLastUsedId(Integer lastUsedId) {
+		getView().setCategoryId(lastUsedId);
+	}
+	
+	
 	private void updateFringeList(Fringe[] fringes) {
 		for (int i = 0; i < fringes.length; i++) {
 			if(getView().listStoreFringes.findModelWithKey(fringes[i].getId().toString()) == null) {
@@ -150,6 +157,13 @@ public class FringeManagerPresenter extends Presenter {
 			}
 		}		
 	}
+	
+	private void updateFringeLastUsedId(Integer lastUsedId) {
+		getView().setFringeId(lastUsedId);
+	}
+
+	
+	
 	
 
 	public FringeManager getView() {
@@ -254,9 +268,12 @@ public class FringeManagerPresenter extends Presenter {
 	
 	public void doAddFringe() {
 		Fringe newFringe = new Fringe();
-		newFringe.setId(getView().getNewCategoryId());
-		newFringe.setName("New fringe 1");
+		newFringe.setId(getView().getNewFringeId());
+		newFringe.setName("New fringe");
 		newFringe.setPath("/");
+		if (getView().getSelectedCategory() != null) {
+			newFringe.setCategoryId(getView().getSelectedCategory().getId());
+		}
 
 		getView().getEditingFringe().cancelEditing();
 		getView().getListStoreFringes().add(0, newFringe);

@@ -1,5 +1,7 @@
 package com.vw.ide.shared;
 
+import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
+
 public enum OperationTypes {
    NEW_FOLDER("new_folder"),	
    NEW_PROJECT("new_project"),
@@ -27,10 +29,18 @@ public enum OperationTypes {
 		this.name = name;
 	}
 	
-	/**
-	 * @return the theme name (e.g., "eclipse")
-	 */
 	public String getName() {
 		return name;
 	}   
+	
+	public static OperationTypes fromString(String text) {
+		if (text != null) {
+			for (OperationTypes b : OperationTypes.values()) {
+				if (text.equalsIgnoreCase(b.name)) {
+					return b;
+				}
+			}
+		}
+		return null;
+	}	
 }
