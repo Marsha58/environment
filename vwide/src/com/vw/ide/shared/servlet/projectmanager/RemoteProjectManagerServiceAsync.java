@@ -56,5 +56,14 @@ public interface RemoteProjectManagerServiceAsync {
 	 * @return
 	 */
 	public void renameFileFromProject(ProjectDescription description, FileItemInfo toRename, FileItemInfo newName, AsyncCallback<RequestProjectRenameFileResult> callback);
+
+	/**
+	 * Moving file/directory inside the given project
+	 * @param description
+	 * @param fromItem
+	 * @param toItem
+	 * @return
+	 */
+	public void moveItemOnProject(ProjectDescription description, FileItemInfo fromItem, FileItemInfo toItem, AsyncCallback<RequestProjectMoveItemResult> callback);
 }
 

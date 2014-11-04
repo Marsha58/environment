@@ -18,6 +18,7 @@ import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerService;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectAddFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectDeletionResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectMoveItemResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRemoveFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRenameFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectUpdateResult;
@@ -351,6 +352,51 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		if (!toRename.isDir()) {
 			usi.removeFileFromOpenedFiles(toRename);
 			usi.addFileToOpenedFiles(newName);
+		}
+		res.setDescription(description);
+		return res;
+	}
+
+	@Override
+	public RequestProjectMoveItemResult moveItemOnProject(ProjectDescription description, FileItemInfo fromItem, FileItemInfo toItem) {
+		RequestProjectMoveItemResult res = new RequestProjectMoveItemResult();
+		res.setOperation("moving file/directory inside the project");
+		res.setRetCode(RequestProjectDeletionResult.GENERAL_OK);
+		UserStateInfo usi = getUserStateInfo(description.getUserName(), res);
+		if (usi == null) {
+			return res;
+		}
+		DirBrowserImpl browser = (DirBrowserImpl)ServiceLocator.instance().locate(DirBrowserImpl.ID);
+		if (browser == null) {
+			res.setRetCode(RequestProjectDeletionResult.GENERAL_FAIL);
+			res.setResult("Remote browser service wasn't found");
+			return res;
+		}
+		boolean fileMoving = true;
+		if (fromItem.isDir()) {
+			fileMoving = false;
+		}
+		RequestResult r = browser.moveDirOrFile(description.getUserName(),
+												(fileMoving) ? fromItem.getAbsolutePath() + "/" + fromItem.getName() : fromItem.getAbsolutePath(),
+												toItem.getAbsolutePath(),
+												fileMoving);
+		if (r.getRetCode() != RequestResult.GENERAL_OK) {
+			res.setRetCode(RequestProjectDeletionResult.GENERAL_FAIL);
+			res.setResult(r.getResult());
+		}
+		r = updateProject(description);
+		if (r.getRetCode() != RequestResult.GENERAL_OK) {
+			res.setResult(r.getResult());
+			res.setRetCode(r.getRetCode());
+			return res;
+		}
+		usi.setProjectIdSelected(description);
+		if (!fromItem.isDir()) {
+			usi.removeFileFromOpenedFiles(fromItem);
+			toItem.setAbsolutePath(toItem.getAbsolutePath() + "/" + fromItem.getName());
+			toItem.setDir(false);
+			toItem.setContent(fromItem.getContent());
+			usi.addFileToOpenedFiles(toItem);
 		}
 		res.setDescription(description);
 		return res;

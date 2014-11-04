@@ -18,6 +18,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -380,6 +381,29 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		} else {
 			res.setResult("File with such name exists");
 			res.setRetCode(-2);
+		}
+		return res;
+	}
+	
+	public RequestDirOperationResult moveDirOrFile(String user, String sourceFullPath, String destinationFullPath, boolean fileMoving) {
+		RequestDirOperationResult res = new RequestDirOperationResult();
+		UserStateInfo userStateInfo = locateUserStateService().getUserStateInfo(user);
+		if (userStateInfo == null) {
+			userNotFoundReport(res, user, "move_dir_of_file");
+			return res;
+		}
+		res.setOperationType(OperationTypes.MOVE_DIR_OR_FILE);
+		try {
+			if (!fileMoving) {
+				FileUtils.moveDirectoryToDirectory(new File(sourceFullPath), new File(destinationFullPath), true);
+			}
+			else {
+				FileUtils.moveFileToDirectory(new File(sourceFullPath), new File(destinationFullPath), true);
+			}
+		}
+		catch(IOException e) {
+			res.setRetCode(RequestResult.GENERAL_FAIL);
+			res.setResult(e.getLocalizedMessage());
 		}
 		return res;
 	}

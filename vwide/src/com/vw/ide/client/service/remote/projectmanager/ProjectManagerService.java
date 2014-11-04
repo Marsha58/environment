@@ -10,6 +10,7 @@ import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerServiceAsync
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectAddFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectDeletionResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectMoveItemResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRemoveFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRenameFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectUpdateResult;
@@ -41,6 +42,9 @@ public class ProjectManagerService implements BusConnectivity, VwIdeClientServic
 	}
 
 	public static class ServiceCallbackForRenameFileOnProject extends ServiceCallback<RequestProjectRenameFileResult> {
+	}
+
+	public static class ServiceCallbackForMovingItemOnProject extends ServiceCallback<RequestProjectMoveItemResult> {
 	}
 	
 	private RemoteProjectManagerServiceAsync serviceImpl = ServicesStubFactory.createRemoteProjectManagerServiceAsync();
@@ -104,5 +108,9 @@ public class ProjectManagerService implements BusConnectivity, VwIdeClientServic
 	
 	public ServiceCallbackForRenameFileOnProject buildCallbackForRenameFileOnProject() {
 		return new ServiceCallbackForRenameFileOnProject();
+	}
+
+	public ServiceCallbackForMovingItemOnProject buildCallbackForMovingItemOnProject() {
+		return new ServiceCallbackForMovingItemOnProject();
 	}
 }

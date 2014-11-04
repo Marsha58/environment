@@ -68,6 +68,14 @@ public class FileItemInfo implements Serializable {
 		} else return FilesTypesEnum.NOT_DEF;
 	}
 	
+	public void copyTo(FileItemInfo to) {
+		to.setAbsolutePath(absolutePath);
+		to.setRelPath(relPath);
+		to.setDir(isDir);
+		to.setName(name);
+		to.setContent(getContent());
+	}
+	
 	public String getName() {
 		return name;
 	}

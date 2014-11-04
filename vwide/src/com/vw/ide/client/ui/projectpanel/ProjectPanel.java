@@ -16,6 +16,7 @@
 package com.vw.ide.client.ui.projectpanel;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -32,16 +33,19 @@ import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.IconProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.SortDir;
+import com.sencha.gxt.data.shared.Store.StoreSortInfo;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.TreeStore.TreeNode;
+import com.sencha.gxt.dnd.core.client.DND.Feedback;
+import com.sencha.gxt.dnd.core.client.DndDragMoveEvent.DndDragMoveHandler;
 import com.sencha.gxt.dnd.core.client.DndDragStartEvent;
 import com.sencha.gxt.dnd.core.client.DndDragStartEvent.DndDragStartHandler;
 import com.sencha.gxt.dnd.core.client.DndDropEvent;
 import com.sencha.gxt.dnd.core.client.DndDropEvent.DndDropHandler;
+import com.sencha.gxt.dnd.core.client.DndDragMoveEvent;
 import com.sencha.gxt.dnd.core.client.TreeDragSource;
 import com.sencha.gxt.dnd.core.client.TreeDropTarget;
-import com.sencha.gxt.dnd.core.client.DND.Feedback;
-import com.sencha.gxt.fx.client.DragEndEvent;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
@@ -72,12 +76,13 @@ import com.vw.ide.shared.servlet.userstate.UserStateInfo;
  * {@link com.google.gwt.user.client.ui.StackPanel},
  * {@link com.google.gwt.user.client.ui.Tree}, and other custom widgets.
  */
+@SuppressWarnings("deprecation")
 public class ProjectPanel extends Composite implements IsWidget, PresenterViewerLink {
 
 	interface Binder extends UiBinder<Widget, ProjectPanel> {
 	}
 
-	public static class ProjectItemInfo implements TreeStore.TreeNode<ProjectItemInfo> {
+	public static class ProjectItemInfo implements TreeStore.TreeNode<ProjectItemInfo>, Comparator<ProjectItemInfo> {
 
 		private ProjectDescription projectDescription;
 		private FileItemInfo associatedData = new FileItemInfo();
@@ -190,6 +195,13 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 			} else if (!associatedData.generateKey().equals(other.associatedData.generateKey()))
 				return false;
 			return true;
+		}
+
+		@Override
+		public int compare(ProjectItemInfo o1, ProjectItemInfo o2) {
+			String s1 = o1.getAssociatedData().generateKey();
+			String s2 = o2.getAssociatedData().generateKey();
+			return s1.compareTo(s2);
 		}
 	}
 	
@@ -320,7 +332,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		return fileItems;
 	}
 	
-	public void deleteBranchView(ProjectItemInfo parent) {
+	public void deleteItemOnTreeBranchView(ProjectItemInfo parent) {
 		store.remove(parent);
 	}
 
@@ -335,7 +347,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 			TreeStore<ProjectItemInfo> renamed = createEphemerialSubTree(proxyItem,
 																		store.getChildren(toRename),
 																		renameCbk);
-			store.remove(toRename);
+			deleteItemOnTreeBranchView(toRename);
 			List<ProjectItemInfo> renamedItems = renamed.getAllChildren(renamed.getRootItems().get(0));
 			for(ProjectItemInfo pi : renamedItems) {
 				buildTreeBranchView(parent, pi.getAssociatedData(), pi);
@@ -351,6 +363,33 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 			}
 			store.remove(toRename);
 			store.add(parent, proxyItem);
+		}
+	}
+
+	public void moveItemOnTreeBranchView(ProjectItemInfo itemToMove, ProjectItemInfo neighbour, RenameOperationBlock.RenameProjectItemCallback renameCbk) {
+		if (neighbour.getAssociatedData().isDir()) {
+			if (itemToMove.getAssociatedData().isDir()) {
+				TreeStore<ProjectItemInfo> moved = createEphemerialSubTree(neighbour,
+																			itemToMove,
+																			renameCbk);
+				deleteItemOnTreeBranchView(itemToMove);
+				List<ProjectItemInfo> movedItems = moved.getAll();
+				for(ProjectItemInfo pi : movedItems) {
+					buildTreeBranchView(neighbour, pi.getAssociatedData(), pi);
+				}
+			}
+			else {
+				ProjectItemInfo proxyItem = new ProjectItemInfo();
+				itemToMove.copyTo(proxyItem);
+				itemToMove.getAssociatedData().copyTo(proxyItem.getAssociatedData());
+				proxyItem.getAssociatedData().setAbsolutePath(neighbour.getAssociatedData().getAbsolutePath());
+				proxyItem.getAssociatedData().setRelPath(neighbour.getAssociatedData().getRelPath());
+				if (renameCbk != null) {
+					renameCbk.rename(itemToMove, proxyItem);
+				}
+				deleteItemOnTreeBranchView(itemToMove);
+				store.add(neighbour, proxyItem);
+			}
 		}
 	}
 	
@@ -394,6 +433,8 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 
 	protected void prepare() {
 		buildContextMenu();
+		StoreSortInfo<ProjectItemInfo> ssi = new StoreSortInfo<ProjectItemInfo>(new ProjectItemInfo(), SortDir.DESC);
+		store.addSortInfo(ssi);
 	}
 	
 	protected void buildContextMenu() {
@@ -485,6 +526,15 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		return r;
 	}
 
+	private TreeStore<ProjectItemInfo> createEphemerialSubTree(ProjectItemInfo newRoot, ProjectItemInfo item, RenameOperationBlock.RenameProjectItemCallback renameCbk) {
+		ProjectItemInfo proxyItem = new ProjectItemInfo();
+		item.copyTo(proxyItem);
+		item.getAssociatedData().copyTo(proxyItem.getAssociatedData());
+		proxyItem.getAssociatedData().setAbsolutePath(newRoot.getAssociatedData().getAbsolutePath() + "/" + item.getAssociatedData().getName());
+		proxyItem.getAssociatedData().setRelPath(newRoot.getAssociatedData().getRelPath() + "/" + item.getAssociatedData().getName());
+		return createEphemerialSubTree(proxyItem, store.getAllChildren(item), renameCbk);
+	}
+	
 	private TreeStore<ProjectItemInfo> createEphemerialSubTree(ProjectItemInfo from, List<ProjectItemInfo> children, RenameOperationBlock.RenameProjectItemCallback renameCbk) {
 		TreeStore<ProjectItemInfo> tStore = new TreeStore<ProjectItemInfo>(new KeyProvider());
 		tStore.add(from);
@@ -604,26 +654,47 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 	            			Info.display("Warning", "The node '" + node.getData().getAssociatedData().getName() + "' can't be moved");
 	            			return;
 	            		}
+	            		if (node.getData().isEdited()) {
+	            			event.setCancelled(true);
+	            			event.getStatusProxy().setStatus(false);
+	            			Info.display("Warning", "The node '" + node.getData().getAssociatedData().getName() + "' must be saved before");
+	            		}
 	            	}
 	            }
 	        }
 		});
 		projectsFieldDragTarget.addDropHandler(new DndDropHandler() {
-
-			@SuppressWarnings("deprecation")
 			@Override
 			public void onDrop(DndDropEvent event) {
 	            @SuppressWarnings("unchecked")
 	            List<TreeNode<ProjectItemInfo>> draggingSelection = (List<TreeNode<ProjectItemInfo>>)event.getData();
 	            if (draggingSelection != null) {
 	            	com.sencha.gxt.widget.core.client.tree.Tree.TreeNode<ProjectItemInfo> item = projectsFieldDragSource.getWidget().findNode(event.getDragEndEvent().getNativeEvent().getEventTarget().<Element> cast());
-		            ProjectItemInfo placeForDraggedItem = item.getModel();
-					if (presenter != null) {
-						for (TreeNode<ProjectItemInfo> node : draggingSelection) {
-							presenter.fireEvent(new MoveFileEvent(node.getData(), placeForDraggedItem));
+		            if (item != null) {
+		            	ProjectItemInfo placeForDraggedItem = item.getModel();
+						if (presenter != null) {
+							for (TreeNode<ProjectItemInfo> node : draggingSelection) {
+								presenter.fireEvent(new MoveFileEvent(node.getData(), placeForDraggedItem));
+							}
 						}
-					}
+		            }
+		            else {
+            			event.getStatusProxy().setStatus(false);
+            			Info.display("Warning", "The selected item(s) can't be moved to this location");
+		            }
 	            }
+			}
+		});
+		projectsFieldDragTarget.addDragMoveHandler(new DndDragMoveHandler() {
+			@Override
+			public void onDragMove(DndDragMoveEvent event) {
+            	com.sencha.gxt.widget.core.client.tree.Tree.TreeNode<ProjectItemInfo> item = projectsFieldDragSource.getWidget().findNode(event.getDragMoveEvent().getNativeEvent().getEventTarget().<Element> cast());
+            	if (item != null) {
+            		if (!item.getModel().getAssociatedData().isDir() || item.getModel().isMarkAsProject() || item.getModel().isMarkAsUserRoot()) {
+            			event.setCancelled(true);
+            			event.getStatusProxy().setStatus(false);
+            		}
+            	}
 			}
 		});
 		return widget;

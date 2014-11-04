@@ -21,6 +21,6 @@ public class MoveFileEventHandler extends Presenter.PresenterEventHandler implem
 	}
 	
 	protected void process(DevelopmentBoardPresenter presenter, MoveFileEvent event) {
-		
+		presenter.getView().getMoveOperationBlock().move(event.getMovedItem(), event.getPlaceForItem());
 	}
 }

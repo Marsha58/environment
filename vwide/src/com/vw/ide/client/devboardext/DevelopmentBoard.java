@@ -28,6 +28,7 @@ import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.operation.block.AddOperationBlock;
 import com.vw.ide.client.devboardext.operation.block.DeleteOperationBlock;
+import com.vw.ide.client.devboardext.operation.block.MoveOperationBlock;
 import com.vw.ide.client.devboardext.operation.block.RenameOperationBlock;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -80,7 +81,8 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	private RenameOperationBlock renameOperationBlock = new RenameOperationBlock(this);
 	private AddOperationBlock addOperationBlock = new AddOperationBlock(this);
 	private DeleteOperationBlock deleteOperationBlock = new DeleteOperationBlock(this);
-
+	private MoveOperationBlock moveOperationBlock = new MoveOperationBlock(this);
+	
 	interface DevelopmentBoardUiBinder extends UiBinder<SimpleContainer, DevelopmentBoard> {
 	}
 
@@ -268,6 +270,10 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 
 	public DeleteOperationBlock getDeleteOperationBlock() {
 		return deleteOperationBlock;
+	}
+	
+	public MoveOperationBlock getMoveOperationBlock() {
+		return moveOperationBlock;
 	}
 	
 	public void appendLog(String log) {

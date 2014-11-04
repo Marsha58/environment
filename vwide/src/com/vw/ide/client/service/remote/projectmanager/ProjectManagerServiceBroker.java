@@ -4,6 +4,7 @@ import com.vw.ide.client.service.remote.Result;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForAddFileToProject;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForAvailableProjects;
+import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForMovingItemOnProject;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForProjectCreation;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForProjectDeletion;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForRemoveFileFromProject;
@@ -14,6 +15,7 @@ import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerServiceAsync
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectAddFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectDeletionResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectMoveItemResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRemoveFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRenameFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectUpdateResult;
@@ -119,6 +121,21 @@ public class ProjectManagerServiceBroker {
 			ServiceCallbackForRenameFileOnProject cbk = ProjectManagerService.instance().buildCallbackForRenameFileOnProject();
 			cbk.setProcessedResult(new Result<RequestProjectRenameFileResult>(resultCallback));
 			service.renameFileFromProject(projectDescription, fileInfo, newName, cbk);
+		}
+	}
+	
+	/**
+	 * Requests for removing file/directory on project
+	 * @param projectDescription
+	 * @param fileInfo
+	 * @param newName
+	 */
+	public static void requestForMovingItemOnProject(ProjectDescription projectDescription, FileItemInfo fileFrom, FileItemInfo fileTo, ResultCallback<RequestProjectMoveItemResult> resultCallback) {
+		RemoteProjectManagerServiceAsync service = ProjectManagerService.instance().getServiceImpl();
+		if (service != null) {
+			ServiceCallbackForMovingItemOnProject cbk = ProjectManagerService.instance().buildCallbackForMovingItemOnProject();
+			cbk.setProcessedResult(new Result<RequestProjectMoveItemResult>(resultCallback));
+			service.moveItemOnProject(projectDescription, fileFrom, fileTo, cbk);
 		}
 	}
 }

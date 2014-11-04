@@ -63,4 +63,13 @@ public interface RemoteProjectManagerService extends RemoteService {
 	 * @return
 	 */
 	public RequestProjectRenameFileResult renameFileFromProject(ProjectDescription description, FileItemInfo toRename, FileItemInfo newName);
+
+	/**
+	 * Moving file/directory inside the given project
+	 * @param description
+	 * @param fromItem
+	 * @param toItem
+	 * @return
+	 */
+	public RequestProjectMoveItemResult moveItemOnProject(ProjectDescription description, FileItemInfo fromItem, FileItemInfo toItem);
 }
