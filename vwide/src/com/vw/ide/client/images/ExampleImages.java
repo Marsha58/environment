@@ -178,5 +178,7 @@ public interface ExampleImages extends ClientBundle {
   @Source("enabled//copy_edit.gif")
   ImageResource copy_edit_en();  
 
+  @Source("enabled//commit.gif")
+  ImageResource commit_en();    
   
 }

@@ -1,7 +1,9 @@
 package com.vw.ide.client.dialog.fringemanagment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.Editor.Path;
@@ -21,6 +23,8 @@ import com.sencha.gxt.widget.core.client.event.CancelEditEvent;
 import com.sencha.gxt.widget.core.client.event.CancelEditEvent.CancelEditHandler;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent.CompleteEditHandler;
+import com.sencha.gxt.widget.core.client.event.HideEvent;
+import com.sencha.gxt.widget.core.client.event.HideEvent.HideHandler;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -39,10 +43,7 @@ import com.sencha.gxt.widget.core.client.grid.editing.GridEditing;
 import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
 import com.sencha.gxt.widget.core.client.grid.filters.GridFilters;
 import com.sencha.gxt.widget.core.client.grid.filters.NumericFilter;
-import com.sencha.gxt.widget.core.client.grid.filters.StringFilter;
 import com.vw.ide.client.dialog.VwmlDialogExt;
-import com.vw.ide.client.event.uiflow.GetCategoriesEvent;
-import com.vw.ide.client.event.uiflow.GetFringesEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.shared.servlet.fringes.model.Category;
@@ -61,9 +62,43 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 	private CategoryContextMenu contextMenuCategory;
 	private FringeContextMenu contextMenuFringe;
-	
+
+	private Boolean isCategoryEditing = false;
+	private Boolean isFringeEditing = false;
+
+	public Boolean getIsCategoryEditing() {
+		return isCategoryEditing;
+	}
+
+	public void setIsCategoryEditing(Boolean isCategoryEditing) {
+		this.isCategoryEditing = isCategoryEditing;
+	}
+
+	public Boolean getIsFringeEditing() {
+		return isFringeEditing;
+	}
+
+	public void setIsFringeEditing(Boolean isFringeEditing) {
+		this.isFringeEditing = isFringeEditing;
+	}
+
 	@UiField
 	TextButton buttonAddCategory;
+	@UiField
+	TextButton buttonEditCategory;
+	@UiField
+	TextButton buttonDeleteCategory;
+
+	@UiField
+	TextButton buttonAddFringe;
+	@UiField
+	TextButton buttonEditFringe;
+	@UiField
+	TextButton buttonDeleteFringe;
+	@UiField
+	TextButton buttonMoveFringe;
+	@UiField
+	TextButton buttonLoadFringeJar;
 
 	@UiField(provided = true)
 	ColumnModel<Category> columnModelCategories;
@@ -82,6 +117,9 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	GridView<Fringe> gridViewFringes;
 	@UiField
 	Grid<Fringe> gridFringes;
+	
+//	private Map<Integer,List<Fringe>> mapCategoryWithFringes = new HashMap<>();
+	private Fringe[] allFringes;
 
 	// final GridEditing<Category> editingCategory = new
 	// GridInlineEditing<Category>(gridCategories);
@@ -90,13 +128,12 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 	private Integer categoryId = -1;
 	private Integer fringeId = -1;
-	
+
 	private Category selectedCategory = null;
 	private Fringe selectedFringe = null;
-	
-	NumericFilter<Fringe,Integer> categoryIdFilter;
-	
-	
+
+	NumericFilter<Fringe, Integer> categoryIdFilter;
+
 	interface FringManagerUiBinder extends UiBinder<Widget, FringeManager> {
 	}
 
@@ -104,9 +141,13 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public interface CategoryProperties extends PropertyAccess<Category> {
 		@Path("id")
 		ModelKeyProvider<Category> key();
+
 		ValueProvider<Category, Integer> id();
+
 		ValueProvider<Category, String> name();
+
 		ValueProvider<Category, String> icon();
+
 		ValueProvider<Category, String> description();
 	}
 
@@ -114,16 +155,22 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public interface FringeProperties extends PropertyAccess<Fringe> {
 		@Path("id")
 		ModelKeyProvider<Fringe> key();
+
 		ValueProvider<Fringe, Integer> id();
+
 		ValueProvider<Fringe, String> name();
+
 		ValueProvider<Fringe, String> path();
+
+		ValueProvider<Fringe, Boolean> loaded();
+
 		ValueProvider<Fringe, Integer> categoryId();
+
 		ValueProvider<Fringe, String> description();
 	}
 
 	TextButton buttonSave = new TextButton("Save");
 	TextButton buttonCancel = new TextButton("Cancel");
-
 
 	public FringeManager() {
 		createCategoryUi();
@@ -138,15 +185,19 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		editingFringe.setEditableGrid(null);
 
 		categoryIdFilter = new NumericFilter<Fringe, Integer>(fringeProperties.categoryId(), new NumberPropertyEditor.IntegerPropertyEditor());
-		
+
 		GridFilters<Fringe> filters = new GridFilters<Fringe>();
-	    filters.initPlugin(gridFringes);
-	    filters.setLocal(true);
-	    filters.addFilter(categoryIdFilter);
-	    
-	    
+		filters.initPlugin(gridFringes);
+		filters.setLocal(true);
+		filters.addFilter(categoryIdFilter);
 		
-		// gridCategories.setSelectionModel(new CellSelectionModel<Category>());
+		
+		
+			
+
+		updateCategoryControlsState();
+		updateFringeControlsState();
+		
 		gridCategories.setSelectionModel(new GridSelectionModel<Category>());
 		gridCategories.getColumnModel().getColumn(0).setHideable(false);
 
@@ -156,74 +207,84 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 				int rowIndex = event.getRowIndex();
 				selectedCategory = listStoreCategories.get(rowIndex);
 				setFilterOnFringesList(selectedCategory);
+				updateCategoryControlsState();
 			}
 		});
-		
-		
+
 		editingCategory.addCompleteEditHandler(new CompleteEditHandler<Category>() {
 			@Override
 			public void onCompleteEdit(CompleteEditEvent<Category> event) {
 				editingCategory.setEditableGrid(null);
 			}
 		});
-		
+
 		editingCategory.addCancelEditHandler(new CancelEditHandler<Category>() {
 			@Override
 			public void onCancelEdit(CancelEditEvent<Category> event) {
 				editingCategory.setEditableGrid(null);
 			}
-			
+
 		});
-		
+
 		gridFringes.addRowClickHandler(new RowClickHandler() {
 			@Override
 			public void onRowClick(RowClickEvent event) {
 				int rowIndex = event.getRowIndex();
 				selectedFringe = listStoreFringes.get(rowIndex);
+				updateFringeControlsState();
 			}
 		});
-		
+
 		editingFringe.addCompleteEditHandler(new CompleteEditHandler<Fringe>() {
 			@Override
 			public void onCompleteEdit(CompleteEditEvent<Fringe> event) {
 				editingFringe.setEditableGrid(null);
 			}
 		});
-		
+
 		editingFringe.addCancelEditHandler(new CancelEditHandler<Fringe>() {
 			@Override
 			public void onCancelEdit(CancelEditEvent<Fringe> event) {
 				editingFringe.setEditableGrid(null);
 			}
-			
-		});		
-		
 
+		});
+
+		
 		addShowHandler(new ShowHandler() {
 			@Override
 			public void onShow(ShowEvent event) {
-				fireEvent(new GetCategoriesEvent());
-				fireEvent(new GetFringesEvent());
+				presenter.registerOnEventBus();
+				presenter.callerGetGategoriesAndFringes();
+				
 			}
 		});
-
-	}
-	
-	
-	private void setFilterOnFringesList(Category selectedCategory){
-		if (selectedCategory.getId() != null) {
-			if (categoryIdFilter.isActive()) {
-				categoryIdFilter.setActive(false,false);
+		
+		
+		addHideHandler(new HideHandler() {
+			@Override
+			public void onHide(HideEvent event) {
+				presenter.unregisterOnEventBus();
 			}
-			Integer priorValue = selectedCategory.getId() - 1;
-			Integer nextValue = selectedCategory.getId() + 1;
-			categoryIdFilter.setGreaterThanValue(priorValue);
-			categoryIdFilter.setLessThanValue(nextValue);
-			categoryIdFilter.setActive(true,false);
-			
+		});
+		
+		
+	}
+
+	private void setFilterOnFringesList(Category selectedCategory) {
+		if (selectedCategory.getId() != null) {
+//			if (categoryIdFilter.isActive()) {
+//				categoryIdFilter.setActive(false, false);
+//			}
+//			Integer priorValue = selectedCategory.getId() - 1;
+//			Integer nextValue = selectedCategory.getId() + 1;
+//			categoryIdFilter.setGreaterThanValue(priorValue);
+//			categoryIdFilter.setLessThanValue(nextValue);
+//			categoryIdFilter.setActive(true, false);
+			listStoreFringes.clear();
+			listStoreFringes.addAll(presenter.getFringesList(selectedCategory.getId()));
 		}
 	}
-	
 
 	private void createCategoryUi() {
 		columnModelCategories = initColumnModelCategory();
@@ -254,7 +315,7 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		ccCategoryDescription = new ColumnConfig<Category, String>(categoryProperties.description(), 200, "Description");
 		ccs.add(ccCategoryDescription);
 		editingCategory.addEditor(ccCategoryDescription, new TextField());
-		
+
 		return new ColumnModel<Category>(ccs);
 	}
 
@@ -269,18 +330,18 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		listStoreFringes = initListStoreFringe();
 
 	}
-	
+
 	private ColumnConfig<Fringe, Integer> ccFringeId;
 	private ColumnConfig<Fringe, String> ccFringeName;
 	private ColumnConfig<Fringe, String> ccFringePath;
+	private ColumnConfig<Fringe, Boolean> ccFringeLoaded;
 	private ColumnConfig<Fringe, Integer> ccFringeCategoryId;
 	private ColumnConfig<Fringe, String> ccFringeDescription;
-	
 
 	private ColumnModel<Fringe> initColumnModelFringe() {
 		// Create the configurations for each column in the grid
 		List<ColumnConfig<Fringe, ?>> ccs = new ArrayList<ColumnConfig<Fringe, ?>>();
-		ccFringeId = new ColumnConfig<Fringe, Integer>(fringeProperties.id(), 20, "Id"); 
+		ccFringeId = new ColumnConfig<Fringe, Integer>(fringeProperties.id(), 20, "Id");
 		ccs.add(ccFringeId);
 		editingFringe.addEditor(ccFringeId, new IntegerField());
 		ccFringeName = new ColumnConfig<Fringe, String>(fringeProperties.name(), 80, "Name");
@@ -288,6 +349,8 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		editingFringe.addEditor(ccFringeName, new TextField());
 		ccFringePath = new ColumnConfig<Fringe, String>(fringeProperties.path(), 100, "Path");
 		ccs.add(ccFringePath);
+		ccFringeLoaded = new ColumnConfig<Fringe, Boolean>(fringeProperties.loaded(), 100, "Jar loaded");
+		ccs.add(ccFringeLoaded);
 		editingFringe.addEditor(ccFringePath, new TextField());
 		ccFringeCategoryId = new ColumnConfig<Fringe, Integer>(fringeProperties.categoryId(), 70, "Category Id");
 		ccs.add(ccFringeCategoryId);
@@ -328,7 +391,6 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	@Override
 	public void associatePresenter(Presenter presenter) {
 		this.presenter = (FringeManagerPresenter) presenter;
-
 	}
 
 	protected Presenter getAssociatedPresenter() {
@@ -342,14 +404,14 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public ListStore<Category> getListStoreCategories() {
 		return listStoreCategories;
 	}
-	
+
 	public Grid<Category> getGridCategories() {
 		return gridCategories;
 	}
 
 	public Category getSelectedCategory() {
-		return selectedCategory; 
-	}	
+		return selectedCategory;
+	}
 
 	public GridEditing<Fringe> getEditingFringe() {
 		return editingFringe;
@@ -358,19 +420,15 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public ListStore<Fringe> getListStoreFringes() {
 		return listStoreFringes;
 	}
-	
+
 	public Grid<Fringe> getGridFringes() {
 		return gridFringes;
 	}
-	
-	public Fringe getSelectedFringe() {
-		return selectedFringe; 
-	}
-	
-	
 
-	
-	
+	public Fringe getSelectedFringe() {
+		return selectedFringe;
+	}
+
 	public void buildContextMenuCategory() {
 		contextMenuCategory = new CategoryContextMenu();
 		contextMenuCategory.setWidth(80);
@@ -381,11 +439,11 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			}
 		});
 		gridCategories.setContextMenu(contextMenuCategory);
-	}		
+	}
 
 	public void buildContextMenuFringe() {
 		contextMenuFringe = new FringeContextMenu();
-		contextMenuFringe.setWidth(80);
+		contextMenuFringe.setWidth(110);
 		contextMenuFringe.addBeforeShowHandler(new BeforeShowHandler() {
 			@Override
 			public void onBeforeShow(BeforeShowEvent event) {
@@ -393,9 +451,8 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			}
 		});
 		gridFringes.setContextMenu(contextMenuFringe);
-	}		
+	}
 
-	
 	public Integer getCategoryId() {
 		return categoryId;
 	}
@@ -403,27 +460,21 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public void setCategoryId(Integer value) {
 		categoryId = value;
 	}
-	
+
 	public Integer getNewCategoryId() {
 		return ++categoryId;
 	}
-	
+
 	public Integer getFringeId() {
 		return fringeId;
 	}
-	
+
 	public void setFringeId(Integer value) {
 		fringeId = value;
 	}
-	
 
 	public Integer getNewFringeId() {
 		return ++fringeId;
-	}	
-	
-	@UiHandler({ "buttonRefreshCategory" })
-	public void onButtonRefreshCategoryClick(SelectEvent event) {
-		presenter.fireEvent(new GetCategoriesEvent());
 	}
 
 	@UiHandler({ "buttonAddCategory" })
@@ -435,17 +486,12 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public void onButtonEditCategoryClick(SelectEvent event) {
 		presenter.doEditCategory();
 	}
-	
+
 	@UiHandler({ "buttonDeleteCategory" })
 	public void onButtonDeleteCategoryClick(SelectEvent event) {
 		presenter.doDeleteCategory();
-	}		
-
-	@UiHandler({ "buttonRefreshFringe" })
-	public void onButtonRefreshFringeClick(SelectEvent event) {
-		presenter.fireEvent(new GetFringesEvent());
 	}
-	
+
 	@UiHandler({ "buttonAddFringe" })
 	public void onButtonAddFringeClick(SelectEvent event) {
 		presenter.doAddFringe();
@@ -455,16 +501,55 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public void onButtonEditFringeClick(SelectEvent event) {
 		presenter.doEditFringe();
 	}
-	
+
 	@UiHandler({ "buttonMoveFringe" })
 	public void onButtonMoveFringeClick(SelectEvent event) {
 		presenter.doMoveFringe();
 	}
-	
-	
+
+	@UiHandler({ "buttonLoadFringeJar" })
+	public void onButtonLoadFringeJarClick(SelectEvent event) {
+		presenter.doLoadFringeJar();
+	}
+
 	@UiHandler({ "buttonDeleteFringe" })
 	public void onButtonDeleteFringeClick(SelectEvent event) {
 		presenter.doDeleteFringe();
-	}		
+	}
+
+	public void updateCategoryControlsState() {
+		buttonAddCategory.setEnabled(true);
+		if (selectedCategory == null) {
+			buttonEditCategory.setEnabled(false);
+			buttonDeleteCategory.setEnabled(false);
+		} else {
+			buttonEditCategory.setEnabled(true);
+			buttonDeleteCategory.setEnabled(true);
+		}
+	}
+	
+	public void updateFringeControlsState() {
+		buttonAddFringe.setEnabled(true);
+		if (selectedFringe == null) {
+			buttonMoveFringe.setEnabled(false);
+			buttonLoadFringeJar.setEnabled(false);
+			buttonEditFringe.setEnabled(false);
+			buttonDeleteFringe.setEnabled(false);
+		} else {
+			buttonMoveFringe.setEnabled(true);
+			buttonLoadFringeJar.setEnabled(true);
+			buttonEditFringe.setEnabled(true);
+			buttonDeleteFringe.setEnabled(true);
+		}
+	}
+	
+	public void setAllFringes(Fringe[] fringes){
+		allFringes = fringes;
+	}
+	
+	public Fringe[] getAllFringes(){
+		return allFringes;
+	}	
+	
 
 }

@@ -20,11 +20,13 @@ import com.vw.ide.client.devboardext.event.handler.SelectFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ServerLogEventHandler;
 import com.vw.ide.client.devboardext.service.browser.callbacks.GettingUserStateResultCallback;
 import com.vw.ide.client.dialog.fringemanagment.event.handler.GetCategoriesEventHandler;
+import com.vw.ide.client.dialog.fringemanagment.event.handler.GetFringesEventHandler;
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
 import com.vw.ide.client.event.handler.FileStateChangedHandler;
 import com.vw.ide.client.event.handler.GetCategoriesHandler;
 import com.vw.ide.client.event.handler.GetDirContentHandler;
+import com.vw.ide.client.event.handler.GetFringesHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
 import com.vw.ide.client.event.handler.OpenFringeManagerHandler;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
@@ -36,6 +38,7 @@ import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.FileStateChangedEvent;
 import com.vw.ide.client.event.uiflow.GetCategoriesEvent;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
+import com.vw.ide.client.event.uiflow.GetFringesEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.OpenFringeManagerEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
@@ -136,7 +139,6 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.addHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.addHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 		eventBus.addHandler(OpenFringeManagerEvent.TYPE, (OpenFringeManagerHandler)dispatcher.get(OpenFringeManagerEvent.TYPE));
-		
 	}
 	
 	@Override
@@ -151,7 +153,6 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.removeHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 		eventBus.removeHandler(OpenFringeManagerEvent.TYPE, (OpenFringeManagerHandler)dispatcher.get(OpenFringeManagerEvent.TYPE));
-		
 	}
 
 	

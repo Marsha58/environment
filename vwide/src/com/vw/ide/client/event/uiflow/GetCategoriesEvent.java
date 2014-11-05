@@ -24,9 +24,6 @@ public class GetCategoriesEvent extends GwtEvent<GetCategoriesHandler> {
 		return TYPE;
 	}
 
-
-
-
 	@Override
 	protected void dispatch(GetCategoriesHandler handler) {
 		handler.onGetCategories(this);

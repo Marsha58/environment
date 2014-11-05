@@ -11,6 +11,7 @@
 		<spring.version>3.0.5.RELEASE</spring.version>
 		<gwtVersion>2.6.0</gwtVersion>
 		<gwtBootstrap3.version>0.8</gwtBootstrap3.version>
+		<guava-version>18.0</guava-version>
 		<libgwtFileVersion>0.3.1</libgwtFileVersion>
 	</properties>
 
@@ -146,6 +147,16 @@
 			<artifactId>gwtbootstrap3-extras</artifactId>
 			<version>${gwtBootstrap3.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-gwt</artifactId>
+			<version>18.0</version>
 		</dependency>
 	</dependencies>
 

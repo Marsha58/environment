@@ -109,7 +109,7 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 		Long projectId = projectManager.getProjectIdByProjectPath(FlowController.getLoggedAsUser(), fileItemInfo.getAbsolutePath());
 		String parentPath = Utils.extractJustPath(fileItemInfo.getAbsolutePath());
 		final FileOpenDialog box = new FileOpenDialog();
-		box.setEditLabelText("Select file to import");
+		box.setEditLabelText("Select file");
 		box.setParentPath(parentPath);
 		box.setProjectId(projectId);
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.ImportFileDialogHideHandler(box, presenter));

@@ -21,7 +21,8 @@ public enum OperationTypes {
    DELETE_CATEGORY("delete_category"),
    ADD_FRINGE("add_fringe"),
    EDIT_FRINGE("edit_fringe"),
-   DELETE_FRINGE("delete_fringe");
+   DELETE_FRINGE("delete_fringe"),
+   LOAD_FRINGE_JAR("load_fringe_jar");
    
 	private final String name;
 	

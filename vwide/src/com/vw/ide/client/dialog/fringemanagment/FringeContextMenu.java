@@ -5,7 +5,9 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.vw.ide.client.Resources;
+import com.vw.ide.client.dialog.fringemanagment.FringeManager.CategoryProperties;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.shared.OperationTypes;
 
@@ -14,6 +16,7 @@ public class FringeContextMenu extends Menu {
 	private MenuItem addFringe;
 	private MenuItem editFringe;
 	private MenuItem moveFringe;
+	private MenuItem loadFringeJar;
 	private MenuItem deleteFringe;
 
 	public SelectionHandler<Item> selectionHandler = new SelectionHandler<Item>() {
@@ -28,6 +31,8 @@ public class FringeContextMenu extends Menu {
 						presenter.doEditFringe();
 					} else if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.DELETE_FRINGE.getName())) {
 						presenter.doDeleteFringe();
+					} else if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.LOAD_FRINGE_JAR.getName())) {
+						presenter.doLoadFringeJar();
 					} 
 					
 				}
@@ -48,6 +53,14 @@ public class FringeContextMenu extends Menu {
 		editFringe.setIcon(Resources.IMAGES.copy_edit_en());
 		editFringe.addSelectionHandler(selectionHandler);
 		this.add(editFringe);
+		this.add(new SeparatorMenuItem());
+		loadFringeJar = new MenuItem();
+		loadFringeJar.setItemId(OperationTypes.LOAD_FRINGE_JAR.getName());
+		loadFringeJar.setText("Load fringe.jar");
+		loadFringeJar.setIcon(Resources.IMAGES.commit_en());
+		loadFringeJar.addSelectionHandler(selectionHandler);
+		this.add(loadFringeJar);
+		this.add(new SeparatorMenuItem());
 		deleteFringe = new MenuItem();
 		deleteFringe.setItemId(OperationTypes.DELETE_FRINGE.getName());
 		deleteFringe.setText("Delete");

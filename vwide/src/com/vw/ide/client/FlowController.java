@@ -24,7 +24,6 @@ public class FlowController implements ValueChangeHandler<String> {
 	
 	private static final String LOGIN_SCREEN = "loginGxt";
 	private static final String DEV_SCREEN = "dev";
-	private static final String FRINGE_MANAGER_SCREEN = "fringeManager";
 	
 	public FlowController(HandlerManager eventBus) {
 		this.eventBus = eventBus;
@@ -50,9 +49,7 @@ public class FlowController implements ValueChangeHandler<String> {
 				setLoggedAsUser(getUserNameFromDevBoardLoginString(token));
 			    presenter = PresenterFactory.buildDevBoardPresenter(eventBus, new DevelopmentBoard());
 			    presenter.setLoggedAsUser(getLoggedAsUser());
-			} else 	if (token.startsWith(FRINGE_MANAGER_SCREEN)) {
-			    presenter = PresenterFactory.buildFringeManagerPresenter(eventBus, new FringeManager());
-			}
+			} 
 			if (presenter != null) {
 				if (prevPresenter != null) {
 					prevPresenter.unregisterOnEventBus(eventBus);
