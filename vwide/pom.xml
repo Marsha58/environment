@@ -148,6 +148,11 @@
 			<version>${gwtBootstrap3.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency> 
+   			<groupId>com.kfuntak.gwt.json</groupId> 
+   			<artifactId>gwtprojsonserializer</artifactId> 
+   			<version>1.0.4</version> 
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -181,6 +186,10 @@
 			<name>Sencha commercial releases</name>
 			<url>https://maven.sencha.com/repo/commercial-release/</url>
 		</repository>
+  		<repository> 
+    			<id>gwtprojsonserializer</id> 
+    			<url>http://gwtprojsonserializer.googlecode.com/svn/repo</url> 
+  		</repository>
 	</repositories>
 
 	<distributionManagement>

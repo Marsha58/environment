@@ -10,7 +10,6 @@ import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.remote.browser.DirBrowserServiceBroker;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
-import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.shared.servlet.remotebrowser.RequestFileOperationResult;
 
 public class SaveFileEventHandler extends Presenter.PresenterEventHandler implements SaveFileHandler {
@@ -45,13 +44,13 @@ public class SaveFileEventHandler extends Presenter.PresenterEventHandler implem
 	}
 	
 	protected void process(DevelopmentBoardPresenter presenter, SaveFileEvent event) {
-		FileSheet currentWidget = presenter.getView().getActiveFileSheetWidget();
+		ProjectItemInfo toSave = event.getSaveProjectItemInfo();
 		DirBrowserServiceBroker.requestForFileSaving(FlowController.getLoggedAsUser(),
-													currentWidget.getItemInfo().getAssociatedData().getAbsolutePath(),
-													currentWidget.getItemInfo().getAssociatedData().getName(),
+													toSave.getAssociatedData().getAbsolutePath(),
+													toSave.getAssociatedData().getName(),
 													null,
 													null,
-													currentWidget.getAceEditor().getText(),
-													new BrowserAnyFileOperationResultCallback(presenter, new HandlerOnSaveFile(presenter, currentWidget.getItemInfo())));
+													toSave.getFileSheet().getAceEditor().getText(),
+													new BrowserAnyFileOperationResultCallback(presenter, new HandlerOnSaveFile(presenter, toSave)));
 	}	
 }

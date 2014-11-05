@@ -32,6 +32,8 @@
 
 	<inherits name="com.seanchenxi.gwt.storage.Storage" />
 
+	<inherits name='com.kfuntak.gwt.json.serialization.GWTProJsonSerializer'/>
+
 	<!-- Include both base GXT themes and set the app to check for url params 
 		to activate blue -->
 <!-- 	 -->

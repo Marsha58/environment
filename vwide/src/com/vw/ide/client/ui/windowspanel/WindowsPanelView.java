@@ -83,9 +83,8 @@ public class WindowsPanelView extends Composite {
    }
    
    public void appendLog(String logContent) {
-	   String sTmp = logAceEditor.getText();
+	   String sTmp = bodyDebug.getText();
 	   sTmp += logContent;
-	   logAceEditor.setText(sTmp);
-   }   
-
+	   bodyDebug.setText(sTmp);
+   }
 }

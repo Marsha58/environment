@@ -14,6 +14,7 @@ import com.vw.ide.client.devboardext.event.handler.GetDirContentEventHandler;
 import com.vw.ide.client.devboardext.event.handler.LogoutEventHandler;
 import com.vw.ide.client.devboardext.event.handler.MoveFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ProjectMenuEventHandler;
+import com.vw.ide.client.devboardext.event.handler.SaveAllFilesEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SaveFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SelectFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ServerLogEventHandler;
@@ -35,6 +36,7 @@ import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.MoveFileEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
+import com.vw.ide.client.event.uiflow.SaveAllFilesEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
@@ -84,6 +86,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 			put(LogoutEvent.TYPE, new LogoutEventHandler());
 			put(ProjectMenuEvent.TYPE, new ProjectMenuEventHandler());
 			put(ServerLogEvent.TYPE, new ServerLogEventHandler());
+			put(SaveAllFilesEvent.TYPE, new SaveAllFilesEventHandler());
 		}
 	};
 	
@@ -130,6 +133,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.addHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.addHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 		eventBus.addHandler(MoveFileEvent.TYPE, (MoveFileEventHandler)dispatcher.get(MoveFileEvent.TYPE));
+		eventBus.addHandler(SaveAllFilesEvent.TYPE, (SaveAllFilesEventHandler)dispatcher.get(SaveAllFilesEvent.TYPE));
 	}
 	
 	@Override
@@ -144,6 +148,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.removeHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 		eventBus.removeHandler(MoveFileEvent.TYPE, (MoveFileEventHandler)dispatcher.get(MoveFileEvent.TYPE));
+		eventBus.removeHandler(SaveAllFilesEvent.TYPE, (SaveAllFilesEventHandler)dispatcher.get(SaveAllFilesEvent.TYPE));
 	}
 	
 	public TopPanel getTopPanel() {

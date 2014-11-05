@@ -53,6 +53,7 @@ import com.vw.ide.client.dialog.about.AboutDialogExt;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
+import com.vw.ide.client.event.uiflow.SaveAllFilesEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -235,7 +236,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 	    }
 	}
 
-	@UiHandler({"userLogout", "bnNewVwmlProjField", "bnSaveFileField"})
+	@UiHandler({"userLogout", "bnNewVwmlProjField", "bnSaveFileField", "bnSaveAllField"})
 	public void onToolBarrButtonClick(SelectEvent event) {
 	    Info.display("Click", ((TextButton) event.getSource()).getText() + " clicked");
 	    String sItemId = ((TextButton)event.getSource()).getItemId(); 
@@ -246,8 +247,13 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 		case "idNewVwmlProjField":
 			presenter.fireEvent(new ProjectMenuEvent("idNewProject"));
 			break;
-		case "idSaveSelectedFile":
-			presenter.fireEvent(new SaveFileEvent());
+		case "idSaveSelectedFile": {
+			ProjectItemInfo saveProjectItemInfo = ((DevelopmentBoardPresenter)presenter).getView().getActiveFileSheetWidget().getItemInfo();
+			presenter.fireEvent(new SaveFileEvent(saveProjectItemInfo));
+			break;
+		}
+		case "idSaveAll":
+			presenter.fireEvent(new SaveAllFilesEvent());
 			break;
 		default:
 			break;

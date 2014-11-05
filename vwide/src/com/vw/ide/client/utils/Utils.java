@@ -5,10 +5,13 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.kfuntak.gwt.json.serialization.client.JsonSerializable;
+import com.kfuntak.gwt.json.serialization.client.Serializer;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
+
 /**
  * Some aux. methods
  * @author Oleg
@@ -156,5 +159,9 @@ public class Utils {
 	
 	public static String createFullProjectPath(ProjectDescription projectDescription) {
 		return projectDescription.getProjectPath() + "/" + projectDescription.getMainModuleName();
+	}
+	
+	public static String jsonSerialization(Serializer serializer, JsonSerializable obj) {
+		return serializer.serialize(obj);
 	}
 }
