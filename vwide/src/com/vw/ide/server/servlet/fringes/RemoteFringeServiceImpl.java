@@ -10,6 +10,7 @@ import com.vw.ide.server.servlet.fringes.persistance.FringePersistanceService;
 import com.vw.ide.shared.servlet.fringes.RemoteFringeService;
 import com.vw.ide.shared.servlet.fringes.RequestGetCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesResult;
+import com.vw.ide.shared.servlet.fringes.RequestLoadFringeJarResult;
 
 
 /**
@@ -73,5 +74,11 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 			res.setRetCode(-1);
 		}
 		return res;
+	}
+
+	@Override
+	public RequestLoadFringeJarResult loadFringeJar(String user, String parent, String fileName, String content) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

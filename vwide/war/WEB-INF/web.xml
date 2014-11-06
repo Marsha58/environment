@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
-              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         version="2.5"
-         xmlns="http://java.sun.com/xml/ns/javaee">
-
-  <!-- Servlets -->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <servlet>
     <servlet-name>remoteBrowserServlet</servlet-name>
     <servlet-class>com.vw.ide.server.servlet.remotebrowser.RemoteDirectoryBrowserImpl</servlet-class>
@@ -15,25 +9,32 @@
     <url-pattern>/vwide/dirbrowser</url-pattern>
   </servlet-mapping>
   <servlet>
-    <servlet-name>securityServlet</servlet-name> 
-    <servlet-class>com.vw.ide.server.servlet.security.SecurityImpl</servlet-class> 
+    <servlet-name>securityServlet</servlet-name>
+    <servlet-class>com.vw.ide.server.servlet.security.SecurityImpl</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>securityServlet</servlet-name> 
-    <url-pattern>/vwide/security</url-pattern> 
+    <servlet-name>securityServlet</servlet-name>
+    <url-pattern>/vwide/security</url-pattern>
   </servlet-mapping>
   <servlet>
-    <servlet-name>fringesServiceServlet</servlet-name> 
-    <servlet-class>com.vw.ide.server.servlet.fringes.RemoteFringeServiceImpl</servlet-class> 
+    <servlet-name>fringesServiceServlet</servlet-name>
+    <servlet-class>com.vw.ide.server.servlet.fringes.RemoteFringeServiceImpl</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>fringesServiceServlet</servlet-name> 
-    <url-pattern>/vwide/fringes</url-pattern> 
+    <servlet-name>fringesServiceServlet</servlet-name>
+    <url-pattern>/vwide/fringes</url-pattern>
   </servlet-mapping>
-  
-  <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Vwide.html</welcome-file>
   </welcome-file-list>
-
+  <servlet>
+    <description></description>
+    <display-name>FringeUploadServlet</display-name>
+    <servlet-name>FringeUploadServlet</servlet-name>
+    <servlet-class>com.vw.ide.server.servlet.fringes.FringeUploadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FringeUploadServlet</servlet-name>
+    <url-pattern>/vwide/fringeupload</url-pattern>
+  </servlet-mapping>
 </web-app>

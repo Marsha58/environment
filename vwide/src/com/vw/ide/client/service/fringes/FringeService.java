@@ -10,6 +10,7 @@ import com.vw.ide.client.service.security.RemoteSecurityService.ServiceCallbackF
 import com.vw.ide.shared.servlet.fringes.RemoteFringeServiceAsync;
 import com.vw.ide.shared.servlet.fringes.RequestGetCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesResult;
+import com.vw.ide.shared.servlet.fringes.RequestLoadFringeJarResult;
 import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;
 
@@ -27,6 +28,9 @@ public class FringeService implements BusConnectivity, VwIdeClientService  {
 	}
 	
 	public static class ServiceCallbackForGetFringes extends ServiceCallback<RequestGetFringesResult>  {
+	}	
+
+	public static class ServiceCallbackForLoadFringeJar extends ServiceCallback<RequestLoadFringeJarResult>  {
 	}	
 	
 	private FringeService() {
@@ -73,6 +77,9 @@ public class FringeService implements BusConnectivity, VwIdeClientService  {
 	public ServiceCallbackForGetFringes buildCallbackForGetFringes() {
 		return new ServiceCallbackForGetFringes();
 	}		
-	
+
+	public ServiceCallbackForLoadFringeJar buildCallbackForLoadFringeJar() {
+		return new ServiceCallbackForLoadFringeJar();
+	}		
 
 }

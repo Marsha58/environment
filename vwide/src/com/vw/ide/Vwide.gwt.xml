@@ -32,8 +32,12 @@
 	<!-- Other module inherits -->
 	<inherits name='edu.ycp.cs.dh.acegwt.AceGWT' />
 	<inherits name='com.sencha.gxt.ui.GXT' />
-
+<!-- 
 	<inherits name="com.seanchenxi.gwt.storage.Storage" />
+-->
+
+<!-- Include GWTUpload library (for fringe jar file uploading)-->
+  	<inherits name="gwtupload.GWTUpload"/>
 
 	<!-- Include both base GXT themes and set the app to check for url params 
 		to activate blue -->

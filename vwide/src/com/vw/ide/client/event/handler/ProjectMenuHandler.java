@@ -4,7 +4,7 @@ import com.google.gwt.event.shared.EventHandler;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 
 /**
- * Login handler
+ * Project context menu handler
  * @author OMelnyk
  *
  */

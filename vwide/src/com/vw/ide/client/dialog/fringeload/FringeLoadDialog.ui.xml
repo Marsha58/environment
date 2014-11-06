@@ -14,10 +14,5 @@
 	}
 	</ui:style>
 
-	<form:FieldLabel text="" ui:field="editLabelField">
-		<form:widget>
-			<fl:FileUploadExt  ui:field="fileField"/>
-		</form:widget>
-	</form:FieldLabel>
-
+    <g:SimplePanel ui:field="simplePanel"></g:SimplePanel>
 </ui:UiBinder> 

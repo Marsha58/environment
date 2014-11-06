@@ -19,10 +19,13 @@ import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
 import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
 import com.vw.ide.client.dialog.fringeload.FringeLoadDialog;
+import com.vw.ide.client.dialog.fringemanagment.event.handler.FringesContextMenuEventHandler;
 import com.vw.ide.client.dialog.fringemanagment.event.handler.GetCategoriesEventHandler;
 import com.vw.ide.client.dialog.fringemanagment.event.handler.GetFringesEventHandler;
+import com.vw.ide.client.event.handler.FringesContextMenuHandler;
 import com.vw.ide.client.event.handler.GetCategoriesHandler;
 import com.vw.ide.client.event.handler.GetFringesHandler;
+import com.vw.ide.client.event.uiflow.FringesContextMenuEvent;
 import com.vw.ide.client.event.uiflow.GetCategoriesEvent;
 import com.vw.ide.client.event.uiflow.GetFringesEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -72,6 +75,7 @@ public class FringeManagerPresenter extends Presenter {
 		{
 			put(GetCategoriesEvent.TYPE, new GetCategoriesEventHandler());
 			put(GetFringesEvent.TYPE, new GetFringesEventHandler());
+			put(FringesContextMenuEvent.TYPE, new FringesContextMenuEventHandler());
 		}
 	};
 
@@ -137,6 +141,7 @@ public class FringeManagerPresenter extends Presenter {
 		}
 		eventBus.addHandler(GetCategoriesEvent.TYPE, (GetCategoriesHandler) dispatcher.get(GetCategoriesEvent.TYPE));
 		eventBus.addHandler(GetFringesEvent.TYPE, (GetFringesHandler) dispatcher.get(GetFringesEvent.TYPE));
+		eventBus.addHandler(FringesContextMenuEvent.TYPE, (FringesContextMenuHandler) dispatcher.get(FringesContextMenuEvent.TYPE));
 
 	}
 
@@ -144,6 +149,7 @@ public class FringeManagerPresenter extends Presenter {
 	public void unregisterOnEventBus(HandlerManager eventBus) {
 		eventBus.removeHandler(GetCategoriesEvent.TYPE, (GetCategoriesHandler) dispatcher.get(GetCategoriesEvent.TYPE));
 		eventBus.removeHandler(GetFringesEvent.TYPE, (GetFringesHandler) dispatcher.get(GetFringesEvent.TYPE));
+		eventBus.removeHandler(FringesContextMenuEvent.TYPE, (FringesContextMenuHandler) dispatcher.get(FringesContextMenuEvent.TYPE));
 	}
 
 	public void callerGetGategoriesAndFringes() {
@@ -238,21 +244,6 @@ public class FringeManagerPresenter extends Presenter {
 		}
 	}
 
-	public void doLoadFringeJar() {
-		if (getView().getSelectedFringe() != null) {
-			// ProjectManager projectManager = presenter.getProjectManager();
-			// Long projectId =
-			// projectManager.getProjectIdByProjectPath(FlowController.getLoggedAsUser(),
-			// fileItemInfo.getAbsolutePath());
-			// String parentPath =
-			// Utils.extractJustPath(fileItemInfo.getAbsolutePath());
-			final FringeLoadDialog box = new FringeLoadDialog();
-			box.setEditLabelText("Select file");
-			// box.setParentPath(parentPath);
-			box.addDialogHideHandler(new FringeManagerDialogHandlers.LoadFringeDialogHideHandler(box, this));
-			box.show();
-		}
-	}
 
 	public void doDeleteFringe() {
 		if (getView().getSelectedFringe() != null) {

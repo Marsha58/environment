@@ -17,10 +17,10 @@ public class FringeManagerDialogHandlers {
 
 		@Override
 		public void onDialogHide(DialogHideEvent event) {
-			if (box.getLoadedFiles() > 0) {
-//				RemoteBrowserServiceBroker.requestForFileCreating(FlowController.getLoggedAsUser(), box.getParentPath(), box.getFileName(0),
+//			if (box.getLoadedFiles() > 0) {
+//				FringeServiceBroker.requestForFileCreating(FlowController.getLoggedAsUser(), box.getParentPath(), box.getFileName(0),
 //						box.getProjectId(), 0L, box.getContent(0), new AnyDirOperationResultCallback(owner));
-			}
+//			}
 		}
 	}	
 	

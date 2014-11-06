@@ -8,6 +8,7 @@ import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.vw.ide.client.Resources;
 import com.vw.ide.client.dialog.fringemanagment.FringeManager.CategoryProperties;
+import com.vw.ide.client.event.uiflow.FringesContextMenuEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.shared.OperationTypes;
 
@@ -25,7 +26,11 @@ public class FringeContextMenu extends Menu {
 			if (event.getSelectedItem().getParent() instanceof FringeContextMenu) {
 				FringeContextMenu menu = (FringeContextMenu) event.getSelectedItem().getParent();
 				if (menu.presenter != null) {
-					if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.ADD_FRINGE.getName())) {
+					
+					presenter.fireEvent(new FringesContextMenuEvent(OperationTypes.LOAD_FRINGE_JAR.getName()));
+
+					
+/*					if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.ADD_FRINGE.getName())) {
 						presenter.doAddFringe();
 					} else if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.EDIT_FRINGE.getName())) {
 						presenter.doEditFringe();
@@ -34,6 +39,7 @@ public class FringeContextMenu extends Menu {
 					} else if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.LOAD_FRINGE_JAR.getName())) {
 						presenter.doLoadFringeJar();
 					} 
+*/
 					
 				}
 			}

@@ -44,8 +44,10 @@ import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
 import com.sencha.gxt.widget.core.client.grid.filters.GridFilters;
 import com.sencha.gxt.widget.core.client.grid.filters.NumericFilter;
 import com.vw.ide.client.dialog.VwmlDialogExt;
+import com.vw.ide.client.event.uiflow.FringesContextMenuEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
+import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.fringes.model.Category;
 import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
@@ -509,7 +511,7 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 	@UiHandler({ "buttonLoadFringeJar" })
 	public void onButtonLoadFringeJarClick(SelectEvent event) {
-		presenter.doLoadFringeJar();
+		presenter.fireEvent(new FringesContextMenuEvent(OperationTypes.LOAD_FRINGE_JAR.getName()));
 	}
 
 	@UiHandler({ "buttonDeleteFringe" })
