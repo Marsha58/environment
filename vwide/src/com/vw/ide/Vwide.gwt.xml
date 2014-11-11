@@ -39,6 +39,12 @@
 <!-- Include GWTUpload library (for fringe jar file uploading)-->
   	<inherits name="gwtupload.GWTUpload"/>
 
+	<inherits name="org.apache.log4j.Log4j" />
+
+ 	<inherits name="com.fasterxml.jackson.annotation.JacksonAnnotation" />
+ 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
+<!---->
+
 	<!-- Include both base GXT themes and set the app to check for url params 
 		to activate blue -->
 <!-- 	 -->

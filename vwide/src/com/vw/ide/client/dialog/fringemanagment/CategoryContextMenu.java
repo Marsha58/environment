@@ -13,6 +13,30 @@ public class CategoryContextMenu extends Menu {
 	public  FringeManagerPresenter presenter;
 	private MenuItem addCategory;
 	private MenuItem editCategory;
+	public MenuItem getAddCategory() {
+		return addCategory;
+	}
+
+	public void setAddCategory(MenuItem addCategory) {
+		this.addCategory = addCategory;
+	}
+
+	public MenuItem getEditCategory() {
+		return editCategory;
+	}
+
+	public void setEditCategory(MenuItem editCategory) {
+		this.editCategory = editCategory;
+	}
+
+	public MenuItem getDeleteCategory() {
+		return deleteCategory;
+	}
+
+	public void setDeleteCategory(MenuItem deleteCategory) {
+		this.deleteCategory = deleteCategory;
+	}
+
 	private MenuItem deleteCategory;
 
 	public SelectionHandler<Item> selectionHandler = new SelectionHandler<Item>() {

@@ -8,9 +8,17 @@ import org.apache.log4j.Logger;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.server.servlet.fringes.persistance.FringePersistanceService;
 import com.vw.ide.shared.servlet.fringes.RemoteFringeService;
+import com.vw.ide.shared.servlet.fringes.RequestAddCategoryResult;
+import com.vw.ide.shared.servlet.fringes.RequestAddFringeResult;
+import com.vw.ide.shared.servlet.fringes.RequestDeleteCategoryResult;
+import com.vw.ide.shared.servlet.fringes.RequestDeleteFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesResult;
 import com.vw.ide.shared.servlet.fringes.RequestLoadFringeJarResult;
+import com.vw.ide.shared.servlet.fringes.RequestUpdateCategoryResult;
+import com.vw.ide.shared.servlet.fringes.RequestUpdateFringeResult;
+import com.vw.ide.shared.servlet.fringes.model.Category;
+import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 
 /**
@@ -48,7 +56,57 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 	}
 	
 	
+	@Override
+	public RequestGetCategoriesResult getCategories() {
+		RequestGetCategoriesResult res = new RequestGetCategoriesResult();
+		res.setRetCode(0);
+		try {
+			res.setCategories(fringePersistanceService.getCategories()); 
+		}
+		catch(Exception ex) {
+			res.setRetCode(-1);
+		}
+		return res;
+	}
 	
+	@Override
+	public RequestAddCategoryResult addCategory(Category category) {
+		RequestAddCategoryResult res = new RequestAddCategoryResult();
+		res.setRetCode(0);
+		try {
+			fringePersistanceService.addCategory(category); 
+		}
+		catch(Exception ex) {
+			res.setRetCode(-1);
+		}
+		return res;
+	}
+	
+	@Override
+	public RequestUpdateCategoryResult updateCategory(Category category) {
+		RequestUpdateCategoryResult res = new RequestUpdateCategoryResult();
+		res.setRetCode(0);
+		try {
+			fringePersistanceService.updateCategory(category); 
+		}
+		catch(Exception ex) {
+			res.setRetCode(-1);
+		}
+		return res;
+	}
+	
+	@Override
+	public RequestDeleteCategoryResult deleteCategory(Integer categoryId) {
+		RequestDeleteCategoryResult res = new RequestDeleteCategoryResult();
+		res.setRetCode(0);
+		try {
+			fringePersistanceService.deleteCategory(categoryId); 
+		}
+		catch(Exception ex) {
+			res.setRetCode(-1);
+		}
+		return res;
+	}
 	
 	@Override
 	public RequestGetFringesResult getFringes() {
@@ -64,11 +122,11 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 	}
 
 	@Override
-	public RequestGetCategoriesResult getCategories() {
-		RequestGetCategoriesResult res = new RequestGetCategoriesResult();
+	public RequestAddFringeResult addFringe(Fringe fringe) {
+		RequestAddFringeResult res = new RequestAddFringeResult();
 		res.setRetCode(0);
 		try {
-			res.setCategories(fringePersistanceService.getCategories()); 
+			fringePersistanceService.addFringe(fringe);; 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -77,8 +135,33 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 	}
 
 	@Override
-	public RequestLoadFringeJarResult loadFringeJar(String user, String parent, String fileName, String content) {
-		// TODO Auto-generated method stub
-		return null;
+	public RequestUpdateFringeResult updateFringe(Fringe fringe) {
+		RequestUpdateFringeResult res = new RequestUpdateFringeResult();
+		res.setRetCode(0);
+		try {
+			fringePersistanceService.updateFringe(fringe);; 
+		}
+		catch(Exception ex) {
+			res.setRetCode(-1);
+		}
+		return res;
 	}
+
+
+
+	@Override
+	public RequestDeleteFringeResult deleteFringe(Integer fringeId) {
+		RequestDeleteFringeResult res = new RequestDeleteFringeResult();
+		res.setRetCode(0);
+		res.setId(fringeId);
+		try {
+			fringePersistanceService.deleteFringe(fringeId); 
+		}
+		catch(Exception ex) {
+			res.setRetCode(-1);
+		}
+		return res;
+	}
+
+
 }

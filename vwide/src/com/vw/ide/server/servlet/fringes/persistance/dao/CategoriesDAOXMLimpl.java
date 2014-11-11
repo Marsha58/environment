@@ -1,20 +1,20 @@
 package com.vw.ide.server.servlet.fringes.persistance.dao;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
+import javax.xml.transform.TransformerException;
 
-import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.vw.ide.server.servlet.utils.XmlUtils;
 import com.vw.ide.shared.servlet.fringes.model.Category;
-import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 
 
@@ -22,11 +22,9 @@ import com.vw.ide.shared.servlet.fringes.model.Fringe;
 public class CategoriesDAOXMLimpl implements CategoriesDAO{
 
 	private ServletContext context;
-	private String fringestoreFileName = "fringestore.xml";
-	private URL fullPath2FringeStore = null;
-	private DOMParser parser;
-	
 
+	
+	
 	@Override
 	public void setContext(ServletContext context) {
 		this.context = context;
@@ -35,31 +33,114 @@ public class CategoriesDAOXMLimpl implements CategoriesDAO{
 	
 	
 	@Override
-	public Category create(Integer id, String name, String icon, String description) throws FringeDAOException {
-		// TODO Auto-generated method stub
-		return null;
+	public void add(Category category)  {
+		try {
+			XMLConnection.getInstance().openStore(context);
+			Document doc = XMLConnection.getInstance().getDocument();
+		    Node categoriesNode = XMLConnection.getInstance().getNodeByItemType(FringeStoreItemTypes.CATEGORIES);
+
+		    Boolean isCategoryExists = false;
+			for (int i = 0; i < categoriesNode.getChildNodes().getLength(); i++) {
+				Node curFringeNode = categoriesNode.getChildNodes().item(i);
+				if (XmlUtils.getNodeAttr("id", curFringeNode).equalsIgnoreCase(category.getId().toString())) {
+					isCategoryExists = true;
+					break;
+				}
+			}
+			if (!isCategoryExists) {
+				Element newCategoryElement = doc.createElement("category");
+				newCategoryElement.setAttribute("id", category.getId().toString());
+				newCategoryElement.setAttribute("name", category.getName());
+				newCategoryElement.setAttribute("icon", category.getIcon());
+				newCategoryElement.setAttribute("description", category.getDescription());
+				categoriesNode.appendChild(newCategoryElement);		
+				try {
+					XMLConnection.getInstance().saveStore(doc);
+				} catch (TransformerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}				
+			}
+		} catch (SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public Category delete(Integer id) throws FringeDAOException {
-		// TODO Auto-generated method stub
-		return null;
+	public void update(Category category)  {
+		try {
+			XMLConnection.getInstance().openStore(context);
+			Document doc = XMLConnection.getInstance().getDocument();
+		    Node categoriesNode = XMLConnection.getInstance().getNodeByItemType(FringeStoreItemTypes.CATEGORIES);
+			for (int i = 0; i < categoriesNode.getChildNodes().getLength(); i++) {
+				if (XmlUtils.getNodeAttr("id", categoriesNode.getChildNodes().item(i)).equalsIgnoreCase(category.getId().toString())) {
+					XmlUtils.setNodeAttr("name", categoriesNode.getChildNodes().item(i), category.getName());
+					XmlUtils.setNodeAttr("icon", categoriesNode.getChildNodes().item(i), category.getIcon());
+					XmlUtils.setNodeAttr("description", categoriesNode.getChildNodes().item(i), category.getDescription());
+					try {
+						XMLConnection.getInstance().saveStore(doc);
+					} catch (TransformerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		} catch (SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public Category update(Integer id, Category Category) throws FringeDAOException {
-		// TODO Auto-generated method stub
-		return null;
+	public void delete(Integer id)  {
+		try {
+			XMLConnection.getInstance().openStore(context);
+			Document doc = XMLConnection.getInstance().getDocument();
+		    Node categoriesNode = XMLConnection.getInstance().getNodeByItemType(FringeStoreItemTypes.CATEGORIES);
+
+			for (int i = 0; i < categoriesNode.getChildNodes().getLength(); i++) {
+				if (XmlUtils.getNodeAttr("id", categoriesNode.getChildNodes().item(i)).equalsIgnoreCase(id.toString())) {
+					categoriesNode.removeChild(categoriesNode.getChildNodes().item(i));
+					try {
+						XMLConnection.getInstance().saveStore(doc);
+					} catch (TransformerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}				
+					break;
+				}
+			}
+	
+		} catch (SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+	@Override
+	public Category findById(Integer id)  {
+		Category category = new Category();
+		try {
+			XMLConnection.getInstance().openStore(context);
+		    Node categoriesNode = XMLConnection.getInstance().getNodeByItemType(FringeStoreItemTypes.FRINGES);
+
+			for (int i = 0; i < categoriesNode.getChildNodes().getLength(); i++) {
+				if (XmlUtils.getNodeAttr("id", categoriesNode.getChildNodes().item(i)).equalsIgnoreCase(id.toString())) {
+					category = convertNodeToCategory(categoriesNode.getChildNodes().item(i)); 
+					break;
+				}
+			}
+		} catch (SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return category;
 	}
 
 	@Override
-	public Category findById(Integer Id) throws FringeDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Category[] findByName(String name) throws FringeDAOException {
+	public Category[] findByName(String name)  {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -73,27 +154,23 @@ public class CategoriesDAOXMLimpl implements CategoriesDAO{
     	String icon;
     	String description;		
 		try {
-			
-			fullPath2FringeStore = context.getResource("/WEB-INF/classes/" + fringestoreFileName);
-		    parser = new DOMParser();
-		    parser.parse(fullPath2FringeStore.toString());
-		    Document doc = parser.getDocument();
-		    NodeList root = doc.getChildNodes();
-		    Node storeNode = XmlUtils.getNode("store", root);
-		    Node categoriesNode = XmlUtils.getNode("categories", storeNode.getChildNodes());
-    		
-		    for(int i = 0; i < categoriesNode.getChildNodes().getLength(); i++) {
-		    	Node categoryNode = categoriesNode.getChildNodes().item(i);
-		    	
-		    	id = XmlUtils.getNodeAttr("id", categoryNode);
-		    	name = XmlUtils.getNodeAttr("name", categoryNode);
-		    	icon = XmlUtils.getNodeAttr("icon", categoryNode);
-		    	description = XmlUtils.getNodeAttr("description", categoryNode);
-
-		    	if (checkParams(id,name)) {
-		    		categories.add(new Category(Integer.parseInt(id), name, icon, description));
-		    	}
-		    }	
+			XMLConnection xmlConnection = XMLConnection.getInstance();
+			xmlConnection.openStore(context);
+		    Node categoriesNode = xmlConnection.getNodeByItemType(FringeStoreItemTypes.CATEGORIES);
+			if(categoriesNode != null) {
+		    	for(int i = 0; i < categoriesNode.getChildNodes().getLength(); i++) {
+		    		Node categoryNode = categoriesNode.getChildNodes().item(i);
+		    		
+		    		id = XmlUtils.getNodeAttr("id", categoryNode);
+		    		name = XmlUtils.getNodeAttr("name", categoryNode);
+		    		icon = XmlUtils.getNodeAttr("icon", categoryNode);
+		    		description = XmlUtils.getNodeAttr("description", categoryNode);
+		    		
+		    		if (checkParams(id,name)) {
+		    			categories.add(new Category(Integer.parseInt(id), name, icon, description));
+		    		}
+		    	}	
+		    }
 		}
 		catch ( Exception e ) {
 		    e.printStackTrace();
@@ -114,5 +191,23 @@ public class CategoriesDAOXMLimpl implements CategoriesDAO{
 		}
 		return res;
 	}
+	
+	
+	private Category convertNodeToCategory(Node node) {
+		Category category = new Category();
+		if (XmlUtils.getNodeAttr("id", node) != null) {
+			category.setId(Integer.parseInt(XmlUtils.getNodeAttr("id", node)));
+		}
+		if (XmlUtils.getNodeAttr("name", node)!= null) {
+			category.setName(XmlUtils.getNodeAttr("name", node));
+		}
+		if (XmlUtils.getNodeAttr("icon", node)!= null) {
+			category.setIcon(XmlUtils.getNodeAttr("icon", node));
+		}
+		if (XmlUtils.getNodeAttr("description", node)!= null) {
+			category.setDescription(XmlUtils.getNodeAttr("description", node));
+		}
+		return category;
+	}	
 	
 }

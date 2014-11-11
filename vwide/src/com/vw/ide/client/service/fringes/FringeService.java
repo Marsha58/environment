@@ -6,13 +6,15 @@ import com.vw.ide.client.service.BusConnectivity;
 import com.vw.ide.client.service.ServiceCallback;
 import com.vw.ide.client.service.VwIdeClientService;
 import com.vw.ide.client.service.factory.ServicesStubFactory;
-import com.vw.ide.client.service.security.RemoteSecurityService.ServiceCallbackForLogin;
 import com.vw.ide.shared.servlet.fringes.RemoteFringeServiceAsync;
+import com.vw.ide.shared.servlet.fringes.RequestAddCategoryResult;
+import com.vw.ide.shared.servlet.fringes.RequestAddFringeResult;
+import com.vw.ide.shared.servlet.fringes.RequestDeleteCategoryResult;
+import com.vw.ide.shared.servlet.fringes.RequestDeleteFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesResult;
-import com.vw.ide.shared.servlet.fringes.RequestLoadFringeJarResult;
-import com.vw.ide.shared.servlet.security.RemoteSecurityAsync;
-import com.vw.ide.shared.servlet.security.RequestLoginResult;
+import com.vw.ide.shared.servlet.fringes.RequestUpdateCategoryResult;
+import com.vw.ide.shared.servlet.fringes.RequestUpdateFringeResult;
 
 public class FringeService implements BusConnectivity, VwIdeClientService  {
 
@@ -23,15 +25,30 @@ public class FringeService implements BusConnectivity, VwIdeClientService  {
 	private static FringeService s_instance = null;
 	
 	
-	
 	public static class ServiceCallbackForGetCategories extends ServiceCallback<RequestGetCategoriesResult>  {
 	}
+
+	public static class ServiceCallbackForAddCategory extends ServiceCallback<RequestAddCategoryResult>  {
+	}	
+
+	public static class ServiceCallbackForUpdateCategory extends ServiceCallback<RequestUpdateCategoryResult>  {
+	}
+	
+	public static class ServiceCallbackForDeleteCategory extends ServiceCallback<RequestDeleteCategoryResult>  {
+	}		
 	
 	public static class ServiceCallbackForGetFringes extends ServiceCallback<RequestGetFringesResult>  {
 	}	
 
-	public static class ServiceCallbackForLoadFringeJar extends ServiceCallback<RequestLoadFringeJarResult>  {
+	public static class ServiceCallbackForAddFringe extends ServiceCallback<RequestAddFringeResult>  {
 	}	
+
+	public static class ServiceCallbackForUpdateFringe extends ServiceCallback<RequestUpdateFringeResult>  {
+	}
+	
+	public static class ServiceCallbackForDeleteFringe extends ServiceCallback<RequestDeleteFringeResult>  {
+	}	
+	
 	
 	private FringeService() {
 		
@@ -73,13 +90,33 @@ public class FringeService implements BusConnectivity, VwIdeClientService  {
 	public ServiceCallbackForGetCategories buildCallbackForGetCategories() {
 		return new ServiceCallbackForGetCategories();
 	}
+
+	public ServiceCallbackForAddCategory buildCallbackForAddCategory() {
+		return new ServiceCallbackForAddCategory();
+	}
+	
+	public ServiceCallbackForUpdateCategory buildCallbackForUpdateCategory() {
+		return new ServiceCallbackForUpdateCategory();
+	}			
+
+	public ServiceCallbackForDeleteCategory buildCallbackForDeleteCategory() {
+		return new ServiceCallbackForDeleteCategory();
+	}		
 	
 	public ServiceCallbackForGetFringes buildCallbackForGetFringes() {
 		return new ServiceCallbackForGetFringes();
 	}		
 
-	public ServiceCallbackForLoadFringeJar buildCallbackForLoadFringeJar() {
-		return new ServiceCallbackForLoadFringeJar();
-	}		
+	public ServiceCallbackForAddFringe buildCallbackForAddFringe() {
+		return new ServiceCallbackForAddFringe();
+	}
+	
+	public ServiceCallbackForUpdateFringe buildCallbackForUpdateFringe() {
+		return new ServiceCallbackForUpdateFringe();
+	}			
 
+	public ServiceCallbackForDeleteFringe buildCallbackForDeleteFringe() {
+		return new ServiceCallbackForDeleteFringe();
+	}			
+	
 }

@@ -10,10 +10,10 @@ import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 public interface FringesDAO {
 	public void setContext(ServletContext value);
-	public Fringe create(Integer id, String name, String path, String description, Integer categoryId) throws FringeDAOException;
-	public Fringe delete(Integer id) throws FringeDAOException;
-	public Fringe update(Integer id, Fringe fringe) throws FringeDAOException;
-	public Fringe findById(Integer Id) throws FringeDAOException;
+	public void add(Fringe fringe) throws FringeDAOException;
+	public void update(Fringe fringe) throws FringeDAOException;
+	public void delete(Integer id) throws FringeDAOException;
+	public Fringe findById(Integer id) throws FringeDAOException;
 	public Fringe[] findByName(String name) throws FringeDAOException;
 	public List<Fringe> getAll() throws FringeDAOException;
 	

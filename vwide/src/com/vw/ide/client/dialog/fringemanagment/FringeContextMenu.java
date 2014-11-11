@@ -13,10 +13,42 @@ import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.shared.OperationTypes;
 
 public class FringeContextMenu extends Menu {
+	public MenuItem getAddFringe() {
+		return addFringe;
+	}
+
+	public void setAddFringe(MenuItem addFringe) {
+		this.addFringe = addFringe;
+	}
+
+	public MenuItem getEditFringe() {
+		return editFringe;
+	}
+
+	public void setEditFringe(MenuItem editFringe) {
+		this.editFringe = editFringe;
+	}
+
+
+	public MenuItem getLoadFringeJar() {
+		return loadFringeJar;
+	}
+
+	public void setLoadFringeJar(MenuItem loadFringeJar) {
+		this.loadFringeJar = loadFringeJar;
+	}
+
+	public MenuItem getDeleteFringe() {
+		return deleteFringe;
+	}
+
+	public void setDeleteFringe(MenuItem deleteFringe) {
+		this.deleteFringe = deleteFringe;
+	}
+
 	public  FringeManagerPresenter presenter;
 	private MenuItem addFringe;
 	private MenuItem editFringe;
-	private MenuItem moveFringe;
 	private MenuItem loadFringeJar;
 	private MenuItem deleteFringe;
 
@@ -26,21 +58,15 @@ public class FringeContextMenu extends Menu {
 			if (event.getSelectedItem().getParent() instanceof FringeContextMenu) {
 				FringeContextMenu menu = (FringeContextMenu) event.getSelectedItem().getParent();
 				if (menu.presenter != null) {
-					
-					presenter.fireEvent(new FringesContextMenuEvent(OperationTypes.LOAD_FRINGE_JAR.getName()));
-
-					
-/*					if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.ADD_FRINGE.getName())) {
+					if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.ADD_FRINGE.getName())) {
 						presenter.doAddFringe();
 					} else if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.EDIT_FRINGE.getName())) {
 						presenter.doEditFringe();
 					} else if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.DELETE_FRINGE.getName())) {
 						presenter.doDeleteFringe();
 					} else if (event.getSelectedItem().getItemId().equalsIgnoreCase(OperationTypes.LOAD_FRINGE_JAR.getName())) {
-						presenter.doLoadFringeJar();
+						presenter.fireEvent(new FringesContextMenuEvent(OperationTypes.LOAD_FRINGE_JAR.getName()));
 					} 
-*/
-					
 				}
 			}
 		}

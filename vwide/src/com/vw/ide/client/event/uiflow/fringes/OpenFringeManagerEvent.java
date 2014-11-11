@@ -1,7 +1,7 @@
-package com.vw.ide.client.event.uiflow;
+package com.vw.ide.client.event.uiflow.fringes;
 
 import com.google.gwt.event.shared.GwtEvent;
-import com.vw.ide.client.event.handler.OpenFringeManagerHandler;
+import com.vw.ide.client.event.handler.fringes.OpenFringeManagerHandler;
 
 /**
  * Fired when user pressed menu item 'Open Fringe Manager'

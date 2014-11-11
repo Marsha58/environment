@@ -116,9 +116,6 @@
 										<button:TextButton ui:field="buttonAddFringe" text="add" width="60" />
 									</container:child>
 									<container:child layoutData="{boxLayoutDataMargins0500}">
-										<button:TextButton ui:field="buttonMoveFringe" text="move" width="60" />
-									</container:child>
-									<container:child layoutData="{boxLayoutDataMargins0500}">
 										<button:TextButton ui:field="buttonEditFringe" text="edit" width="60" />
 									</container:child>
 									<container:child layoutData="{boxLayoutDataMargins0}">

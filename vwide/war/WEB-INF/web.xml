@@ -28,13 +28,11 @@
     <welcome-file>Vwide.html</welcome-file>
   </welcome-file-list>
   <servlet>
-    <description></description>
-    <display-name>FringeUploadServlet</display-name>
-    <servlet-name>FringeUploadServlet</servlet-name>
+    <servlet-name>fringeUploadServlet</servlet-name>
     <servlet-class>com.vw.ide.server.servlet.fringes.FringeUploadServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>FringeUploadServlet</servlet-name>
-    <url-pattern>/vwide/fringeupload</url-pattern>
+    <servlet-name>fringeUploadServlet</servlet-name>
+    <url-pattern>/vwide/vwide/fringes/fringeupload</url-pattern>
   </servlet-mapping>
 </web-app>

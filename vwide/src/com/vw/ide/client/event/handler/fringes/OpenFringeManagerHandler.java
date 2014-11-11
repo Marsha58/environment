@@ -1,7 +1,7 @@
-package com.vw.ide.client.event.handler;
+package com.vw.ide.client.event.handler.fringes;
 
 import com.google.gwt.event.shared.EventHandler;
-import com.vw.ide.client.event.uiflow.OpenFringeManagerEvent;
+import com.vw.ide.client.event.uiflow.fringes.OpenFringeManagerEvent;
 
 /**
  * Login handler

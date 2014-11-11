@@ -22,8 +22,8 @@ public class XmlUtils {
 	    for (int x = 0; x < childNodes.getLength(); x++ ) {
 	        Node data = childNodes.item(x);
 	        if ( data.getNodeType() == Node.TEXT_NODE )
-	            return data.getNodeValue();
-	    }
+	            return data.getNodeValue();  
+	    } 
 	    return "";
 	}
 	 
@@ -74,5 +74,26 @@ public class XmlUtils {
 	}
 	
 	
+	public static void setNodeValue( Node node, String value) {
+	    NodeList childNodes = node.getChildNodes();
+	    for (int x = 0; x < childNodes.getLength(); x++ ) {
+	        Node data = childNodes.item(x);
+	        if ( data.getNodeType() == Node.TEXT_NODE )
+	            data.setNodeValue(value);  
+	    } 
+	}
 
+	public static void setNodeAttr(String attrName, Node node, String value ) {
+	    NamedNodeMap attrs = node.getAttributes();
+	    if (attrs != null) {
+	    	for (int y = 0; y < attrs.getLength(); y++ ) {
+	    		Node attr = attrs.item(y);
+	    		if (attr.getNodeName().equalsIgnoreCase(attrName)) {
+	    			 attr.setNodeValue(value);
+	    		}
+	    	}
+	    }
+	}
+	
+	
 }

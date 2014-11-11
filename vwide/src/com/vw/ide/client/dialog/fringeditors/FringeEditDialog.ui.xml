@@ -1,0 +1,60 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:w="urn:import:com.google.gwt.widget.client"
+	xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:f="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
+	xmlns:fl='urn:import:org.vectomatic.file'>	
+
+	<ui:style>
+	.important {
+		font-weight: bold;
+	}
+	</ui:style>
+
+  <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="verticalLayoutData">
+    <ui:attributes width="1" height="-1" />
+  </ui:with>
+
+  <form:FieldSet ui:field="fieldSet" headingText="User Information" collapsible="true">
+        <container:VerticalLayoutContainer>
+          <container:child layoutData="{verticalLayoutData}">
+            <form:FieldLabel text="id">
+              <form:widget>
+                <form:TextField ui:field="fieldId" allowBlank="false" enabled="false"/>
+              </form:widget>
+            </form:FieldLabel>
+          </container:child>
+          <container:child layoutData="{verticalLayoutData}">
+            <form:FieldLabel text="Name">
+              <form:widget>
+                <form:TextField ui:field="fieldName" allowBlank="false" />
+              </form:widget>
+            </form:FieldLabel>
+          </container:child>
+          <container:child layoutData="{verticalLayoutData}">
+            <form:FieldLabel text="Path">
+              <form:widget>
+                <form:TextField ui:field="fieldPath" allowBlank="false" />
+              </form:widget>
+            </form:FieldLabel>
+          </container:child>
+          <container:child layoutData="{verticalLayoutData}">
+            <form:FieldLabel text="Category Id">
+              <form:widget>
+                <form:TextField ui:field="fieldCategoryId"  allowBlank="false" />
+              </form:widget>
+            </form:FieldLabel>
+          </container:child>
+          <container:child layoutData="{verticalLayoutData}">
+            <form:FieldLabel text="Description">
+              <form:widget>
+                <f:TextArea ui:field="fieldDescription" allowBlank="false" />
+              </form:widget>
+            </form:FieldLabel>
+          </container:child>
+        </container:VerticalLayoutContainer>
+      </form:FieldSet>
+</ui:UiBinder> 

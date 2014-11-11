@@ -7,6 +7,7 @@ import com.vw.ide.client.dialog.fringemanagment.FringeManagerPresenter;
 import com.vw.ide.client.event.handler.FringesContextMenuHandler;
 import com.vw.ide.client.event.uiflow.FringesContextMenuEvent;
 import com.vw.ide.client.presenters.Presenter;
+import com.vw.ide.shared.servlet.fringes.model.Category;
 import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 public class FringesContextMenuEventHandler  extends Presenter.PresenterEventHandler implements FringesContextMenuHandler{
@@ -28,7 +29,7 @@ public class FringesContextMenuEventHandler  extends Presenter.PresenterEventHan
 		if (menuId != null && presenter.getView().getSelectedFringe() != null) {
 			switch (menuId) {
 			case "load_fringe_jar":
-				doLoadJar(presenter, presenter.getView().getSelectedFringe());
+				doLoadJar(presenter, presenter.getView().getSelectedCategory(), presenter.getView().getSelectedFringe());
 				break;
 			default:
 				break;
@@ -37,11 +38,11 @@ public class FringesContextMenuEventHandler  extends Presenter.PresenterEventHan
 	}
 	
 	
-	private void doLoadJar(FringeManagerPresenter presenter, Fringe fringe) {
-		final FringeLoadDialog box = new FringeLoadDialog(fringe);
+	private void doLoadJar(FringeManagerPresenter presenter,Category category, Fringe fringe) {
+		final FringeLoadDialog box = new FringeLoadDialog(presenter, category, fringe);
 //		box.setEditLabelText("Select file");
 		// box.setParentPath(parentPath);
-		box.setHeadingText("asdsad");
+		box.setHeadingText("Fringe loading dialog");
 		box.addDialogHideHandler(new FringeManagerDialogHandlers.LoadFringeDialogHideHandler(box, presenter));
 		box.show();		
 	}	
