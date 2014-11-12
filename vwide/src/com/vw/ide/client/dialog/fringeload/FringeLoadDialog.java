@@ -33,8 +33,7 @@ public class FringeLoadDialog extends VwmlDialogExt {
 	
 	private static Logger logger = Logger.getLogger(FringeLoadDialog.class);
 	
-//	final private String SERVLET_URL = "http://localhost:8080/vwide/vwide/vwide/fringes/fringeupload";
-	final private String SERVLET_URL = "/vwide/vwide/vwide/fringes/fringeupload";
+	final private String SERVLET_URL = "vwide/vwide/fringes/fringeupload";
 	private static FringeLoadDialogUiBinder uiBinder = GWT.create(FringeLoadDialogUiBinder.class);
 	private String parentPath;
     private SingleUploader singleUploader;	
