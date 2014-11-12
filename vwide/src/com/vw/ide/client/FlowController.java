@@ -6,7 +6,6 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.vw.ide.client.devboardext.DevelopmentBoard;
-import com.vw.ide.client.dialog.fringemanagment.FringeManager;
 import com.vw.ide.client.login.LoginViewGxt;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterFactory;

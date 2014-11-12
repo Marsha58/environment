@@ -3,7 +3,7 @@ package com.vw.ide.client.presenters;
 import com.google.gwt.event.shared.HandlerManager;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.login.LoginGxtPresenter;
-import com.vw.ide.client.dialog.fringemanagment.FringeManagerPresenter;;
+import com.vw.ide.client.fringemanagment.FringeManagerPresenter;;
 
 /**
  * Instantiates available presenters
