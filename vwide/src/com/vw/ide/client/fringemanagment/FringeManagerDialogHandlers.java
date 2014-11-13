@@ -8,6 +8,7 @@ import com.vw.ide.client.fringemanagment.fringeload.FringeLoadDialog;
 import com.vw.ide.client.event.uiflow.fringes.AddFringeEvent;
 import com.vw.ide.client.event.uiflow.fringes.UpdateFringeEvent;
 import com.vw.ide.shared.CrudTypes;
+import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 public class FringeManagerDialogHandlers {
 
@@ -57,5 +58,7 @@ public class FringeManagerDialogHandlers {
 		}
 	}	
 	
+	
+
 	
 }

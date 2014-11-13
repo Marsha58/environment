@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -20,10 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.server.servlet.fringes.JarClassLoader;;
 
 /**
  * Servlet implementation class FringeUploadServlet
@@ -32,6 +35,7 @@ public class FringeUploadServlet extends UploadAction {
 	private Logger logger = Logger.getLogger(FringeUploadServlet.class);
 	private static final long serialVersionUID = 1L;
 	private static String s_defFringesDir = "D://var/fringes";
+	private static String fringeInterfaceName = "";
 
 	Hashtable<String, String> receivedContentTypes = new Hashtable<String, String>();
 	/**
@@ -43,12 +47,14 @@ public class FringeUploadServlet extends UploadAction {
 
 		Properties prop = new Properties();
 		try {
-			// load a properties file from class path, inside static method
 			InputStream isPropertiesFile = context.getResourceAsStream("/WEB-INF/classes/config.properties");
 			if (isPropertiesFile != null) {
 				prop.load(isPropertiesFile);
 				if (prop.getProperty("fringes_dir") != null) {
 					s_defFringesDir = prop.getProperty("fringes_dir");
+				}
+				if (prop.getProperty("fringe_interface") != null) {
+					fringeInterfaceName = prop.getProperty("fringe_interface");
 				}
 			}
 		} catch (IOException ex) {
@@ -80,6 +86,7 @@ public class FringeUploadServlet extends UploadAction {
 				logger.error(e.getLocalizedMessage());
 			}
 		}
+		JarClassLoader jarClassLoader = null; 
 		for (FileItem item : sessionFiles) {
 			if (false == item.isFormField()) {
 				try {
@@ -88,10 +95,24 @@ public class FringeUploadServlet extends UploadAction {
 					File file = new File(fringeFullFileName);
 					item.write(file);
 					
+					
 					ObjectNode object=JsonNodeFactory.instance.objectNode();
 					object.put("id", Integer.parseInt(request.getParameter("id")));
 					object.put("path", parentPath);
 					object.put("filename", item.getName());
+					
+					jarClassLoader = new JarClassLoader(fringeFullFileName,"fringes",fringeInterfaceName);
+					ArrayNode arrayClassNames = JsonNodeFactory.instance.arrayNode();
+					for (String curName : jarClassLoader.getCacheClassNames()) {
+						arrayClassNames.add(curName); 
+					}
+					
+					object.put("classes", arrayClassNames);
+
+					if(arrayClassNames.size() == 0) {
+						doDeleteFile(fringeFullFileName);
+					}
+					
 					response += object.toString();
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage());
@@ -131,6 +152,10 @@ public class FringeUploadServlet extends UploadAction {
 	 */
 	@Override
 	public void removeItem(HttpServletRequest request, String fieldName) throws UploadActionException {
+		doDeleteFile(fieldName);
+	}
+
+	private void doDeleteFile(String fieldName){
 		File file = receivedFiles.get(fieldName);
 		receivedFiles.remove(fieldName);
 		receivedContentTypes.remove(fieldName);

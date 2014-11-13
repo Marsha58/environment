@@ -1,11 +1,8 @@
 package com.vw.ide.client.fringemanagment;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -43,16 +40,16 @@ import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
+import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
 import com.sencha.gxt.widget.core.client.grid.GridSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.GridView;
-import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
 import com.sencha.gxt.widget.core.client.grid.editing.GridEditing;
 import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
 import com.vw.ide.client.dialog.VwmlDialogExt;
 import com.vw.ide.client.event.uiflow.FringesContextMenuEvent;
 import com.vw.ide.client.event.uiflow.fringes.AddCategoryEvent;
-import com.vw.ide.client.event.uiflow.fringes.UpdateCategoryEvent;
 import com.vw.ide.client.event.uiflow.fringes.AddFringeEvent;
+import com.vw.ide.client.event.uiflow.fringes.UpdateCategoryEvent;
 import com.vw.ide.client.event.uiflow.fringes.UpdateFringeEvent;
 import com.vw.ide.client.fringemanagment.contextmenus.CategoryContextMenu;
 import com.vw.ide.client.fringemanagment.contextmenus.FringeContextMenu;
@@ -207,6 +204,8 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		ValueProvider<Fringe, String> path();
 
 		ValueProvider<Fringe, String> filename();
+
+		ValueProvider<Fringe, String> classname();
 		
 		ValueProvider<Fringe, Boolean> loaded();
 
@@ -460,6 +459,7 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	private ColumnConfig<Fringe, String> ccFringeName;
 	private ColumnConfig<Fringe, String> ccFringePath;
 	private ColumnConfig<Fringe, String> ccFringeFileName;
+	private ColumnConfig<Fringe, String> ccFringeClassName;
 	private ColumnConfig<Fringe, Boolean> ccFringeLoaded;
 	private ColumnConfig<Fringe, Integer> ccFringeCategoryId;
 	private ColumnConfig<Fringe, String> ccFringeDescription;
@@ -470,20 +470,31 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		ccFringeId = new ColumnConfig<Fringe, Integer>(fringeProperties.id(), 20, "Id");
 		ccs.add(ccFringeId);
 		editingFringe.addEditor(ccFringeId, new IntegerField());
+		
 		ccFringeName = new ColumnConfig<Fringe, String>(fringeProperties.name(), 80, "Name");
 		ccs.add(ccFringeName);
 		editingFringe.addEditor(ccFringeName, new TextField());
+		
 		ccFringePath = new ColumnConfig<Fringe, String>(fringeProperties.path(), 100, "Path");
 		ccs.add(ccFringePath);
+		editingFringe.addEditor(ccFringePath, new TextField());
+		
 		ccFringeFileName = new ColumnConfig<Fringe, String>(fringeProperties.filename(), 80, "Filename");
 		ccs.add(ccFringeFileName);
-		editingFringe.addEditor(ccFringeName, new TextField());
+		editingFringe.addEditor(ccFringeFileName, new TextField());
+
+		ccFringeClassName = new ColumnConfig<Fringe, String>(fringeProperties.classname(), 120, "Classname");
+		ccs.add(ccFringeClassName);
+		editingFringe.addEditor(ccFringeClassName, new TextField());
+		
 		ccFringeLoaded = new ColumnConfig<Fringe, Boolean>(fringeProperties.loaded(), 100, "Jar loaded");
 		ccs.add(ccFringeLoaded);
 		editingFringe.addEditor(ccFringePath, new TextField());
+		
 		ccFringeCategoryId = new ColumnConfig<Fringe, Integer>(fringeProperties.categoryId(), 70, "Category Id");
 		ccs.add(ccFringeCategoryId);
 		editingFringe.addEditor(ccFringeCategoryId, new IntegerField());
+		
 		ccFringeDescription = new ColumnConfig<Fringe, String>(fringeProperties.description(), 200, "Description");
 		ccs.add(ccFringeDescription);
 		editingFringe.addEditor(ccFringeDescription, new TextField());
@@ -717,11 +728,13 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		updateEditedFringeInFringesList(fringe, editingType);
 		deleteFringeFromFringeCache(fringe);
 		int row = getListStoreFringes().indexOf(fringe);
-		editingCategory.startEditing(new GridCell(row, 0));
-		editingFringe.setEditableGrid(gridFringes);
-		listStoreFringes.add(0, fringe);
-		editingCategory.completeEditing();
-		editingFringe.setEditableGrid(null);			
+		if(editingType == CrudTypes.ADD) {
+			editingCategory.startEditing(new GridCell(row, 0));
+			editingFringe.setEditableGrid(gridFringes);
+			listStoreFringes.add(0, fringe);
+			editingCategory.completeEditing();
+			editingFringe.setEditableGrid(null);			
+		}
 		selectedFringe = fringe;
 	}	
 	

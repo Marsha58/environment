@@ -9,6 +9,7 @@ public class Fringe implements Serializable{
 	private String name;
 	private String path;
 	private String filename;
+	private String classname;
 	private Boolean loaded;
 	private String description;
 	private Category category;
@@ -31,11 +32,12 @@ public class Fringe implements Serializable{
 		this.description = description;
 	}
 
-	public Fringe(Integer id, String name, String path, String filename, Boolean loaded, Integer categoryId, String description) {
+	public Fringe(Integer id, String name, String path, String filename, String classname, Boolean loaded, Integer categoryId, String description) {
 		this.id = id;
 		this.name = name;
 		this.path = path;
 		this.filename = filename;
+		this.classname = classname;
 		this.loaded = loaded;
 		this.categoryId = categoryId;
 		this.description = description;
@@ -65,6 +67,13 @@ public class Fringe implements Serializable{
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
+	public String getClassname() {
+		return classname;
+	}
+	
+	public void setClassname(String classname) {
+		this.classname = classname;
+	}
 	public Boolean getLoaded() {
 		return loaded;
 	}	
@@ -92,7 +101,7 @@ public class Fringe implements Serializable{
 	
 	
 	public String toString() {
-		return "Fringe [id=" + id  + ", name="  + name + ", filename="  + filename + 
+		return "Fringe [id=" + id  + ", name="  + name + ", filename="  + filename + ", classname="  + classname +
 				", path="  + path + ", loaded="  + loaded + ", description=" + description + 
 				", category=" + category  + ", categoryId=" + categoryId  + "]";
 	}		

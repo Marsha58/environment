@@ -1,18 +1,30 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-	xmlns:w="urn:import:com.google.gwt.widget.client"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:w="urn:import:com.google.gwt.widget.client"
 	xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form"
 	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
 	xmlns:f="urn:import:com.sencha.gxt.widget.core.client.form"
 	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
-	xmlns:fl='urn:import:org.vectomatic.file'>	
+	xmlns:fl='urn:import:org.vectomatic.file'>
 
-	<ui:style>
-	.important {
-		font-weight: bold;
-	}
-	</ui:style>
 
-    <g:SimplePanel ui:field="simplePanel"></g:SimplePanel>
+  <ui:with type="com.sencha.gxt.core.client.util.Margins" field="loaderMargins">
+    <ui:attributes top="4" right="4" bottom="8" left="4" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.core.client.util.Margins" field="listMargins">
+    <ui:attributes top="10" right="0" bottom="0" left="0" />
+  </ui:with>  
+  <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="loaderData">
+    <ui:attributes width="1" height=".5d" margins="{loaderMargins}" />
+  </ui:with>
+  <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="listData">
+    <ui:attributes width="1" height="-200" margins="{listMargins}" />
+  </ui:with>  
+
+	<container:VerticalLayoutContainer 	ui:field="place" layoutData="{loaderData}">
+        <container:SimpleContainer ui:field="loaderPlace" layoutData="{listData}">
+        </container:SimpleContainer> 
+        <container:VerticalLayoutContainer ui:field="listPlace" layoutData="{listData}">
+        </container:VerticalLayoutContainer>
+	</container:VerticalLayoutContainer>
 </ui:UiBinder> 

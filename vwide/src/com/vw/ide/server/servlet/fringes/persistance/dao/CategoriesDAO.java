@@ -5,15 +5,14 @@ import java.util.List;
 import javax.servlet.ServletContext;
 
 import com.vw.ide.shared.servlet.fringes.model.Category;
-import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 
 public interface CategoriesDAO {
 	public void setContext(ServletContext value);
-	public void add(Category category) throws FringeDAOException;
-	public void update(Category category) throws FringeDAOException;
-	public void delete(Integer id) throws FringeDAOException;
-	public Category findById(Integer id) throws FringeDAOException;
-	public Category[] findByName(String name) throws FringeDAOException;
-	public List<Category> getAll() throws FringeDAOException;
+	public void add(Category category);
+	public void update(Category category);
+	public void delete(Integer id);
+	public Category findById(Integer id);
+	public Category[] findByName(String name);
+	public List<Category> getAll();
 }

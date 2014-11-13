@@ -10,7 +10,6 @@ import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.vw.ide.server.servlet.utils.XmlUtils;
@@ -48,6 +47,7 @@ public class FringesDAOXMLimpl implements FringesDAO {
 				newFringeElement.setAttribute("name", fringe.getName());
 				newFringeElement.setAttribute("path", fringe.getPath());
 				newFringeElement.setAttribute("filename", fringe.getFilename());
+				newFringeElement.setAttribute("classname", fringe.getClassname());
 				newFringeElement.setAttribute("loaded", fringe.getLoaded().toString());
 				newFringeElement.setAttribute("category_id", fringe.getCategoryId().toString());
 				newFringeElement.setAttribute("description", fringe.getDescription());
@@ -78,6 +78,7 @@ public class FringesDAOXMLimpl implements FringesDAO {
 					XmlUtils.setNodeAttr("name", fringesNode.getChildNodes().item(i), fringe.getName());
 					XmlUtils.setNodeAttr("path", fringesNode.getChildNodes().item(i), fringe.getPath());
 					XmlUtils.setNodeAttr("filename", fringesNode.getChildNodes().item(i), fringe.getFilename());
+					XmlUtils.setNodeAttr("classname", fringesNode.getChildNodes().item(i), fringe.getClassname());
 					XmlUtils.setNodeAttr("loaded", fringesNode.getChildNodes().item(i), fringe.getLoaded().toString());
 					XmlUtils.setNodeAttr("category_id", fringesNode.getChildNodes().item(i), fringe.getCategoryId().toString());
 					XmlUtils.setNodeAttr("description", fringesNode.getChildNodes().item(i), fringe.getDescription());
@@ -159,6 +160,9 @@ public class FringesDAOXMLimpl implements FringesDAO {
 		if (XmlUtils.getNodeAttr("filename", node)!= null) {
 			fringe.setFilename(XmlUtils.getNodeAttr("filename", node));
 		}
+		if (XmlUtils.getNodeAttr("classname", node)!= null) {
+			fringe.setFilename(XmlUtils.getNodeAttr("classname", node));
+		}		
 		if (XmlUtils.getNodeAttr("loaded", node)!= null) {
 			if (XmlUtils.getNodeAttr("loaded", node).equalsIgnoreCase("true")) {
 				fringe.setLoaded(true);
@@ -189,6 +193,7 @@ public class FringesDAOXMLimpl implements FringesDAO {
 		String name;
 		String path;
 		String filename;
+		String classname;
 		Boolean loaded;
 		String categoryId;
 		String description;
@@ -204,6 +209,7 @@ public class FringesDAOXMLimpl implements FringesDAO {
 					name = XmlUtils.getNodeAttr("name", curFringeNode);
 					path = XmlUtils.getNodeAttr("path", curFringeNode);
 					filename = XmlUtils.getNodeAttr("filename", curFringeNode);
+					classname = XmlUtils.getNodeAttr("classname", curFringeNode);
 					if (XmlUtils.getNodeAttr("loaded", curFringeNode).equalsIgnoreCase("true")) {
 						loaded = true;
 					} else {
@@ -213,7 +219,7 @@ public class FringesDAOXMLimpl implements FringesDAO {
 					description = XmlUtils.getNodeAttr("description", curFringeNode);
 					
 					if (checkParams(id, name, categoryId)) {
-						Fringe fringe = new Fringe(Integer.parseInt(id), name, path, filename, loaded, Integer.parseInt(categoryId), description);
+						Fringe fringe = new Fringe(Integer.parseInt(id), name, path, filename, classname, loaded, Integer.parseInt(categoryId), description);
 						fringes.add(fringe);
 					}
 				}
