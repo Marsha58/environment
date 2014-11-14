@@ -12,6 +12,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -19,10 +20,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.server.servlet.fringes.FringeUploadServlet;
 import com.vw.ide.server.servlet.utils.XmlUtils;
 
 public class XMLConnection {
-
+	private Logger logger = Logger.getLogger(XMLConnection.class);
 	private static XMLConnection instance = new XMLConnection();
 	private DOMParser parser = null;
 	public DOMParser getParser() {
@@ -92,16 +94,22 @@ public class XMLConnection {
 	}	
 	
 	public Node getNodeByItemType(FringeStoreItemTypes item_type) {
-		NodeList root = parser.getDocument().getChildNodes();
-		if (root != null) {
-			Node storeNode = XmlUtils.getNode("store", root);
-			if (storeNode != null) {
-				Node itemNode = XmlUtils.getNode(item_type.getName(), storeNode.getChildNodes());
-				return itemNode;
+		Node itemNode = null;
+		try {
+			NodeList root = parser.getDocument().getChildNodes();
+			if (root != null) {
+				Node storeNode = XmlUtils.getNode("store", root);
+				if (storeNode != null) {
+					itemNode = XmlUtils.getNode(item_type.getName(), storeNode.getChildNodes());
+					return itemNode;
+				}
+				
 			}
 			
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage());
 		}
-		return null;
+		return itemNode;
 	}	
 		
 	

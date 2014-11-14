@@ -30,7 +30,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="lib" path="D:/java3lib/log4j-gwt.jar"/>
-	<classpathentry kind="lib" path="D:/1__work/workspace/fringers_lib/target/fringers_lib.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="lib" path="D:/1__work/workspace/fringers_lib/target/fringers_lib.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

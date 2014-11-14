@@ -4,7 +4,10 @@ import gwtupload.client.IUploadStatus.Status;
 import gwtupload.client.IUploader;
 import gwtupload.client.SingleUploader;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.log4j.lf5.LogLevel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,7 +36,6 @@ import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
 import com.sencha.gxt.widget.core.client.form.ListField;
 import com.vw.ide.client.dialog.VwmlDialogExt;
-import com.vw.ide.client.event.uiflow.fringes.AddFringeEvent;
 import com.vw.ide.client.event.uiflow.fringes.UpdateFringeEvent;
 import com.vw.ide.client.fringemanagment.FringeManagerPresenter;
 import com.vw.ide.client.utils.Utils;
@@ -49,7 +51,7 @@ import com.vw.ide.shared.servlet.fringes.model.Fringe;
  */
 public class FringeLoadDialog extends VwmlDialogExt {
 
-	private static Logger logger = Logger.getLogger(FringeLoadDialog.class);
+	private static Logger logger = Logger.getLogger("");
 
 	@UiField
 	VerticalLayoutContainer place;
@@ -111,9 +113,7 @@ public class FringeLoadDialog extends VwmlDialogExt {
 			this.path = path;
 			this.filename = filename;
 			this.classes = classes;
-			// for (int i = 0; i < classes.length; i++) {
-			// this.classes.add(classes[i]);
-			// }
+			
 
 		}
 
@@ -160,7 +160,7 @@ public class FringeLoadDialog extends VwmlDialogExt {
 		singleUploader = new SingleUploader();
 
 		singleUploader.setServletPath(SERVLET_URL + "?" + makeParams(category, fringe));
-		logger.debug(singleUploader.getServletPath());
+		logger.info("singleUploader.getServletPath()" + singleUploader.getServletPath()); 
 		// You could change the internationalization creating your own Constants
 		// file
 		// defaultUploader.setI18Constants(c);
@@ -176,28 +176,22 @@ public class FringeLoadDialog extends VwmlDialogExt {
 			params += Utils.FILE_SEPARATOR + fringe.getPath();
 		}
 		params += "\"";
+//		logger.info("params : " + params);
+		logger.log(Level.INFO,"params : " + params);
 		return params;
 	}
 
 	private IUploader.OnStatusChangedHandler onStatusChangedHandler = new IUploader.OnStatusChangedHandler() {
 		public void onStatusChanged(IUploader uploader) {
-			logger.debug("uploader.getStatus(): " + uploader.getStatus());
+			logger.log(Level.INFO,"uploader.getStatus(): " + uploader.getStatus());
 		}
 	};
 
-	private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-
-		@Override
-		public void onStart(IUploader uploader) {
-			// TODO Auto-generated method stub
-
-		}
-
-	};
 
 	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
 
 		public void onFinish(IUploader uploader) {
+
 			FringeLoadResult fringeLoadResult = deserializeResult(uploader.getServerInfo().message);
 			if (uploader.getStatus() == Status.SUCCESS) {
 				try {
@@ -241,7 +235,7 @@ public class FringeLoadDialog extends VwmlDialogExt {
 					presenter.getView().getListStoreFringes().get(i).setLoaded(true);
 					presenter.getView().getFringesListByCategoryId(presenter.getView().getListStoreFringes().get(i).getCategoryId());
 
-					for (int j = 0; i < fringeLoadResult.getClasses().length; j++) {
+					for (int j = 0; j < fringeLoadResult.getClasses().length; j++) {
 						listStore.add(new Data(fringeLoadResult.getClasses()[j]));
 					}
 					break;

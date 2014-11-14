@@ -20,7 +20,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Appender;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.spi.ErrorHandler;
+import org.apache.log4j.spi.Filter;
+import org.apache.log4j.spi.LoggingEvent;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
@@ -36,12 +44,14 @@ public class FringeUploadServlet extends UploadAction {
 	private static final long serialVersionUID = 1L;
 	private static String s_defFringesDir = "D://var/fringes";
 	private static String fringeInterfaceName = "";
+	private static String fringeInterfaceClassLib = "";
 
 	Hashtable<String, String> receivedContentTypes = new Hashtable<String, String>();
 	/**
 	 * Maintain a list with received files and their content types.
 	 */
 	Hashtable<String, File> receivedFiles = new Hashtable<String, File>();
+	
 
 	private void loadProperties(ServletContext context) {
 
@@ -56,9 +66,11 @@ public class FringeUploadServlet extends UploadAction {
 				if (prop.getProperty("fringe_interface") != null) {
 					fringeInterfaceName = prop.getProperty("fringe_interface");
 				}
-			}
+				if (prop.getProperty("fringe_interface_classlib") != null) {
+					fringeInterfaceClassLib = prop.getProperty("fringe_interface_classlib");
+				}			}
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			logger.error(ex.getLocalizedMessage());
 		}
 	}
 
@@ -101,7 +113,10 @@ public class FringeUploadServlet extends UploadAction {
 					object.put("path", parentPath);
 					object.put("filename", item.getName());
 					
-					jarClassLoader = new JarClassLoader(fringeFullFileName,"fringes",fringeInterfaceName);
+					
+					jarClassLoader = new JarClassLoader(fringeFullFileName,"fringes",fringeInterfaceClassLib, fringeInterfaceName);
+					jarClassLoader.cacheClasses();
+					
 					ArrayNode arrayClassNames = JsonNodeFactory.instance.arrayNode();
 					for (String curName : jarClassLoader.getCacheClassNames()) {
 						arrayClassNames.add(curName); 
@@ -114,6 +129,7 @@ public class FringeUploadServlet extends UploadAction {
 					}
 					
 					response += object.toString();
+					logger.debug("response: " + response);
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage());
 					throw new UploadActionException(e);
@@ -152,6 +168,7 @@ public class FringeUploadServlet extends UploadAction {
 	 */
 	@Override
 	public void removeItem(HttpServletRequest request, String fieldName) throws UploadActionException {
+		logger.info(fieldName + " deleted");
 		doDeleteFile(fieldName);
 	}
 
