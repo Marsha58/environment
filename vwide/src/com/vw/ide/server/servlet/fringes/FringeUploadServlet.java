@@ -110,7 +110,7 @@ public class FringeUploadServlet extends UploadAction {
 					object.put("classes", arrayClassNames);
 
 					if(arrayClassNames.size() == 0) {
-						doDeleteFile(fringeFullFileName);
+						file.delete();
 					}
 					
 					response += object.toString();
