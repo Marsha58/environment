@@ -14,6 +14,8 @@ import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.FileStateChangedEvent;
+import com.vw.ide.shared.servlet.fringes.model.Fringe;
+import com.vw.ide.client.fringemanagment.parser.FringeMetaParser;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.client.utils.Utils;
@@ -176,7 +178,6 @@ public class FileSheet extends Composite {
 								// setTheme/setMode/etc.
 		aceEditor.setTheme(((DevelopmentBoardPresenter) presenter).getTopPanel().comboATh.getCurrentValue());
 		aceEditor.setText(textFile);
-		
 		aceEditor.setAutocompleteEnabled(true);		
 		
 		// use cursor position change events to keep a label updated

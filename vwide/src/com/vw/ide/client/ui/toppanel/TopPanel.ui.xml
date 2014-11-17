@@ -157,7 +157,7 @@
 						<menu:menu>
 							<menu:Menu ui:field="fringesMenu">
 								<menu:MenuItem ui:field="openFringeManager" itemId="idOpenFringeManager" text="Open Fringe Manager" />
-								<menu:MenuItem text="Insert Fringe" />
+								<menu:MenuItem ui:field="insertFringeInFile" itemId="idInsertFringeInFile" text="Insert Fringe" />
 								<menu:MenuItem text="List of installed" />
 							</menu:Menu>
 						</menu:menu>

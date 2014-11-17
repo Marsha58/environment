@@ -18,6 +18,11 @@ public class FolderDto extends BaseDto {
 	     setType("dir");
   }
 
+  public FolderDto(Integer id, String name) {
+	    super(id, name);
+	    setType("dir");
+  }
+  
   public FolderDto(Integer id, String name, String relPath, String absolutePath) {
     super(id, name);
     setType("dir");
@@ -33,8 +38,8 @@ public class FolderDto extends BaseDto {
     this.children = children;
   }
 
-  public void addChild(BaseDto child) {
-    getChildren().add(child);
+  public void addChild(BaseDto itemDto) {
+    getChildren().add(itemDto);
   }
   
   public void addOrReplaceChild(BaseDto child) {

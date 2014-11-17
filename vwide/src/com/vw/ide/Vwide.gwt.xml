@@ -45,13 +45,9 @@
  	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
  	
  	
-# add logging module
 	<inherits name="com.google.gwt.logging.Logging"/>                
-# To change the default logLevel 
 	<set-property name="gwt.logging.logLevel" value="INFO" />  
-# To enable logging   
 	<set-property name="gwt.logging.enabled" value="TRUE"/>       
-# To disable a popup Handler   
 	<set-property name="gwt.logging.popupHandler" value="DISABLED" />  	
  	
 <!---->

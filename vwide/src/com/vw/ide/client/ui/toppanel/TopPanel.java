@@ -61,6 +61,7 @@ import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
+import com.vw.ide.client.event.uiflow.fringes.OpenDialogForSelectFringeEvent;
 import com.vw.ide.client.event.uiflow.fringes.OpenFringeManagerEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -293,7 +294,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 		return this.presenter;
 	}
 
-	@UiHandler(value = { "miHelpAboutField", "newVwmlProjField", "openFringeManager" })
+	@UiHandler(value = { "miHelpAboutField", "newVwmlProjField", "openFringeManager","insertFringeInFile" })
 	public void onMenuSelection(SelectionEvent<Item> event) {
 		MenuItem item = (MenuItem) event.getSelectedItem();
 		if (item.getItemId().equalsIgnoreCase("idHelpAbout")) {
@@ -302,9 +303,9 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 			presenter.fireEvent(new ProjectMenuEvent("idNewProject"));
 		} if (item.getItemId().equalsIgnoreCase("idOpenFringeManager")) {
 			presenter.fireEvent(new OpenFringeManagerEvent("idOpenFringeManager"));
-		} else {
-			
-		}
+		} if (item.getItemId().equalsIgnoreCase("idInsertFringeInFile")) {
+			presenter.fireEvent(new OpenDialogForSelectFringeEvent("idInsertFringeInFile"));
+		} 
 	}
 
 	@UiHandler({ "userLogout", "bnNewVwmlProjField", "bnSaveSelectedFile" })

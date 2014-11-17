@@ -8,8 +8,13 @@ import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.vw.ide.client.Resources;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
+import com.vw.ide.client.event.uiflow.fringes.OpenDialogForSelectFringeEvent;
+import com.vw.ide.client.fringemanagment.FringeManagerDialogHandlers;
+import com.vw.ide.client.fringemanagment.fringeditors.FringeEditDialog;
+import com.vw.ide.client.fringemanagment.fringeinsert.FringeInsertDialog;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.projects.FilesTypesEnum;
+import com.vw.ide.shared.CrudTypes;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
@@ -24,6 +29,13 @@ public class EditorPanelContextMenu extends Menu{
 				EditorPanelContextMenu menu = (EditorPanelContextMenu) event.getSelectedItem().getParent();
 				if (menu.presenter != null) {
 					menu.presenter.fireEvent(new ProjectMenuEvent(event.getSelectedItem().getItemId())); 
+					
+					
+					presenter.fireEvent(new OpenDialogForSelectFringeEvent("idInsertFringeInFile"));
+					
+
+					
+					
 				}
 			}
 		}

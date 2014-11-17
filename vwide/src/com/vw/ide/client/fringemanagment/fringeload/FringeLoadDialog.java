@@ -7,8 +7,6 @@ import gwtupload.client.SingleUploader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.log4j.lf5.LogLevel;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.nmorel.gwtjackson.client.ObjectMapper;

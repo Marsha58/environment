@@ -12,7 +12,9 @@ import com.vw.ide.client.devboardext.event.handler.AceColorThemeChangedEventHand
 import com.vw.ide.client.devboardext.event.handler.EditorTabClosedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.FileStateChangedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.GetDirContentEventHandler;
+import com.vw.ide.client.devboardext.event.handler.InsertFringeInFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.LogoutEventHandler;
+import com.vw.ide.client.devboardext.event.handler.OpenDialogForSelectFringeEventHandler;
 import com.vw.ide.client.devboardext.event.handler.OpenFringeManagerEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ProjectMenuEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SaveFileEventHandler;
@@ -28,6 +30,8 @@ import com.vw.ide.client.event.handler.ProjectMenuHandler;
 import com.vw.ide.client.event.handler.SaveFileHandler;
 import com.vw.ide.client.event.handler.SelectFileHandler;
 import com.vw.ide.client.event.handler.ServerLogHandler;
+import com.vw.ide.client.event.handler.fringes.InsertFringeInFileHandler;
+import com.vw.ide.client.event.handler.fringes.OpenDialogForSelectFringeHandler;
 import com.vw.ide.client.event.handler.fringes.OpenFringeManagerHandler;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
@@ -38,6 +42,8 @@ import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
+import com.vw.ide.client.event.uiflow.fringes.InsertFringeInFileEvent;
+import com.vw.ide.client.event.uiflow.fringes.OpenDialogForSelectFringeEvent;
 import com.vw.ide.client.event.uiflow.fringes.OpenFringeManagerEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -82,6 +88,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 			put(ProjectMenuEvent.TYPE, new ProjectMenuEventHandler());
 			put(ServerLogEvent.TYPE, new ServerLogEventHandler());
 			put(OpenFringeManagerEvent.TYPE, new OpenFringeManagerEventHandler());
+			put(OpenDialogForSelectFringeEvent.TYPE, new OpenDialogForSelectFringeEventHandler());
+			put(InsertFringeInFileEvent.TYPE, new InsertFringeInFileEventHandler());
 		}
 	};
 	
@@ -130,6 +138,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.addHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.addHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 		eventBus.addHandler(OpenFringeManagerEvent.TYPE, (OpenFringeManagerHandler)dispatcher.get(OpenFringeManagerEvent.TYPE));
+		eventBus.addHandler(OpenDialogForSelectFringeEvent.TYPE, (OpenDialogForSelectFringeHandler)dispatcher.get(OpenDialogForSelectFringeEvent.TYPE));
+		eventBus.addHandler(InsertFringeInFileEvent.TYPE, (InsertFringeInFileHandler)dispatcher.get(InsertFringeInFileEvent.TYPE));
 	}
 	
 	@Override
@@ -144,6 +154,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(ProjectMenuEvent.TYPE, (ProjectMenuHandler)dispatcher.get(ProjectMenuEvent.TYPE));
 		eventBus.removeHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 		eventBus.removeHandler(OpenFringeManagerEvent.TYPE, (OpenFringeManagerHandler)dispatcher.get(OpenFringeManagerEvent.TYPE));
+		eventBus.removeHandler(OpenDialogForSelectFringeEvent.TYPE, (OpenDialogForSelectFringeHandler)dispatcher.get(OpenDialogForSelectFringeEvent.TYPE));
+		eventBus.removeHandler(InsertFringeInFileEvent.TYPE, (InsertFringeInFileHandler)dispatcher.get(InsertFringeInFileEvent.TYPE));
 	}
 
 	

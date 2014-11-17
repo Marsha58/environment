@@ -1,0 +1,21 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:w="urn:import:com.google.gwt.widget.client"
+	xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:f="urn:import:com.sencha.gxt.widget.core.client.form"
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
+	xmlns:tree="urn:import:com.sencha.gxt.widget.core.client.tree">
+
+
+  	<ui:with type="com.sencha.gxt.data.shared.TreeStore" field="store" />
+  	<ui:with type="com.sencha.gxt.core.client.ValueProvider" field="valueProvider" /> 
+	<ui:with type="com.vw.ide.client.images.ExampleImages" field="images" />
+
+
+	<container:SimpleContainer>
+		<tree:Tree ui:field="treeFringesByCategories" width="300" borders="false"
+			valueProvider="{valueProvider}" store="{store}">
+		</tree:Tree>
+	</container:SimpleContainer>
+</ui:UiBinder> 
