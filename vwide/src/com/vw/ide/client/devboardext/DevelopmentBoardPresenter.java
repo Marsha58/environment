@@ -12,6 +12,7 @@ import com.vw.ide.client.devboardext.event.handler.AceColorThemeChangedEventHand
 import com.vw.ide.client.devboardext.event.handler.EditorTabClosedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.FileStateChangedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.GetDirContentEventHandler;
+import com.vw.ide.client.devboardext.event.handler.GetFringesInCategoriesEventHandler;
 import com.vw.ide.client.devboardext.event.handler.InsertFringeInFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.LogoutEventHandler;
 import com.vw.ide.client.devboardext.event.handler.OpenDialogForSelectFringeEventHandler;
@@ -24,7 +25,9 @@ import com.vw.ide.client.devboardext.service.browser.callbacks.GettingUserStateR
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
 import com.vw.ide.client.event.handler.FileStateChangedHandler;
+import com.vw.ide.client.event.handler.GetCategoriesHandler;
 import com.vw.ide.client.event.handler.GetDirContentHandler;
+import com.vw.ide.client.event.handler.GetFringesInCategoriesHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
 import com.vw.ide.client.event.handler.SaveFileHandler;
@@ -36,7 +39,9 @@ import com.vw.ide.client.event.handler.fringes.OpenFringeManagerHandler;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.FileStateChangedEvent;
+import com.vw.ide.client.event.uiflow.GetCategoriesEvent;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
+import com.vw.ide.client.event.uiflow.GetFringesInCategoriesEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
@@ -45,6 +50,8 @@ import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.event.uiflow.fringes.InsertFringeInFileEvent;
 import com.vw.ide.client.event.uiflow.fringes.OpenDialogForSelectFringeEvent;
 import com.vw.ide.client.event.uiflow.fringes.OpenFringeManagerEvent;
+import com.vw.ide.client.fringemanagment.event.handler.GetCategoriesEventHandler;
+import com.vw.ide.client.fringemanagment.event.handler.GetFringesEventHandler;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.projects.ProjectManager;
@@ -90,6 +97,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 			put(OpenFringeManagerEvent.TYPE, new OpenFringeManagerEventHandler());
 			put(OpenDialogForSelectFringeEvent.TYPE, new OpenDialogForSelectFringeEventHandler());
 			put(InsertFringeInFileEvent.TYPE, new InsertFringeInFileEventHandler());
+			put(GetFringesInCategoriesEvent.TYPE, new GetFringesInCategoriesEventHandler());
+			
 		}
 	};
 	
@@ -140,6 +149,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.addHandler(OpenFringeManagerEvent.TYPE, (OpenFringeManagerHandler)dispatcher.get(OpenFringeManagerEvent.TYPE));
 		eventBus.addHandler(OpenDialogForSelectFringeEvent.TYPE, (OpenDialogForSelectFringeHandler)dispatcher.get(OpenDialogForSelectFringeEvent.TYPE));
 		eventBus.addHandler(InsertFringeInFileEvent.TYPE, (InsertFringeInFileHandler)dispatcher.get(InsertFringeInFileEvent.TYPE));
+		eventBus.addHandler(GetFringesInCategoriesEvent.TYPE, (GetFringesInCategoriesHandler) dispatcher.get(GetFringesInCategoriesEvent.TYPE));
 	}
 	
 	@Override
@@ -156,6 +166,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(OpenFringeManagerEvent.TYPE, (OpenFringeManagerHandler)dispatcher.get(OpenFringeManagerEvent.TYPE));
 		eventBus.removeHandler(OpenDialogForSelectFringeEvent.TYPE, (OpenDialogForSelectFringeHandler)dispatcher.get(OpenDialogForSelectFringeEvent.TYPE));
 		eventBus.removeHandler(InsertFringeInFileEvent.TYPE, (InsertFringeInFileHandler)dispatcher.get(InsertFringeInFileEvent.TYPE));
+		eventBus.removeHandler(GetFringesInCategoriesEvent.TYPE, (GetFringesInCategoriesHandler) dispatcher.get(GetFringesInCategoriesEvent.TYPE));
 	}
 
 	

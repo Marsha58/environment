@@ -1,10 +1,10 @@
 package com.vw.ide.client.fringemanagment.event.handler;
 
 import com.google.gwt.event.shared.GwtEvent;
-import com.vw.ide.client.fringemanagment.service.fringes.callbacks.GettingFringesResultCallback;
 import com.vw.ide.client.event.handler.GetFringesHandler;
 import com.vw.ide.client.event.uiflow.GetFringesEvent;
 import com.vw.ide.client.fringemanagment.FringeManagerPresenter;
+import com.vw.ide.client.fringemanagment.service.fringes.callbacks.GettingFringesResultCallback;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.fringes.FringeServiceBroker;
 

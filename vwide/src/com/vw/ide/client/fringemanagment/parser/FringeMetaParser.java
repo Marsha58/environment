@@ -1,11 +1,7 @@
 package com.vw.ide.client.fringemanagment.parser;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
-
-import org.apache.commons.lang3.ArrayUtils;
+import java.util.logging.Logger;
 
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
@@ -18,8 +14,7 @@ public class FringeMetaParser {
 	private String fullText = "";
 	private String sectionLanguage = "";
 	private int initialSectionLanguageLength = -1;
-	private String sectionBeyond = "";
-	private List<String> sectionFringes = new ArrayList<>();
+
 
 	public String getFullText() {
 		return fullText;
@@ -37,21 +32,6 @@ public class FringeMetaParser {
 		this.sectionLanguage = sectionLanguage;
 	}
 
-	public String getSectionBeyond() {
-		return sectionBeyond;
-	}
-
-	public void setSectionBeyond(String sectionBeyond) {
-		this.sectionBeyond = sectionBeyond;
-	}
-
-	public List<String> getSectionFringes() {
-		return sectionFringes;
-	}
-
-	public void setSectionFringes(List<String> sectionFringes) {
-		this.sectionFringes = sectionFringes;
-	}
 
 	public FringeMetaParser() {
 
@@ -61,50 +41,30 @@ public class FringeMetaParser {
 		this.fullText = fullText;
 	}
 
-	public Boolean catchLanguageSection(String out_pattern) {
+	public Boolean catchLanguageSection() {
 		Boolean res = false;
-		String pattern = "";
-		if (out_pattern != null) {
-			pattern = out_pattern;
-		} else {
-			pattern = "language[\\s]*=[\\s]*[\\s\\S]*{[a-zA-Z_0-9\\s()\".\\/\\/]*}[\\s]*}";
-		}	
+		String pattern = "(language)[\\s]*=[a-zA-Z_0-9\\s]*(\\{){1}[a-zA-Z_0-9\\s\".:=\\-{()}\\\\\\/]*(})";
 		RegExp regExp = RegExp.compile(pattern);
 		MatchResult matcher = regExp.exec(fullText);
 		boolean matchFound = matcher != null;
 		if (matchFound) {
 			sectionLanguage = matcher.getGroup(0);
-			logger.log(Level.INFO, "sectionLanguage. matcher.getGroup(" + 0 + ")" + matcher.getGroup(0));
 			res = true;
 		}
+		logger.log(Level.INFO, "sectionLanguage : " + sectionLanguage);
 		initialSectionLanguageLength = sectionLanguage.length();		
 		return res;
 	};
 
-	public int getBeyondSectionInsertPlace() {
-		int res = -1;
-		if (!catchBeyondSection()) {
-			for (int i = sectionLanguage.length() - 1; i > 0; i--) {
-				if (sectionLanguage.charAt(i) == '}') {
-					res = i - 1;
-					break;
-				}
-			}
-		}
-		return res;
-	}
+
 
 	private Boolean catchBeyondSection() {
 		Boolean res = false;
-		String pattern = "beyond[\\s]*{[a-zA-Z_0-9\\s()\".\\/\\/]*}";
+		String pattern = "beyond[\\s]*{[a-zA-Z_0-9\\s()\\-\".\\/\\/]*}";
 		RegExp regExp = RegExp.compile(pattern);
 		MatchResult matcher = regExp.exec(sectionLanguage);
-		boolean matchFound = matcher != null;
-		if (matchFound) {
-			sectionBeyond = matcher.getGroup(0);
-			logger.log(Level.INFO, "sectionBeyond. matcher.getGroup(" + 0 + ")" + matcher.getGroup(0));
-			res = true;
-		}
+		res =  matcher != null;
+		logger.log(Level.INFO, "catchBeyondSection() : " + res);
 		return res;
 	};
 
@@ -118,61 +78,56 @@ public class FringeMetaParser {
 		if (res.length() == 0) {
 			res = text;
 		}
+		logger.log(Level.INFO, "insertText : " + res);
+
 		return res;
 	};
 
 	public void makeBeyondSection() {
 		int beyondSectionInsertPlace = getBeyondSectionInsertPlace();
 		String beyondSection = "beyond {\n\t}";
-		sectionLanguage = insertText(sectionLanguage, beyondSectionInsertPlace, beyondSection);
+		if (beyondSectionInsertPlace != -1) {
+			sectionLanguage = insertText(sectionLanguage, beyondSectionInsertPlace, beyondSection);
+			logger.log(Level.INFO, "sectionLanguage : " + sectionLanguage);
+
+		} else {
+			logger.log(Level.SEVERE, "beyondSectionInsertPlace == -1");
+		}
 	};
+	
+	public int getBeyondSectionInsertPlace() {
+		int res = -1;
+		int parenthesisCount = 0;		
+		int beforeThisParenthesis = 1;
+		if (!catchBeyondSection()) {
+			for (int i = sectionLanguage.length() - 1; i > 0; i--) {
+				if (sectionLanguage.charAt(i) == '}') {
+					parenthesisCount++;
+					if(parenthesisCount == beforeThisParenthesis) {
+						res = i - 1;
+						break;
+					}
+				}
+			}
+		}
+		return res;
+	}		
 
 	public Boolean catchFringesSection() {
 		Boolean res = false;
-		// String pattern =
-		// "fringe[\\s]*[a-zA-Z_0-9]*[\\s]*([a-zA-Z_0-9\\s(\".\\/\\/]*) ";
 		String pattern = "([\\s]*fringe[a-zA-Z_0-9\\s]*[(][a-zA-Z_0-9\\s\".\\/\\/]*[)][\\s]*)+";
 		RegExp regExp = RegExp.compile(pattern);
-		MatchResult matcher = regExp.exec(sectionBeyond);
-
-		boolean matchFound = matcher != null;
-		if (matchFound) {
-			for (int i = 0; i < matcher.getGroupCount(); i++) {
-				sectionFringes.add(matcher.getGroup(i));
-				if (i == 0) {
-					String[] sec = matcher.getGroup(i).split("[)]");
-
-					for (int j = 0; j < sec.length; j++) {
-						logger.log(Level.INFO, "sec" + j + ": " + sec[j]);
-					}
-
-				}
-				logger.log(Level.INFO, "matcher.getGroup(" + i + ")" + matcher.getGroup(i));
-			}
-			res = true;
-		}
+		MatchResult matcher = regExp.exec(sectionLanguage);
+		res =  matcher != null;
+		logger.log(Level.INFO, "catchFringesSection() : " + res);
+		
 		return res;
 	};
 
-	public int getFringeSectionInsertPlace() {
-		int res = -1;
-		int parenthesisCounter = 0;
-		for (int i = sectionLanguage.length() - 1; i > 0; i--) {
-			if (sectionLanguage.charAt(i) == '}') {
-				if (parenthesisCounter == 0) {
-					parenthesisCounter++;
-				} else {
-					res = i - 1;
-					break;
-				}
-			}
-		}
 
-		return res;
-	}
 
 	private String makeFringeText(Fringe fringe) {
-		String res = fringe.getClassname();
+		String res = "\t\t"  + fringe.getName() + " ias \"" + fringe.getClassname() + "\"";
 		return res;
 	}
 
@@ -183,17 +138,84 @@ public class FringeMetaParser {
 		return fullText;
 	}
 
+	
+	public Boolean catchFringeGroupSection(String groupName) {
+		Boolean res = false;
+		String pattern = "((fringe){1}[\\s]*"+groupName+"[\\s]*(ias){1}[\\s]*[(][a-zA-Z_0-9\\s\".\\/\\/]*[)])+";
+		RegExp regExp = RegExp.compile(pattern);
+		MatchResult matcher = regExp.exec(sectionLanguage);
+		res = matcher != null;
+		logger.log(Level.INFO, "catchFringeGroupSection() : " + res);
+		
+		return res;
+	};	
+	
 	public void insertFringe(Fringe fringe) {
-		catchLanguageSection(null);
+		catchLanguageSection();
 		
 		if (!catchBeyondSection()) {
-			catchLanguageSection("language[\\s]*=[a-zA-Z_0-9\\s]*\\{[a-zA-Z_0-9\\s\".:=\\\\\\/]*\\}");
 			makeBeyondSection();
 		}
-		int fringeSectionInsertPlace = getFringeSectionInsertPlace();
-		sectionLanguage = insertText(sectionLanguage, fringeSectionInsertPlace, makeFringeText(fringe));
+		
+		if(!catchFringeGroupSection(fringe.getCategory().getName())){
+			makeFringeGroupSection(fringe.getCategory().getName());
+		}
+		
+		int fringeSectionInsertPlace = getFringeSectionInsertPlace(fringe.getCategory().getName());
+		if (fringeSectionInsertPlace != -1) {		
+			sectionLanguage = insertText(sectionLanguage, fringeSectionInsertPlace, makeFringeText(fringe));
+			logger.log(Level.INFO, "sectionLanguage : " + sectionLanguage);
+		} else {
+			logger.log(Level.SEVERE, "fringeSectionInsertPlace == -1");
+		}
 		replaceSectionLanguageInText();
 
 	}
+	
+	public void makeFringeGroupSection(String fringeGroupName) {
+		int fringeGroupSectionInsertPlace = getFringeGroupSectionInsertPlace(fringeGroupName,2);
+		String fringeSection = "\tfringe "+ fringeGroupName+" ias (\n\t\t\t)";
+		if(fringeGroupSectionInsertPlace != -1) {
+			sectionLanguage = insertText(sectionLanguage, fringeGroupSectionInsertPlace, fringeSection);
+		}else {
+			logger.log(Level.SEVERE, "fringeGroupSectionInsertPlace == -1");
+		}
+	};	
+	
+	
+
+	
+	public int getFringeGroupSectionInsertPlace(String fringeGroupName,int beforeThisParenthesis) {
+		int res = -1;
+		int parenthesisCount = 0;
+		if (!catchFringeGroupSection(fringeGroupName)) {
+			for (int i = sectionLanguage.length() - 1; i > 0; i--) {
+				if (sectionLanguage.charAt(i) == '}') {
+					parenthesisCount++;
+					if(parenthesisCount == beforeThisParenthesis) {
+						res = i - 1;
+						break;
+					}
+					
+				}
+			}
+		} else {
+			
+		}
+		return res;
+	}	
+	
+	public int getFringeSectionInsertPlace(String groupName) {
+		int res = -1;
+		String pattern = "((fringe){1}[\\s]*"+groupName+"[\\s]*(ias){1}[\\s]*[(])+";
+		RegExp regExp = RegExp.compile(pattern);
+		MatchResult matcher = regExp.exec(sectionLanguage);
+		boolean matchFound = matcher != null;
+		if (matchFound) {
+			String matchedString =	matcher.getGroup(0);
+			res = sectionLanguage.indexOf(matchedString) + matchedString.length() + 1;
+		}
+		return res;
+	}	
 
 }

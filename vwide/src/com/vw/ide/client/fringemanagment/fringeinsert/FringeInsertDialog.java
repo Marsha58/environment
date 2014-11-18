@@ -2,6 +2,7 @@ package com.vw.ide.client.fringemanagment.fringeinsert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,9 +19,12 @@ import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
+import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
 import com.sencha.gxt.widget.core.client.tree.Tree;
+import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.dialog.VwmlDialogExt;
 import com.vw.ide.client.event.uiflow.fringes.InsertFringeInFileEvent;
 import com.vw.ide.client.fringemanagment.model.BaseDto;
@@ -28,6 +32,7 @@ import com.vw.ide.client.fringemanagment.model.FolderDto;
 import com.vw.ide.client.fringemanagment.model.FringeDto;
 import com.vw.ide.client.images.ExampleImages;
 import com.vw.ide.client.presenters.Presenter;
+import com.vw.ide.client.ui.editorpanel.EditorPanelContextMenu;
 import com.vw.ide.shared.servlet.fringes.model.Category;
 import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
@@ -53,6 +58,9 @@ public class FringeInsertDialog extends VwmlDialogExt {
 	private Presenter presenter;
 	private BaseDto treeSelectedItem = null;
 	private Fringe selectedFringe = null;
+
+
+	private FringeInsertDialogContextMenu contextMenu;
 
 	interface FringeInsertDialogUiBinder extends UiBinder<Widget, FringeInsertDialog> {
 	}
@@ -88,36 +96,23 @@ public class FringeInsertDialog extends VwmlDialogExt {
 	
 	  public FolderDto getRootFolder() {
 		    FolderDto root = makeFolder("Root");
-
-		    FolderDto category1 = makeFolder("communication");
-		    category1.setType("category");
+		    Map<Category,List<Fringe>> fringesInCategories = ((DevelopmentBoardPresenter) presenter).getView().getFringesInCategories();
 		    List<BaseDto> children = new ArrayList<BaseDto>();
-		    children.add(category1);
 		    root.setChildren(children);
-
-		    Fringe fringe1 = new Fringe();
-		    fringe1.setName("fringe1");
-		    fringe1.setClassname("com.win.game.model.fringe.gate.async.console.AsyncConsole");
-		    category1.addChild(makeItem(fringe1, category1));
-		    Fringe fringe2 = new Fringe();
-		    fringe2.setName("fringe2");
-		    fringe2.setClassname("com.win.game.model.fringe.gate.async.console.AsyncConsole2");
-		    category1.addChild(makeItem(fringe2, category1));
-
-		    
-		    FolderDto category2 = makeFolder("services");
-		    category2.setType("category");
-		    children.add(category2);
-
-		    Fringe fringe3 = new Fringe();
-		    fringe3.setName("fringe3");
-		    fringe3.setClassname("com.vw.lang.beyond.java.fringe.gate.math.Math");
-		    category2.addChild(makeItem(fringe3, category2));
-		    Fringe fringe4 = new Fringe();
-		    fringe4.setName("fringe4");
-		    fringe4.setClassname("com.win.game.model.fringe.gate.algorithm.graphloader.GraphLoader");
-		    category2.addChild(makeItem(fringe4, category2));
-		    
+		    if (fringesInCategories != null ) {
+		    	for (Category curCategory : fringesInCategories.keySet()) {
+		    		FolderDto categoryFolder = makeFolder(curCategory.getName());
+		    		categoryFolder.setType("category");
+		    		children.add(categoryFolder);
+					List<Fringe> curFringeList = fringesInCategories.get(curCategory);
+					for(Fringe curFringe : curFringeList) {
+						Fringe fringeItem = new Fringe();
+						fringeItem.setName(curFringe.getName());
+						fringeItem.setClassname(curFringe.getClassname());
+						categoryFolder.addChild(makeItem(fringeItem, categoryFolder));
+					}
+				}
+		    }
 		    
 		    return root;
 		  }
@@ -168,14 +163,27 @@ public class FringeInsertDialog extends VwmlDialogExt {
 					selectedFringe.setCategory(category);
 					logger.log(Level.INFO, category.getName() + " : " + selectedFringe.getName() +  " : " + selectedFringe.getClassname());
 				}
+				contextMenu.getInsertFringe().setEnabled(treeSelectedItem.getType() == "fringe");
 			}
 		});		
 		
-		
+		buildContextMenu();
 		initTree();
 //		createListField();
 	}
 
+	
+	public void buildContextMenu() {
+		contextMenu = new FringeInsertDialogContextMenu(this);
+		contextMenu.setWidth(130);
+		contextMenu.addBeforeShowHandler(new BeforeShowHandler() {
+			@Override
+			public void onBeforeShow(BeforeShowEvent event) {
+				contextMenu.associatePresenter(presenter);
+			}
+		});
+		treeFringesByCategories.setContextMenu(contextMenu);
+	}		
 
 
 	private void initTree() {
@@ -199,24 +207,16 @@ public class FringeInsertDialog extends VwmlDialogExt {
 
 
 	protected void onButtonPressed(TextButton textButton) {
-		// super.onButtonPressed(textButton);
-			if(treeSelectedItem == null) {
-				ConfirmMessageBox box = new ConfirmMessageBox("Confirm", "You didn't choose fringe from the tree. Exit in any case?");
-				box.addDialogHideHandler(new DialogHideHandler() {
-					
-					@Override
-					public void onDialogHide(DialogHideEvent event) {
-						if (event.getHideButton().name().equalsIgnoreCase("YES")) {
-							hide();
-						}
-					}
-				});
-				box.show();
-			} else {
-				presenter.fireEvent(new InsertFringeInFileEvent(selectedFringe));
-				hide();
-			}
-
+		hide();
 	}
+	
+	public Fringe getSelectedFringe() {
+		return selectedFringe;
+	}
+
+
+	public void setSelectedFringe(Fringe selectedFringe) {
+		this.selectedFringe = selectedFringe;
+	}	
 
 }

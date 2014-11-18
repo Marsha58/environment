@@ -2,12 +2,14 @@ package com.vw.ide.client.fringemanagment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.editor.client.Editor.Path;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -737,6 +739,8 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		}
 		selectedFringe = fringe;
 	}	
+	
+
 	
 
 	

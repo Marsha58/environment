@@ -1,4 +1,10 @@
 package com.vw.ide.server.servlet.fringes;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gwt.dev.util.collect.HashMap;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -13,6 +19,7 @@ import com.vw.ide.shared.servlet.fringes.RequestAddFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestDeleteCategoryResult;
 import com.vw.ide.shared.servlet.fringes.RequestDeleteFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetCategoriesResult;
+import com.vw.ide.shared.servlet.fringes.RequestGetFringesInCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesResult;
 import com.vw.ide.shared.servlet.fringes.RequestLoadFringeJarResult;
 import com.vw.ide.shared.servlet.fringes.RequestUpdateCategoryResult;
@@ -156,6 +163,20 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		res.setId(fringeId);
 		try {
 			fringePersistanceService.deleteFringe(fringeId); 
+		}
+		catch(Exception ex) {
+			res.setRetCode(-1);
+		}
+		return res;
+	}
+
+	@Override
+	public RequestGetFringesInCategoriesResult getFringesInCategories() {
+		RequestGetFringesInCategoriesResult res = new RequestGetFringesInCategoriesResult();
+		res.setRetCode(0);
+		try {
+			res.setCategoriesList(fringePersistanceService.getCategories()); 
+			res.setFringesList(fringePersistanceService.getFringes()); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);

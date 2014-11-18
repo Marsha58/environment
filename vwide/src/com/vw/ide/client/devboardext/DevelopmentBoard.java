@@ -1,6 +1,10 @@
 package com.vw.ide.client.devboardext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -37,6 +41,8 @@ import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
 import com.vw.ide.client.ui.windowspanel.WindowsPanelView;
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.servlet.fringes.model.Category;
+import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 public class DevelopmentBoard extends ResizeComposite implements IsWidget, PresenterViewerLink {
 
@@ -113,10 +119,34 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	WindowsPanelView windows;
 
 	private Presenter presenter = null;
+	private Map<Category,List<Fringe>> fringesInCategories = null;
 
+	public Map<Category, List<Fringe>> getFringesInCategories() {
+		return fringesInCategories;
+	}
+
+	public void setFringesInCategories(Map<Category,List<Fringe>> fringesInCategories) {
+		this.fringesInCategories = fringesInCategories;
+	}
+	
+	public void updateFringesInCategories(List<Category> categoriesList, List<Fringe> fringesList) {
+		fringesInCategories= new HashMap<>();
+		for (Category curCategory : categoriesList) {
+			List<Fringe> curList = new ArrayList<>();
+			for(Fringe curFringe : fringesList) {
+				if(curCategory.getId() == curFringe.getCategoryId()) {
+					curList.add(curFringe);
+				}
+			}
+			fringesInCategories.put(curCategory, curList);
+		}
+	}
+	
+	
 	interface DevelopmentBoardUiBinder extends UiBinder<SimpleContainer, DevelopmentBoard> {
 	}
 
+	
 	public DevelopmentBoard() {
 		ListStore<Theme> colors = new ListStore<Theme>(new ModelKeyProvider<Theme>() {
 			@Override
@@ -284,4 +314,5 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		windows.associatePresenter(presenter);
 		projectPanel.associatePresenter(presenter);
 	}
+
 }

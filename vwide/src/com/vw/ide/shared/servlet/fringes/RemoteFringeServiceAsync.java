@@ -16,4 +16,6 @@ public interface RemoteFringeServiceAsync {
 	void updateFringe(Fringe fringe,AsyncCallback<RequestUpdateFringeResult> callback);
 	void deleteFringe(Integer fringeId,AsyncCallback<RequestDeleteFringeResult> callback);
 
+	void getFringesInCategories(AsyncCallback<RequestGetFringesInCategoriesResult> callback);
+	
 }

@@ -8,6 +8,7 @@ import com.vw.ide.client.service.fringes.FringeService.ServiceCallbackForDeleteC
 import com.vw.ide.client.service.fringes.FringeService.ServiceCallbackForDeleteFringe;
 import com.vw.ide.client.service.fringes.FringeService.ServiceCallbackForGetCategories;
 import com.vw.ide.client.service.fringes.FringeService.ServiceCallbackForGetFringes;
+import com.vw.ide.client.service.fringes.FringeService.ServiceCallbackForGetFringesInCategories;
 import com.vw.ide.client.service.fringes.FringeService.ServiceCallbackForUpdateCategory;
 import com.vw.ide.client.service.fringes.FringeService.ServiceCallbackForUpdateFringe;
 import com.vw.ide.shared.servlet.fringes.RemoteFringeServiceAsync;
@@ -16,6 +17,7 @@ import com.vw.ide.shared.servlet.fringes.RequestAddFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestDeleteCategoryResult;
 import com.vw.ide.shared.servlet.fringes.RequestDeleteFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetCategoriesResult;
+import com.vw.ide.shared.servlet.fringes.RequestGetFringesInCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesResult;
 import com.vw.ide.shared.servlet.fringes.RequestUpdateCategoryResult;
 import com.vw.ide.shared.servlet.fringes.RequestUpdateFringeResult;
@@ -173,6 +175,22 @@ public class FringeServiceBroker {
 			cbk.setProcessedResult(new Result<RequestDeleteFringeResult>(resultCallback));
 			service.deleteFringe(fringeId,cbk);
 		}
-	}		
+	}	
+	
+
+	/**
+	 * Requests for the list of fringes
+	 * @param resultCallback
+	 */
+	public static void requestForFringesInCategories( ResultCallback<RequestGetFringesInCategoriesResult> resultCallback) {
+		RemoteFringeServiceAsync service = FringeService.instance().getServiceImpl();
+		if (service != null) {
+			ServiceCallbackForGetFringesInCategories cbk = FringeService.instance().buildCallbackForGetFringesInCategories();
+			cbk.setProcessedResult(new Result<RequestGetFringesInCategoriesResult>(resultCallback));
+			service.getFringesInCategories(cbk);
+		}			
+		
+	}	
+	
 	
 }

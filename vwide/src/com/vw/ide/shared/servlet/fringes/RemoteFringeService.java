@@ -45,5 +45,10 @@ public interface RemoteFringeService extends RemoteService {
 	 */	
 	public RequestDeleteFringeResult deleteFringe(Integer fringeId);
 
+	/**
+	 * Get fringes grouped by categories
+	 */		
+	public RequestGetFringesInCategoriesResult getFringesInCategories();
+
 	
 }

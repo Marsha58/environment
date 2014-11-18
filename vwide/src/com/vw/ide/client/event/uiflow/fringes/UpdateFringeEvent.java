@@ -1,11 +1,6 @@
 package com.vw.ide.client.event.uiflow.fringes;
 
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.GwtEvent.Type;
-import com.vw.ide.client.event.handler.GetCategoriesHandler;
-import com.vw.ide.client.event.handler.GetDirContentHandler;
-import com.vw.ide.client.event.handler.GetFringesHandler;
-import com.vw.ide.client.event.handler.LoginHandler;
 import com.vw.ide.client.event.handler.fringes.UpdateFringeHandler;
 import com.vw.ide.shared.servlet.fringes.model.Fringe;
 

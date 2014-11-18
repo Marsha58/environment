@@ -12,6 +12,7 @@ import com.vw.ide.shared.servlet.fringes.RequestAddFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestDeleteCategoryResult;
 import com.vw.ide.shared.servlet.fringes.RequestDeleteFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetCategoriesResult;
+import com.vw.ide.shared.servlet.fringes.RequestGetFringesInCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesResult;
 import com.vw.ide.shared.servlet.fringes.RequestUpdateCategoryResult;
 import com.vw.ide.shared.servlet.fringes.RequestUpdateFringeResult;
@@ -49,6 +50,9 @@ public class FringeService implements BusConnectivity, VwIdeClientService  {
 	public static class ServiceCallbackForDeleteFringe extends ServiceCallback<RequestDeleteFringeResult>  {
 	}	
 	
+	public static class ServiceCallbackForGetFringesInCategories extends ServiceCallback<RequestGetFringesInCategoriesResult>  {
+	}	
+
 	
 	private FringeService() {
 		
@@ -117,6 +121,11 @@ public class FringeService implements BusConnectivity, VwIdeClientService  {
 
 	public ServiceCallbackForDeleteFringe buildCallbackForDeleteFringe() {
 		return new ServiceCallbackForDeleteFringe();
-	}			
+	}
+	
+	public ServiceCallbackForGetFringesInCategories buildCallbackForGetFringesInCategories() {
+		return new ServiceCallbackForGetFringesInCategories();
+	}		
+	
 	
 }

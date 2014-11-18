@@ -29,7 +29,7 @@ public class InsertFringeInFileEventHandler extends Presenter.PresenterEventHand
 		Fringe fringe = event.getFringe();
 		FileSheet currentTab = (FileSheet)presenter.getEditorPanel().getTabPanel().getActiveWidget();
 		FringeMetaParser fringeMetaParser = new FringeMetaParser(currentTab.getAceEditor().getText());
-		fringeMetaParser.insertFringe(fringe);
+		fringeMetaParser.insertFringe(fringe); 
 		currentTab.getAceEditor().setText(fringeMetaParser.getFullText());
 	}
 
