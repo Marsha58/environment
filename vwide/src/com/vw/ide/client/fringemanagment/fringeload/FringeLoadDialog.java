@@ -270,7 +270,8 @@ public class FringeLoadDialog extends VwmlDialogExt {
 	}
 
 	public void updateFringeClassname() {
-		presenter.getView().updateFringeListAndCache(fringeForUpdate, CrudTypes.EDIT);
+//		presenter.getView().updateListStoreFringes(fringeForUpdate, CrudTypes.EDIT);
+		presenter.getView().getFringesListByCategoryId(fringeForUpdate.getCategoryId());
 		presenter.fireEvent(new UpdateFringeEvent(fringeForUpdate));
 	}
 

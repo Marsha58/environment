@@ -298,7 +298,6 @@ public class FringeManagerPresenter extends Presenter {
 					if (event.getHideButton().name().equalsIgnoreCase("YES")) {
 						getView().getListStoreFringes().remove(getView().getSelectedFringe());
 						getView().updateEditedFringeInFringesList(getView().getSelectedFringe(),CrudTypes.DELETE);
-						getView().deleteFringeFromFringeCache(getView().getSelectedFringe());
 						fireEvent(new DeleteFringeEvent(getView().getSelectedFringe().getId()));
 					}
 					;

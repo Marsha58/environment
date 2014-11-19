@@ -45,7 +45,7 @@ public class FringeManagerDialogHandlers {
 			String btn = box.getSelectedHideButton();
 			if (btn.equalsIgnoreCase("OK")) {
 				if (box.getEditingType() == CrudTypes.ADD) {
-					presenter.getView().updateFringeListAndCache(box.getFringe(),box.getEditingType() );
+					presenter.getView().updateListStoreFringes(box.getFringe(),box.getEditingType() );
 					presenter.fireEvent(new AddFringeEvent(box.getFringe()));
 				} else {
 					presenter.fireEvent(new UpdateFringeEvent(box.getFringe()));

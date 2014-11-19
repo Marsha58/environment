@@ -2,7 +2,10 @@ package com.vw.ide.server.servlet.fringes.persistance.dao;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.xml.transform.TransformerException;
@@ -15,7 +18,7 @@ import org.xml.sax.SAXException;
 import com.vw.ide.server.servlet.utils.XmlUtils;
 import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
-public class FringesDAOXMLimpl implements FringesDAO {
+public class FringesDAOXMLimpl implements ItemDAO<Fringe> {
 
 	private ServletContext context;
 
@@ -243,6 +246,15 @@ public class FringesDAOXMLimpl implements FringesDAO {
 			}
 		}
 		return res;
+	}
+
+	@Override
+	public Map<Integer, Fringe> getAllMap() {
+		Map<Integer, Fringe> map = new HashMap<>();
+		for (Fringe fringe : getAll()) {
+			map.put(fringe.getId(), fringe);
+		}
+		return map;
 	}
 
 }

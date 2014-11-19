@@ -2,14 +2,8 @@ package com.vw.ide.client.fringemanagment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.editor.client.Editor.Path;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -20,8 +14,6 @@ import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
-import com.sencha.gxt.data.shared.event.StoreRecordChangeEvent;
-import com.sencha.gxt.data.shared.event.StoreRecordChangeEvent.StoreRecordChangeHandler;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent;
 import com.sencha.gxt.widget.core.client.event.BeforeShowEvent.BeforeShowHandler;
@@ -77,12 +69,6 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 	private Boolean isCategoryEditing = false;
 	private Boolean isFringeEditing = false;
-	
-	private LoadingCache<Integer, List<Fringe>> fringesCache;
-
-	public LoadingCache<Integer, List<Fringe>> getFringesCache() {
-		return fringesCache;
-	}
 
 	public Boolean getIsCategoryEditing() {
 		return isCategoryEditing;
@@ -133,8 +119,9 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	GridView<Fringe> gridViewFringes;
 	@UiField
 	Grid<Fringe> gridFringes;
-	
-//	private Map<Integer,List<Fringe>> mapCategoryWithFringes = new HashMap<>();
+
+	// private Map<Integer,List<Fringe>> mapCategoryWithFringes = new
+	// HashMap<>();
 	private List<Fringe> allFringes = new ArrayList<>();
 
 	// final GridEditing<Category> editingCategory = new
@@ -147,11 +134,11 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 	private Category selectedCategory = null;
 	private Fringe selectedFringe = null;
-	
+
 	private CrudTypes categoryOperationType = null;
 	private CrudTypes fringeOperationType = null;
 
-//	NumericFilter<Fringe, Integer> categoryIdFilter;
+	// NumericFilter<Fringe, Integer> categoryIdFilter;
 
 	public CrudTypes getCategoryOperationType() {
 		return categoryOperationType;
@@ -208,7 +195,7 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		ValueProvider<Fringe, String> filename();
 
 		ValueProvider<Fringe, String> classname();
-		
+
 		ValueProvider<Fringe, Boolean> loaded();
 
 		ValueProvider<Fringe, Integer> categoryId();
@@ -229,32 +216,10 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		editingCategory.setEditableGrid(null);
 		buildContextMenuFringe();
 		editingFringe.setEditableGrid(null);
-		
-		initCache();
-	
-		listStoreFringes.addStoreRecordChangeHandler(new StoreRecordChangeHandler<Fringe>() {
-
-			@Override
-			public void onRecordChange(StoreRecordChangeEvent<Fringe> event) {
-				presenter.fireEvent(new UpdateFringeEvent(event.getRecord().getModel()));
-			}
-		});
-		
-
-/*		categoryIdFilter = new NumericFilter<Fringe, Integer>(fringeProperties.categoryId(), new NumberPropertyEditor.IntegerPropertyEditor());
-
-		GridFilters<Fringe> filters = new GridFilters<Fringe>();
-		filters.initPlugin(gridFringes);
-		filters.setLocal(true);
-		filters.addFilter(categoryIdFilter);
-*/		
-		
-		
-			
 
 		updateCategoryControlsState();
 		updateFringeControlsState();
-		
+
 		gridCategories.setSelectionModel(new GridSelectionModel<Category>());
 		gridCategories.getColumnModel().getColumn(0).setHideable(false);
 
@@ -276,7 +241,7 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 					presenter.fireEvent(new AddCategoryEvent(selectedCategory));
 				} else {
 					presenter.fireEvent(new UpdateCategoryEvent(selectedCategory));
-				}  				
+				}
 				editingCategory.setEditableGrid(null);
 			}
 		});
@@ -298,7 +263,6 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			}
 		});
 
-		
 		editingFringe.addCompleteEditHandler(new CompleteEditHandler<Fringe>() {
 			@Override
 			public void onCompleteEdit(CompleteEditEvent<Fringe> event) {
@@ -306,10 +270,9 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 					presenter.fireEvent(new AddFringeEvent(selectedFringe));
 				} else {
 					presenter.fireEvent(new UpdateFringeEvent(selectedFringe));
-				}  
-				
-				updateEditedFringeInFringesList(selectedFringe,fringeOperationType);
-				deleteFringeFromFringeCache(selectedFringe);
+				}
+
+				updateEditedFringeInFringesList(selectedFringe, fringeOperationType);
 				editingFringe.setEditableGrid(null);
 			}
 		});
@@ -322,7 +285,6 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 		});
 
-		
 		addShowHandler(new ShowHandler() {
 			@Override
 			public void onShow(ShowEvent event) {
@@ -331,30 +293,24 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 				presenter.callerGetFringes();
 			}
 		});
-		
-		
+
 		addHideHandler(new HideHandler() {
 			@Override
 			public void onHide(HideEvent event) {
 				presenter.unregisterOnEventBus();
 			}
 		});
-		
-		
-	}
-	
-	
-	public void initCache() {
-		fringesCache = (LoadingCache<Integer, List<Fringe>>) CacheBuilder.newBuilder().build(new CacheLoader<Integer, List<Fringe>>() {
-			@Override
-			public List<Fringe> load(Integer categoryId) throws Exception {
-				return  getFringesListFromAllFringesArray(categoryId);
-			}
-		});
+
 	}
 
 	public List<Fringe> getFringesList(Integer categoryId) {
-		return fringesCache.getUnchecked(categoryId);
+		List<Fringe> fringesList = new ArrayList<>();
+		for (Fringe fringe : allFringes) {
+			if (categoryId == fringe.getCategoryId()) {
+				fringesList.add(fringe);
+			}
+		}
+		return fringesList;
 	}
 
 	public List<Fringe> getFringesListFromAllFringesArray(Integer categoryId) {
@@ -366,37 +322,17 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		}
 		return fringesList;
 	}
-	
-	public void deleteFringeFromFringeCache(Fringe fringe) {
-		try {
-			List<Fringe> curCategory = fringesCache.get(fringe.getCategoryId());
-			if (curCategory != null) {
-				for (Fringe curFringe : curCategory) {
-					if (curFringe.getId() == fringe.getId()) {
-						curCategory.remove(curFringe);
-						break;
-					}
-				}
-			}
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		fringesCache.invalidate(fringe.getCategoryId());
-	}
-	
+
 	public Boolean isCategoryHasFringes(Category category) {
 		Boolean hasFringes = false;
-		try {
-			List<Fringe> curCategory = fringesCache.get(category.getId());
-			hasFringes = curCategory.size()>0;
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (int i = 0; i < listStoreFringes.size(); i++) {
+			if (listStoreFringes.get(i).getCategoryId() == category.getId()) {
+				hasFringes = true;
+				break;
+			}
 		}
 		return hasFringes;
-	}	
-
+	}
 
 	public void getFringesListByCategory(Category selectedCategory) {
 		if (selectedCategory.getId() != null) {
@@ -404,13 +340,13 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			listStoreFringes.addAll(getFringesList(selectedCategory.getId()));
 		}
 	}
-	
+
 	public void getFringesListByCategoryId(Integer id) {
 		if (id != null) {
 			listStoreFringes.clear();
 			listStoreFringes.addAll(getFringesList(id));
 		}
-	}	
+	}
 
 	private void createCategoryUi() {
 		columnModelCategories = initColumnModelCategory();
@@ -472,15 +408,15 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		ccFringeId = new ColumnConfig<Fringe, Integer>(fringeProperties.id(), 20, "Id");
 		ccs.add(ccFringeId);
 		editingFringe.addEditor(ccFringeId, new IntegerField());
-		
+
 		ccFringeName = new ColumnConfig<Fringe, String>(fringeProperties.name(), 80, "Name");
 		ccs.add(ccFringeName);
 		editingFringe.addEditor(ccFringeName, new TextField());
-		
+
 		ccFringePath = new ColumnConfig<Fringe, String>(fringeProperties.path(), 100, "Path");
 		ccs.add(ccFringePath);
 		editingFringe.addEditor(ccFringePath, new TextField());
-		
+
 		ccFringeFileName = new ColumnConfig<Fringe, String>(fringeProperties.filename(), 80, "Filename");
 		ccs.add(ccFringeFileName);
 		editingFringe.addEditor(ccFringeFileName, new TextField());
@@ -488,15 +424,15 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		ccFringeClassName = new ColumnConfig<Fringe, String>(fringeProperties.classname(), 120, "Classname");
 		ccs.add(ccFringeClassName);
 		editingFringe.addEditor(ccFringeClassName, new TextField());
-		
+
 		ccFringeLoaded = new ColumnConfig<Fringe, Boolean>(fringeProperties.loaded(), 100, "Jar loaded");
 		ccs.add(ccFringeLoaded);
 		editingFringe.addEditor(ccFringePath, new TextField());
-		
+
 		ccFringeCategoryId = new ColumnConfig<Fringe, Integer>(fringeProperties.categoryId(), 70, "Category Id");
 		ccs.add(ccFringeCategoryId);
 		editingFringe.addEditor(ccFringeCategoryId, new IntegerField());
-		
+
 		ccFringeDescription = new ColumnConfig<Fringe, String>(fringeProperties.description(), 200, "Description");
 		ccs.add(ccFringeDescription);
 		editingFringe.addEditor(ccFringeDescription, new TextField());
@@ -637,7 +573,6 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		presenter.doEditFringe();
 	}
 
-
 	@UiHandler({ "buttonLoadFringeJar" })
 	public void onButtonLoadFringeJarClick(SelectEvent event) {
 		presenter.fireEvent(new FringesContextMenuEvent(OperationTypes.LOAD_FRINGE_JAR.getName()));
@@ -648,9 +583,8 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 		presenter.doDeleteFringe();
 	}
 
-	
 	public void updateContextMenuCategoryControlsState(CategoryContextMenu contextMenuCategory) {
-		
+
 		contextMenuCategory.getAddCategory().setEnabled(true);
 		if (selectedCategory == null) {
 			contextMenuCategory.getEditCategory().setEnabled(false);
@@ -660,8 +594,7 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			contextMenuCategory.getDeleteCategory().setEnabled(!isCategoryHasFringes(selectedCategory));
 		}
 	}
-	
-	
+
 	public void updateContextMenuFringeControlsState(FringeContextMenu contextMenuFringe) {
 		contextMenuFringe.getAddFringe().setEnabled(true);
 		if (selectedFringe == null) {
@@ -673,7 +606,7 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			contextMenuFringe.getEditFringe().setEnabled(true);
 			contextMenuFringe.getDeleteFringe().setEnabled(true);
 		}
-	}	
+	}
 
 	public void updateCategoryControlsState() {
 		buttonAddCategory.setEnabled(true);
@@ -682,11 +615,11 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			buttonDeleteCategory.setEnabled(false);
 		} else {
 			buttonEditCategory.setEnabled(true);
-			
+
 			buttonDeleteCategory.setEnabled(!isCategoryHasFringes(selectedCategory));
 		}
 	}
-	
+
 	public void updateFringeControlsState() {
 		buttonAddFringe.setEnabled(true);
 		if (selectedFringe == null) {
@@ -699,50 +632,45 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 			buttonDeleteFringe.setEnabled(true);
 		}
 	}
-	
-	public void setAllFringes(Fringe[] fringes){
+
+	public void setAllFringes(Fringe[] fringes) {
 		for (int i = 0; i < fringes.length; i++) {
 			allFringes.add(fringes[i]);
 		}
 	}
-	
-	public List<Fringe> getAllFringes(){
+
+	public List<Fringe> getAllFringes() {
 		return allFringes;
-	}	
-	
-	public void updateEditedFringeInFringesList(Fringe fringe, CrudTypes operType) {
-	  if(operType != CrudTypes.ADD) {
-		  
-		  for (Fringe curFringe : allFringes) {
-			  if (curFringe.getId() == fringe.getId()) {
-				  allFringes.remove(curFringe);
-				  break;
-			  }
-		  }
-		  
-	  }
-	  if(operType != CrudTypes.DELETE) {
-		  allFringes.add(fringe);
-	  }
 	}
-	
-	public void updateFringeListAndCache(Fringe fringe, CrudTypes editingType) {
+
+	public void updateEditedFringeInFringesList(Fringe fringe, CrudTypes operType) {
+		if (operType != CrudTypes.ADD) {
+
+			for (Fringe curFringe : allFringes) {
+				if (curFringe.getId() == fringe.getId()) {
+					allFringes.remove(curFringe);
+					break;
+				}
+			}
+
+		}
+		if (operType != CrudTypes.DELETE) {
+			allFringes.add(fringe);
+		}
+	}
+
+
+	public void updateListStoreFringes(Fringe fringe, CrudTypes editingType) {
 		updateEditedFringeInFringesList(fringe, editingType);
-		deleteFringeFromFringeCache(fringe);
 		int row = getListStoreFringes().indexOf(fringe);
-		if(editingType == CrudTypes.ADD) {
+		if (editingType == CrudTypes.ADD) {
 			editingCategory.startEditing(new GridCell(row, 0));
 			editingFringe.setEditableGrid(gridFringes);
 			listStoreFringes.add(0, fringe);
 			editingCategory.completeEditing();
-			editingFringe.setEditableGrid(null);			
+			editingFringe.setEditableGrid(null);
 		}
 		selectedFringe = fringe;
-	}	
-	
+	}
 
-	
-
-	
-	
 }

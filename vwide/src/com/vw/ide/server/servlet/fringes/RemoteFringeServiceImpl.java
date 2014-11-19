@@ -1,18 +1,14 @@
 package com.vw.ide.server.servlet.fringes;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gwt.dev.util.collect.HashMap;
-
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.vw.ide.server.servlet.fringes.persistance.FringePersistanceService;
+import com.vw.ide.server.servlet.fringes.persistance.dao.FringesDAOFactory;
+import com.vw.ide.server.servlet.fringes.persistance.dao.FringesDAOXMLFactoryImpl;
+import com.vw.ide.server.servlet.fringes.persistance.dao.ItemDAO;
+import com.vw.ide.shared.servlet.fringes.ItemCache;
 import com.vw.ide.shared.servlet.fringes.RemoteFringeService;
 import com.vw.ide.shared.servlet.fringes.RequestAddCategoryResult;
 import com.vw.ide.shared.servlet.fringes.RequestAddFringeResult;
@@ -21,7 +17,6 @@ import com.vw.ide.shared.servlet.fringes.RequestDeleteFringeResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesInCategoriesResult;
 import com.vw.ide.shared.servlet.fringes.RequestGetFringesResult;
-import com.vw.ide.shared.servlet.fringes.RequestLoadFringeJarResult;
 import com.vw.ide.shared.servlet.fringes.RequestUpdateCategoryResult;
 import com.vw.ide.shared.servlet.fringes.RequestUpdateFringeResult;
 import com.vw.ide.shared.servlet.fringes.model.Category;
@@ -38,7 +33,13 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 
 	private Logger logger = Logger.getLogger(RemoteFringeServiceImpl.class);
 	
-	private FringePersistanceService fringePersistanceService;
+//	private FringePersistanceService fringePersistanceService;
+	private FringesDAOFactory factory;
+	private ItemDAO<Category> categoriesDAO = null;
+	private ItemDAO<Fringe> fringesDAO = null;
+	private ItemCache<Fringe> fringeCache = null;
+	private ItemCache<Category> categoryCache = null;
+	
 	
 	public RemoteFringeServiceImpl() {
 		super();
@@ -51,11 +52,17 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		ServletContext context = getServletContext();
-		FringePersistanceService.setContext(context);
-		fringePersistanceService = FringePersistanceService.getInstance();
 		
+		
+		factory =  new FringesDAOXMLFactoryImpl(config.getServletContext());
+		categoriesDAO = factory.categoriesDAO();
+		categoriesDAO.setContext(config.getServletContext());
+		fringesDAO = factory.fringesDAO();
+		fringesDAO.setContext(config.getServletContext());
 
+		fringeCache = new ItemCache<Fringe>(fringesDAO);
+		categoryCache = new ItemCache<Category>(categoriesDAO);
+		
 //		fringePersistanceService.openAndParseUsersXml(context);
 //		if (logger.isInfoEnabled()) {
 //			logger.info("SecurityImpl started and initialized");
@@ -68,7 +75,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestGetCategoriesResult res = new RequestGetCategoriesResult();
 		res.setRetCode(0);
 		try {
-			res.setCategories(fringePersistanceService.getCategories()); 
+			res.setCategories(categoriesDAO.getAll()); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -81,7 +88,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestAddCategoryResult res = new RequestAddCategoryResult();
 		res.setRetCode(0);
 		try {
-			fringePersistanceService.addCategory(category); 
+			categoriesDAO.add(category); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -94,7 +101,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestUpdateCategoryResult res = new RequestUpdateCategoryResult();
 		res.setRetCode(0);
 		try {
-			fringePersistanceService.updateCategory(category); 
+			categoriesDAO.update(category);
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -107,7 +114,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestDeleteCategoryResult res = new RequestDeleteCategoryResult();
 		res.setRetCode(0);
 		try {
-			fringePersistanceService.deleteCategory(categoryId); 
+			categoriesDAO.delete(categoryId); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -120,7 +127,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestGetFringesResult res = new RequestGetFringesResult();
 		res.setRetCode(0);
 		try {
-			res.setFringes(fringePersistanceService.getFringes()); 
+			res.setFringes(fringesDAO.getAll()); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -133,7 +140,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestAddFringeResult res = new RequestAddFringeResult();
 		res.setRetCode(0);
 		try {
-			fringePersistanceService.addFringe(fringe);; 
+			fringesDAO.add(fringe);
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -146,7 +153,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestUpdateFringeResult res = new RequestUpdateFringeResult();
 		res.setRetCode(0);
 		try {
-			fringePersistanceService.updateFringe(fringe);; 
+			fringesDAO.update(fringe);
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -162,7 +169,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		res.setRetCode(0);
 		res.setId(fringeId);
 		try {
-			fringePersistanceService.deleteFringe(fringeId); 
+			fringesDAO.delete(fringeId); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -175,8 +182,8 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestGetFringesInCategoriesResult res = new RequestGetFringesInCategoriesResult();
 		res.setRetCode(0);
 		try {
-			res.setCategoriesList(fringePersistanceService.getCategories()); 
-			res.setFringesList(fringePersistanceService.getFringes()); 
+			res.setCategoriesList(categoriesDAO.getAll()); 
+			res.setFringesList(fringesDAO.getAll()); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);

@@ -2,6 +2,8 @@ package com.vw.ide.server.servlet.fringes.persistance.dao;
 
 import javax.servlet.ServletContext;
 
+import com.vw.ide.shared.servlet.fringes.model.Category;
+import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 
 public class FringesDAOXMLFactoryImpl implements FringesDAOFactory {
@@ -13,13 +15,13 @@ public class FringesDAOXMLFactoryImpl implements FringesDAOFactory {
 	}
 	
 	@Override
-	public CategoriesDAO categoriesDAO() {
+	public ItemDAO<Category> categoriesDAO() {
 		return new CategoriesDAOXMLimpl();
 	}
 
 	@Override
-	public FringesDAO fringesDAO() {
-		return new FringesDAOXMLimpl();
+	public ItemDAO<Fringe> fringesDAO() {
+		return  new FringesDAOXMLimpl();
 	}
 
 

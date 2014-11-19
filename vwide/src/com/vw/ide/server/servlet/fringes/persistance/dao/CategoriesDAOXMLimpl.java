@@ -2,7 +2,9 @@ package com.vw.ide.server.servlet.fringes.persistance.dao;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.xml.transform.TransformerException;
@@ -10,16 +12,16 @@ import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.vw.ide.server.servlet.utils.XmlUtils;
 import com.vw.ide.shared.servlet.fringes.model.Category;
+import com.vw.ide.shared.servlet.fringes.model.Fringe;
 
 
 
 
-public class CategoriesDAOXMLimpl implements CategoriesDAO{
+public class CategoriesDAOXMLimpl implements ItemDAO<Category>{
 
 	private ServletContext context;
 
@@ -208,6 +210,28 @@ public class CategoriesDAOXMLimpl implements CategoriesDAO{
 			category.setDescription(XmlUtils.getNodeAttr("description", node));
 		}
 		return category;
-	}	
+	}
+
+
+
+	@Override
+	public Map<Integer, Category> getAllMap() {
+		Map<Integer, Category> map = new HashMap<>();
+		for (Category category : getAll()) {
+			map.put(category.getId(), category);
+		}
+		return map;
+
+	}
+
+
+
+
+
+
+
+
+
+
 	
 }
