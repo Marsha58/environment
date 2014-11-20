@@ -226,6 +226,19 @@ public class CategoriesDAOXMLimpl implements ItemDAO<Category>{
 
 
 
+	@Override
+	public String getHash() {
+		String res = "";
+		try {
+			res = XMLConnection.getInstance().calcFileHash(context);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+
+
 
 
 

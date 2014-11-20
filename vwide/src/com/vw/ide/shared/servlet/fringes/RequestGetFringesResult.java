@@ -1,6 +1,6 @@
 package com.vw.ide.shared.servlet.fringes;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 import com.vw.ide.shared.servlet.fringes.model.Fringe;
 import com.vw.ide.shared.servlet.remotebrowser.RequestResult;
@@ -19,13 +19,15 @@ public class RequestGetFringesResult extends RequestResult{
 		return lastUsedId;
 	}
 	
-	public void setFringes(List<Fringe> fringesList) {
-		fringes = new Fringe[fringesList.size()];
+	public void setFringes(ConcurrentMap<Integer, Fringe> concurrentMap) {
+		fringes = new Fringe[concurrentMap.size()];
 		Integer maxId = -1;
-		for (int i=0; i<fringesList.size();i++) {
-			fringes[i] = fringesList.get(i);
-			if (fringesList.get(i).getId() > maxId) {
-				maxId = fringesList.get(i).getId();
+		for (int i=0; i<concurrentMap.size();i++) {
+			fringes[i] = concurrentMap.get(i);
+			if (fringes[i] != null) {
+				if (fringes[i].getId() > maxId) {
+					maxId = fringes[i].getId();
+				}
 			}
 		}
 		lastUsedId = maxId;

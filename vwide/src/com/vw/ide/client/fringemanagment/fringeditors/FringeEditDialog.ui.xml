@@ -18,7 +18,7 @@
     <ui:attributes width="1" height="-1" />
   </ui:with>
 
-  <form:FieldSet ui:field="fieldSet" headingText="User Information" collapsible="true">
+  <form:FieldSet ui:field="fieldSet" headingText=" " collapsible="true">
         <container:VerticalLayoutContainer>
           <container:child layoutData="{verticalLayoutData}">
             <form:FieldLabel text="id">

@@ -257,4 +257,15 @@ public class FringesDAOXMLimpl implements ItemDAO<Fringe> {
 		return map;
 	}
 
+	@Override
+	public String getHash() {
+		String res = "";
+		try {
+			res = XMLConnection.getInstance().calcFileHash(context);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
 }

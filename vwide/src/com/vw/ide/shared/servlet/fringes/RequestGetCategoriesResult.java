@@ -1,6 +1,6 @@
 package com.vw.ide.shared.servlet.fringes;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 import com.vw.ide.shared.servlet.fringes.model.Category;
 import com.vw.ide.shared.servlet.remotebrowser.RequestResult;
@@ -18,16 +18,18 @@ public class RequestGetCategoriesResult extends RequestResult {
 		return lastUsedId;
 	}	
 
-	public void setCategories(List<Category> categoriesList) {
-		categories = new Category[categoriesList.size()];
+	public void setCategories(ConcurrentMap<Integer, Category> concurrentMap) {
+		categories = new Category[concurrentMap.size()];
 		Integer maxId = -1;
-		for (int i=0; i<categoriesList.size();i++) {
-			categories[i] = categoriesList.get(i);
-			if (categoriesList.get(i).getId() > maxId) {
-				maxId = categoriesList.get(i).getId();
+		for (int i=0; i<concurrentMap.size();i++) {
+			categories[i] = concurrentMap.get(i);
+			if (categories[i] != null) {
+				if (categories[i].getId() > maxId) {
+					maxId = categories[i].getId();
+				}
 			}
 		}
-		lastUsedId = maxId;
+		lastUsedId = maxId;		
 	}
 
 	@Override

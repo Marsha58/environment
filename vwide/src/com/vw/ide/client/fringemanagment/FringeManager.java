@@ -306,8 +306,10 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 	public List<Fringe> getFringesList(Integer categoryId) {
 		List<Fringe> fringesList = new ArrayList<>();
 		for (Fringe fringe : allFringes) {
-			if (categoryId == fringe.getCategoryId()) {
-				fringesList.add(fringe);
+			if(fringe != null) {
+				if (categoryId == fringe.getCategoryId()) {
+					fringesList.add(fringe);
+				}
 			}
 		}
 		return fringesList;
@@ -645,11 +647,12 @@ public class FringeManager extends VwmlDialogExt implements IsWidget, PresenterV
 
 	public void updateEditedFringeInFringesList(Fringe fringe, CrudTypes operType) {
 		if (operType != CrudTypes.ADD) {
-
 			for (Fringe curFringe : allFringes) {
-				if (curFringe.getId() == fringe.getId()) {
-					allFringes.remove(curFringe);
-					break;
+				if(curFringe != null) {
+					if (curFringe.getId() == fringe.getId()) {
+						allFringes.remove(curFringe);
+						break;
+					}
 				}
 			}
 

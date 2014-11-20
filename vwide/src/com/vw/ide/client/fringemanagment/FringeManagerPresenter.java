@@ -60,10 +60,12 @@ public class FringeManagerPresenter extends Presenter {
 
 	public void updateCategoryList(Category[] categories) {
 		for (int i = 0; i < categories.length; i++) {
-			if (getView().listStoreCategories.findModelWithKey(categories[i].getId().toString()) == null) {
-				getView().listStoreCategories.add(categories[i]);
-			} else {
-				getView().listStoreCategories.update(categories[i]);
+			if (categories[i] != null) {
+				if (getView().listStoreCategories.findModelWithKey(categories[i].getId().toString()) == null) {
+					getView().listStoreCategories.add(categories[i]);
+				} else {
+					getView().listStoreCategories.update(categories[i]);
+				}
 			}
 		}
 	}
@@ -251,18 +253,7 @@ public class FringeManagerPresenter extends Presenter {
 			newFringe.setCategoryId(getView().getSelectedCategory().getId());
 		}
 
-//		getView().getEditingFringe().cancelEditing();
-//		getView().getListStoreFringes().add(0, newFringe);
-
-//		getView().getEditingFringe().setEditableGrid(getView().getGridFringes());
-//
-//		int row = getView().getListStoreFringes().indexOf(newFringe);
-//		getView().getEditingCategory().startEditing(new GridCell(row, 0));
-//		getView().setSelectedFringe(newFringe);
-//		getView().setFringeOperationType(CrudTypes.ADD);
-		
 		final FringeEditDialog box = new FringeEditDialog(this, newFringe);
-//		box.setEditLabelText("Select file");
 		box.setHeadingText("Fringe add dialog");
 		box.setEditingType(CrudTypes.ADD);
 		box.addDialogHideHandler(new FringeManagerDialogHandlers.FringeEditDialogHideHandler(box, this));

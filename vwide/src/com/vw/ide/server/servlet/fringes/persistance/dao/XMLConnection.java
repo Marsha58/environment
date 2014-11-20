@@ -1,6 +1,8 @@
 package com.vw.ide.server.servlet.fringes.persistance.dao;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -38,6 +40,7 @@ public class XMLConnection {
 	private String fringeStoreDir = null;
 	private String fringeStoreFileName = null;
 	private String fringeStoreFullFileName = null;	
+	private String fileHash = null;	
 	
 
 	private XMLConnection() {
@@ -46,6 +49,26 @@ public class XMLConnection {
 	public static XMLConnection getInstance() {
 		return instance;
 	}
+	
+	
+	public String calcFileHash(ServletContext context) throws IOException {
+		
+		if(fringeStoreDir == null || fringeStoreFileName == null) {
+			loadFringeStoreProperties(context);
+		}
+		
+		FileInputStream fis;
+		String md5 = "";
+		fis = new FileInputStream(new File(fringeStoreFullFileName));
+		md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(fis);
+		fis.close();
+		return md5;
+	}
+	
+	public String getFileHash(){
+		return fileHash;
+	}
+
 	
 	public void loadFringeStoreProperties(ServletContext context) {
 

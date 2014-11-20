@@ -14,5 +14,6 @@ public interface ItemDAO<T> {
 	public T[] findByName(String name);
 	public List<T> getAll();
 	public Map<Integer,T> getAllMap();
+	public String getHash();
 	
 }

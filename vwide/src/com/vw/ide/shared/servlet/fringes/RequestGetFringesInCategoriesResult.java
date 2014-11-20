@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import com.vw.ide.shared.servlet.fringes.model.Category;
 import com.vw.ide.shared.servlet.fringes.model.Fringe;
@@ -20,16 +21,20 @@ public class RequestGetFringesInCategoriesResult  extends RequestResult{
 			return categoriesList;
 		}
 
-		public void setCategoriesList(List<Category> categoriesList) {
-			this.categoriesList = categoriesList;
+		public void setCategoriesList(ConcurrentMap<Integer, Category> concurrentMap) {
+			for (int i=0; i<concurrentMap.size();i++) {
+				categoriesList.add(concurrentMap.get(i));
+			}			
 		}
 
 		public List<Fringe> getFringesList() {
 			return fringesList;
 		}
 
-		public void setFringesList(List<Fringe> fringesList) {
-			this.fringesList = fringesList;
+		public void setFringesList(ConcurrentMap<Integer, Fringe> concurrentMap) {
+			for (int i=0; i<concurrentMap.size();i++) {
+				fringesList.add(concurrentMap.get(i));
+			}			
 		}
 
 		

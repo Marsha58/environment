@@ -37,8 +37,8 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 	private FringesDAOFactory factory;
 	private ItemDAO<Category> categoriesDAO = null;
 	private ItemDAO<Fringe> fringesDAO = null;
-	private ItemCache<Fringe> fringeCache = null;
-	private ItemCache<Category> categoryCache = null;
+	private ItemCache<Fringe> fringesCache = null;
+	private ItemCache<Category> categoriesCache = null;
 	
 	
 	public RemoteFringeServiceImpl() {
@@ -60,8 +60,8 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		fringesDAO = factory.fringesDAO();
 		fringesDAO.setContext(config.getServletContext());
 
-		fringeCache = new ItemCache<Fringe>(fringesDAO);
-		categoryCache = new ItemCache<Category>(categoriesDAO);
+		fringesCache = new ItemCache<Fringe>(fringesDAO);
+		categoriesCache = new ItemCache<Category>(categoriesDAO);
 		
 //		fringePersistanceService.openAndParseUsersXml(context);
 //		if (logger.isInfoEnabled()) {
@@ -75,7 +75,7 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestGetCategoriesResult res = new RequestGetCategoriesResult();
 		res.setRetCode(0);
 		try {
-			res.setCategories(categoriesDAO.getAll()); 
+			res.setCategories(categoriesCache.getAll()); 			
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -127,7 +127,8 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestGetFringesResult res = new RequestGetFringesResult();
 		res.setRetCode(0);
 		try {
-			res.setFringes(fringesDAO.getAll()); 
+			res.setFringes(fringesCache.getAll()); 
+//			res.setFringes(fringesDAO.getAll()); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
@@ -182,8 +183,8 @@ public class RemoteFringeServiceImpl extends RemoteServiceServlet implements Rem
 		RequestGetFringesInCategoriesResult res = new RequestGetFringesInCategoriesResult();
 		res.setRetCode(0);
 		try {
-			res.setCategoriesList(categoriesDAO.getAll()); 
-			res.setFringesList(fringesDAO.getAll()); 
+			res.setCategoriesList(categoriesCache.getAll()); 
+			res.setFringesList(fringesCache.getAll()); 
 		}
 		catch(Exception ex) {
 			res.setRetCode(-1);
