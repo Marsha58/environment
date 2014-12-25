@@ -15,7 +15,8 @@ public enum OperationTypes {
    RENAME_DIR("rename_dir"),
    MOVE_DIR_OR_FILE("move_dir_file"),
    READ_FILE("read_file"),
-   SAVE_ALL_FILES("save_all_files");
+   SAVE_ALL_FILES("save_all_files"),
+   LOG_OPERATION("log");
    
 	private final String name;
 	

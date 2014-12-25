@@ -5,27 +5,64 @@
          version="2.5"
          xmlns="http://java.sun.com/xml/ns/javaee">
 
+ <!-- Listener for shutting down the comet processor when the ServletContext is destroyed -->
+  <listener>
+    <listener-class>net.zschech.gwt.comet.server.CometServletContextListener</listener-class>
+  </listener>
+  <!-- Listener for invalidating CometSessions when HTTPSessions are invalidated -->
+  <listener>
+    <listener-class>net.zschech.gwt.comet.server.CometHttpSessionListener</listener-class>
+  </listener>
   <!-- Servlets -->
+  <!-- IDE servlets -->
+  <servlet>
+    <servlet-name>commandProcessorServlet</servlet-name>
+    <servlet-class>com.vw.ide.server.servlet.processor.CommandProcessorServiceImpl</servlet-class>
+    <load-on-startup>6</load-on-startup>
+  </servlet>
   <servlet>
     <servlet-name>projectManagerServlet</servlet-name>
     <servlet-class>com.vw.ide.server.servlet.projectmanager.ProjectManagerServiceImpl</servlet-class>
-    <load-on-startup>4</load-on-startup>
+    <load-on-startup>5</load-on-startup>
   </servlet>
   <servlet>
     <servlet-name>remoteBrowserServlet</servlet-name>
     <servlet-class>com.vw.ide.server.servlet.remotebrowser.DirBrowserImpl</servlet-class>
-    <load-on-startup>3</load-on-startup>
+    <load-on-startup>4</load-on-startup>
   </servlet>
   <servlet>
     <servlet-name>securityServlet</servlet-name> 
     <servlet-class>com.vw.ide.server.servlet.security.SecurityImpl</servlet-class>
-    <load-on-startup>2</load-on-startup> 
+    <load-on-startup>3</load-on-startup> 
   </servlet>
   <servlet>
     <servlet-name>userStateServlet</servlet-name> 
     <servlet-class>com.vw.ide.server.servlet.userstate.UserStateServiceImpl</servlet-class>
-    <load-on-startup>1</load-on-startup> 
+    <load-on-startup>2</load-on-startup> 
   </servlet>
+  <!-- TRACER servlets -->
+  <servlet>
+    <servlet-name>tracerService</servlet-name>
+    <servlet-class>com.vw.ide.server.servlet.tracer.TracerServiceImpl</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <!-- the comet servlet for streaming messages to the client -->
+  <servlet>
+    <servlet-name>tracerComet</servlet-name>
+    <servlet-class>net.zschech.gwt.comet.server.CometServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <!-- TRACER -->
+  <servlet-mapping>
+    <servlet-name>tracerService</servlet-name>
+    <url-pattern>/vwide/tracer</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>tracerComet</servlet-name>
+    <url-pattern>/vwide/comet</url-pattern>
+  </servlet-mapping>
+  <!-- SERVICES -->
   <servlet-mapping>
     <servlet-name>projectManagerServlet</servlet-name>
     <url-pattern>/vwide/projectmanager</url-pattern>
@@ -42,6 +79,11 @@
     <servlet-name>userStateServlet</servlet-name> 
     <url-pattern>/vwide/userstate</url-pattern> 
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>commandProcessorServlet</servlet-name> 
+    <url-pattern>/vwide/processor</url-pattern> 
+  </servlet-mapping>
+
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Vwide.html</welcome-file>

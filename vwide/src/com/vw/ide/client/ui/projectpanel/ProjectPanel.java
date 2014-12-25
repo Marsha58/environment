@@ -600,7 +600,12 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 					@Override
 					public void onSelection(SelectionEvent<ProjectItemInfo> event) {
 						treeSelectedItem = event.getSelectedItem();
-						if (treeSelectedItem.isMarkAsProject() || treeSelectedItem.isMarkAsUserRoot()) {
+						if (treeSelectedItem.isMarkAsProject()) {
+							((DevelopmentBoardPresenter)presenter).getView().getTopPanel().enableStarExecution(true);
+							return;
+						}
+						((DevelopmentBoardPresenter)presenter).getView().getTopPanel().enableStarExecution(false);
+						if (treeSelectedItem.isMarkAsUserRoot()) {
 							return;
 						}
 						FileItemInfo fileItemInfo = treeSelectedItem.getAssociatedData();

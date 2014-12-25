@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.server.servlet.IService;
 import com.vw.ide.server.servlet.locator.ServiceLocator;
+import com.vw.ide.server.servlet.tracer.TracerServiceImpl;
 import com.vw.ide.server.servlet.userstate.UserStateServiceImpl;
 import com.vw.ide.shared.servlet.security.RemoteSecurity;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;
@@ -69,6 +70,10 @@ public class SecurityImpl extends RemoteServiceServlet implements RemoteSecurity
 					if (logger.isInfoEnabled()) {
 						logger.info("User '" + userName + "' successfully logged in");
 					}
+					TracerServiceImpl tsi = (TracerServiceImpl)ServiceLocator.instance().locate(TracerServiceImpl.ID);
+					if (tsi != null) {
+						tsi.registerInternal(getThreadLocalRequest().getSession(), userName);
+					}
 				}
 				else {
 					logger.error("User '" + userName + "' couldn't be logged in since state service wasn't found");
@@ -93,6 +98,10 @@ public class SecurityImpl extends RemoteServiceServlet implements RemoteSecurity
 			sis.removeUserStateInfo(userName);
 			if (logger.isInfoEnabled()) {
 				logger.info("User '" + userName + "' successfully logged out");
+			}
+			TracerServiceImpl tsi = (TracerServiceImpl)ServiceLocator.instance().locate(TracerServiceImpl.ID);
+			if (tsi != null) {
+				tsi.unregisterInternal(getThreadLocalRequest().getSession(), userName);
 			}
 		}
 		else {

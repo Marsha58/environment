@@ -4,8 +4,10 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.vw.ide.client.service.BusConnectivity;
 import com.vw.ide.client.service.VwIdeClientService;
 import com.vw.ide.client.service.remote.browser.DirBrowserService;
+import com.vw.ide.client.service.remote.processor.CommandProcessorService;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService;
 import com.vw.ide.client.service.remote.security.SecurityService;
+import com.vw.ide.client.service.remote.tracer.TracerService;
 import com.vw.ide.client.service.remote.userstate.RemoteUserStateService;
 
 /**
@@ -22,7 +24,9 @@ public class ServicesBrokerFactory {
 											DirBrowserService.instance(),
 											SecurityService.instance(),
 											RemoteUserStateService.instance(),
-											ProjectManagerService.instance()
+											ProjectManagerService.instance(),
+											TracerService.instance(),
+											CommandProcessorService.instance()
 										};
 		for(VwIdeClientService s : services) {
 			if (s != null && s instanceof BusConnectivity) {

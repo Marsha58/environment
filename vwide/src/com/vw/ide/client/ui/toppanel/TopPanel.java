@@ -77,18 +77,21 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 
 	public ComboBox<AceEditorTheme> comboATh;
 	
-	 @UiField MenuItem newVwmlProjField;
-	 @UiField MenuItem miHelpAboutField;
-	 @UiField TextButton bnNewVwmlProjField;
-	 @UiField TextButton bnSaveFileField;
-	 @UiField TextButton bnSaveAllField;
-	 @UiField SimpleContainer comboAceEditorPlaceCont;
-	 @UiField SimpleContainer userNamePlaceCont;
-	 @UiField SimpleContainer comboPlaceCont;
-	 @UiField Label userName;
-	 @UiField TextButton userLogout;
-	 @UiField Menu scrollMenu;
-
+	@UiField MenuItem newVwmlProjField;
+	@UiField MenuItem miHelpAboutField;
+	@UiField TextButton bnNewVwmlProjField;
+	@UiField TextButton bnStartExecution;
+	@UiField TextButton bnSaveFileField;
+	@UiField TextButton bnSaveAllField;
+	@UiField TextButton bnContinueExecution;
+	@UiField TextButton bnSuspendExecution;
+	@UiField TextButton bnTerminateExecution;
+	@UiField SimpleContainer comboAceEditorPlaceCont;
+	@UiField SimpleContainer userNamePlaceCont;
+	@UiField SimpleContainer comboPlaceCont;
+	@UiField Label userName;
+	@UiField TextButton userLogout;
+	@UiField Menu scrollMenu;
 
 	@UiField(provided = true)
 	BorderLayoutData northDataTP = new BorderLayoutData(21);
@@ -210,6 +213,10 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 		});
 		bnSaveFileField.disable();
 		bnSaveAllField.disable();
+		bnStartExecution.disable();
+		bnContinueExecution.disable();
+		bnSuspendExecution.disable();
+		bnTerminateExecution.disable();
 		bind();
 	}
   
@@ -292,6 +299,15 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 		}
 	}
 
+	public void enableStarExecution(boolean enable) {
+		if (enable) {
+			bnStartExecution.enable();
+		}
+		else {
+			bnStartExecution.disable();
+		}
+	}
+	
 	public void enableNewVwmlProject(boolean enable) {
 		if (enable) {
 			bnNewVwmlProjField.enable();

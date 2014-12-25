@@ -1,0 +1,130 @@
+package com.vw.ide.client.service.remote.tracer;
+
+import java.io.Serializable;
+import java.util.List;
+
+import net.zschech.gwt.comet.client.CometClient;
+import net.zschech.gwt.comet.client.CometListener;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Window;
+import com.vw.ide.client.event.uiflow.ServerLogEvent;
+import com.vw.ide.client.service.BusConnectivity;
+import com.vw.ide.client.service.ServiceCallback;
+import com.vw.ide.client.service.VwIdeClientService;
+import com.vw.ide.client.service.factory.ServicesStubFactory;
+import com.vw.ide.shared.OperationTypes;
+import com.vw.ide.shared.servlet.RequestResult;
+import com.vw.ide.shared.servlet.tracer.RemoteTracerAsync;
+import com.vw.ide.shared.servlet.tracer.TracerMessage;
+import com.vw.ide.shared.servlet.tracer.TracerRegisterResult;
+import com.vw.ide.shared.servlet.tracer.TracerUnregisterResult;
+
+public class TracerService implements BusConnectivity, VwIdeClientService {
+
+	protected static class TracerEventListener implements CometListener {
+
+		private TracerService owner = null;
+		
+		public TracerEventListener(TracerService owner) {
+			this.owner = owner;
+		}
+		
+		@Override
+		public void onConnected(int heartbeat) {
+			System.out.println("tracer service connected");
+		}
+
+		@Override
+		public void onDisconnected() {
+			System.out.println("tracer service disconnected");
+		}
+
+		@Override
+		public void onError(Throwable exception, boolean connected) {
+			System.out.println("tracer service reports about error '" + exception.getLocalizedMessage() + "'");
+		}
+
+		@Override
+		public void onHeartbeat() {
+		}
+
+		@Override
+		public void onRefresh() {
+		}
+
+		@Override
+		public void onMessage(List<? extends Serializable> messages) {
+			if (messages != null) {
+				for(Serializable message : messages) {
+					TracerMessage data = (TracerMessage)message;
+					RequestResult rr = new RequestResult();
+					rr.setOperationType(OperationTypes.LOG_OPERATION);
+					rr.setRetCode(0);
+					rr.setOperation("log");
+					rr.setResult(data.getData());
+					owner.fireEvent(new ServerLogEvent(rr));
+				}
+			}
+		}
+	}
+	
+	public static class ServiceCallbackForTracerRegister extends ServiceCallback<TracerRegisterResult> {
+		
+	}
+
+	public static class ServiceCallbackForTracerUnregister extends ServiceCallback<TracerUnregisterResult> {
+		
+	}
+	
+	private RemoteTracerAsync serviceImpl = ServicesStubFactory.createRemoteTracerServiceAsync();
+	private HandlerManager bus;
+	private static TracerService s_instance = null;
+	
+	/**
+	 * Simple singleton implementation
+	 * @return
+	 */
+	public static synchronized TracerService instance() {
+		if (s_instance != null) {
+			return s_instance;
+		}
+		s_instance = new TracerService();
+		s_instance.init();
+		return s_instance;
+	}
+	
+	@Override
+	public void setBusRef(HandlerManager busRef) {
+		bus = busRef;
+	}
+
+	public RemoteTracerAsync getServiceImpl() {
+		return serviceImpl;
+	}
+	
+	@Override
+	public void fireEvent(GwtEvent<?> event) {
+		try {
+			bus.fireEvent(event);
+		}
+		catch(Exception e) {
+		}
+	}
+	
+	public ServiceCallbackForTracerRegister buildCallbackForTracerRegister() {
+		return new ServiceCallbackForTracerRegister();
+	}
+	
+	public ServiceCallbackForTracerUnregister buildCallbackForTracerUnregister() {
+		return new ServiceCallbackForTracerUnregister();
+	}
+	
+	protected void init() {
+		String tracerServiceUrl = GWT.getModuleBaseURL() + "comet?gwt.codesvr=127.0.0.1:9997";
+		CometClient client = new CometClient(tracerServiceUrl, new TracerEventListener(this));
+		client.start();
+	}
+}

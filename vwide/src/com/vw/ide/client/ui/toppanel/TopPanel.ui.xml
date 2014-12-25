@@ -175,12 +175,15 @@
 					<button:TextButton icon="{images.saveall_edit_en}" ui:field="bnSaveAllField"
 								itemId="idSaveAll" toolTip="Save All" />
 					<toolbar:SeparatorToolItem />
-					<button:TextButton icon="{images.exec_dis}"
-						toolTip="Continue execution" />
-					<button:TextButton icon="{images.suspend_dis}"
-						toolTip="Suspend" />
-					<button:TextButton icon="{images.terminate_obj_dis}"
-						toolTip="Terminate" />
+					<button:TextButton icon="{images.exec_en}" ui:field="bnStartExecution"
+						itemId="idStartExecution" toolTip="Compile and start execution" />
+					<toolbar:SeparatorToolItem />
+					<button:TextButton icon="{images.exec_en}" ui:field="bnContinueExecution"
+						itemId="idContinueExecution" toolTip="Continue execution" />
+					<button:TextButton icon="{images.suspend_en}" ui:field="bnSuspendExecution"
+						itemId="idSuspendExecution" toolTip="Suspend" />
+					<button:TextButton icon="{images.terminate_obj_en}" ui:field="bnTerminateExecution"
+						itemId="idTerminateExecution" toolTip="Terminate" />
 					<toolbar:SeparatorToolItem />
 					<button:TextButton icon="{images.search_en}"
 						toolTip="Search" />

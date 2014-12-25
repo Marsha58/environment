@@ -42,7 +42,6 @@
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-dev</artifactId>
 			<version>${gwtVersion}</version>
-			<scope>test</scope>
 		</dependency> 
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -152,6 +151,12 @@
    			<groupId>com.kfuntak.gwt.json</groupId> 
    			<artifactId>gwtprojsonserializer</artifactId> 
    			<version>1.0.4</version> 
+		</dependency>
+		<!-- CATALINA -->
+		<dependency> 
+   			<groupId>org.apache.catalina</groupId> 
+   			<artifactId>apache-catalina</artifactId> 
+   			<version>6.0.33</version> 
 		</dependency>
 	</dependencies>
 
