@@ -600,6 +600,7 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 					@Override
 					public void onSelection(SelectionEvent<ProjectItemInfo> event) {
 						treeSelectedItem = event.getSelectedItem();
+						((DevelopmentBoardPresenter)presenter).setSelectedItemInTheProjectTree(treeSelectedItem);
 						if (treeSelectedItem.isMarkAsProject()) {
 							((DevelopmentBoardPresenter)presenter).getView().getTopPanel().enableStarExecution(true);
 							return;

@@ -20,12 +20,12 @@ public class CommandProcessorServiceBroker {
 	 * @param projDescription
 	 * @param resultCallback
 	 */
-	public static void compileProject(String userName, ProjectDescription projDescription, ResultCallback<CommandProcessorResult> resultCallback) {
+	public static void buildProject(String userName, ProjectDescription projDescription, ResultCallback<CommandProcessorResult> resultCallback) {
 		CommandProcessorAsync service = CommandProcessorService.instance().getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForCommandProcessor cbk = CommandProcessorService.instance().buildCallbackForCommandProcessor();
 			cbk.setProcessedResult(new Result<CommandProcessorResult>(resultCallback));
-			service.compileProject(userName, projDescription, cbk);
+			service.buildProject(userName, projDescription, cbk);
 		}		
 	}
 	
@@ -50,12 +50,12 @@ public class CommandProcessorServiceBroker {
 	 * @param projectDescription
 	 * @return
 	 */
-	public static void compileAndExportProjectToExecBin(String userName, ProjectDescription projectDescription, ResultCallback<CommandProcessorResult> resultCallback) {
+	public static void buildAndExportProjectToExecBin(String userName, ProjectDescription projectDescription, ResultCallback<CommandProcessorResult> resultCallback) {
 		CommandProcessorAsync service = CommandProcessorService.instance().getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForCommandProcessor cbk = CommandProcessorService.instance().buildCallbackForCommandProcessor();
 			cbk.setProcessedResult(new Result<CommandProcessorResult>(resultCallback));
-			service.compileAndExportProjectToExecBin(userName, projectDescription, cbk);
+			service.buildAndExportProjectToExecBin(userName, projectDescription, cbk);
 		}		
 	}
 }

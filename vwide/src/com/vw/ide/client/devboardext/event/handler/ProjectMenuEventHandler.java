@@ -12,6 +12,7 @@ import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
 import com.vw.ide.client.dialog.vwmlproj.VwmlProjectDialog;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
+import com.vw.ide.client.event.uiflow.StartProjectExecutionEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.utils.Utils;
@@ -48,6 +49,9 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 			case "delete_project":
 				doDelCurrentProject(presenter, presenter.getSelectedItemInTheProjectTree());
 				break;
+			case "import_project":
+				doImportProject(presenter);
+				break;
 			case "import_file":
 				doImportFile(presenter, presenter.getSelectedItemInTheProjectTree());
 				break;
@@ -62,6 +66,9 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 				break;
 			case "new_folder":
 				doCreateFolder(presenter, presenter.getSelectedItemInTheProjectTree());
+				break;
+			case "start_execution_project":
+				doStartProjectExecution(presenter, presenter.getSelectedItemInTheProjectTree());
 				break;
 			default:
 				break;
@@ -101,6 +108,14 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 		box.show();
 	}
 
+	private void doImportProject(DevelopmentBoardPresenter presenter) {
+		final FileOpenDialog box = new FileOpenDialog();
+		box.setEditLabelText("Select project to import (main VWML project file)");
+		box.setParentPath("/");
+		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.ImportProjectDialogHideHandler(box, presenter));
+		box.show();
+	}
+	
 	private void doCreateFile(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
 		final PromptMessageBox box = new PromptMessageBox("Name", "Please enter file name:");
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.CreateFileDialogHideHandler(box, presenter));
@@ -135,5 +150,10 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.DeleteFileDialogHideHandler(presenter));
 		box.show();
 	}
+	
+	private void doStartProjectExecution(DevelopmentBoardPresenter presenter, ProjectItemInfo projectItemInfo) {
+		presenter.fireEvent(new StartProjectExecutionEvent(projectItemInfo.getProjectDescription()));
+	}
+
 }
 

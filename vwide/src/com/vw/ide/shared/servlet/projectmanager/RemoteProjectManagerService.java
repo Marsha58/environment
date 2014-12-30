@@ -12,6 +12,11 @@ import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 @RemoteServiceRelativePath("projectmanager")
 public interface RemoteProjectManagerService extends RemoteService {
 
+	// import phases of project
+	public static final Integer IMPORT_PHASE_START 		= 0x00;
+	public static final Integer IMPORT_PHASE_PROGRESS 	= 0x01;
+	public static final Integer IMPORT_PHASE_END 		= 0x02;
+	
 	/**
 	 * Creates new project
 	 * @param description
@@ -31,7 +36,17 @@ public interface RemoteProjectManagerService extends RemoteService {
 	 * @return
 	 */
 	public RequestProjectUpdateResult updateProject(ProjectDescription description);
-	
+
+	/**
+	 * Import project
+	 * @param projDescr
+	 * @param userName
+	 * @param mainVWMLProjFile
+	 * @param phase
+	 * @return
+	 */
+	public RequestProjectImportResult importProject(ProjectDescription projDescr, String userName, FileItemInfo vwmlProjFile, Integer phase);
+
 	/**
 	 * Returns list of user's projects
 	 * @param userName

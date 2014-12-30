@@ -7,6 +7,7 @@ import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.Ser
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForMovingItemOnProject;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForProjectCreation;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForProjectDeletion;
+import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForProjectImport;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForRemoveFileFromProject;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForRenameFileOnProject;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerService.ServiceCallbackForUpdatingProject;
@@ -15,6 +16,7 @@ import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerServiceAsync
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectAddFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectCreationResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectDeletionResult;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectImportResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectMoveItemResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRemoveFileResult;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectRenameFileResult;
@@ -66,6 +68,27 @@ public class ProjectManagerServiceBroker {
 		}
 	}
 
+	/**
+	 * Requests to import project
+	 * @param projectDescription
+	 * @param userName
+	 * @param mainVWMLProjFile
+	 * @param phase
+	 * @param callback
+	 */
+	public static void requestForImportProject(ProjectDescription projectDescription, String userName, FileItemInfo vwmlProjFile, Integer phase, ResultCallback<RequestProjectImportResult> resultCallback) {
+		RemoteProjectManagerServiceAsync service = ProjectManagerService.instance().getServiceImpl();
+		if (service != null) {
+			ServiceCallbackForProjectImport cbk = ProjectManagerService.instance().buildCallbackForProjectImport();
+			cbk.setProcessedResult(new Result<RequestProjectImportResult>(resultCallback));
+			service.importProject(projectDescription,
+								  userName,
+								  vwmlProjFile,
+								  phase,
+								  cbk);
+		}
+	}
+	
 	/**
 	 * Requests for available projects
 	 * @param user

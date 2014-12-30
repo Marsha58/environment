@@ -26,6 +26,16 @@ public interface RemoteProjectManagerServiceAsync {
 	public void updateProject(ProjectDescription description, AsyncCallback<RequestProjectUpdateResult> callback);
 
 	/**
+	 * Import project
+	 * @param projDescr
+	 * @param userName
+	 * @param vwmlProjFile
+	 * @param phase
+	 * @return
+	 */
+	public void importProject(ProjectDescription projDescr, String userName, FileItemInfo mainVWMLProjFile, Integer phase, AsyncCallback<RequestProjectImportResult> callback);
+
+	/**
 	 * Returns list of user's projects
 	 * @param userName
 	 * @return

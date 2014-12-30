@@ -10,6 +10,14 @@ import com.vw.ide.shared.servlet.tracer.TracerUnregisterResult;
 
 public class TracerServiceBroker {
 	
+	public static void registerBackNotification() {
+		TracerService.instance().registerBackNotification();
+	}
+
+	public static void unregisterBackNotification() {
+		TracerService.instance().unregisterBackNotification();
+	}
+	
 	public static void registerClientOnTracer(String userName, ResultCallback<TracerRegisterResult> resultCallback) {
 		RemoteTracerAsync service = TracerService.instance().getServiceImpl();
 		if (service != null) {

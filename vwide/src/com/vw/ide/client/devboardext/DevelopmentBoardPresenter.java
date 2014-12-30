@@ -18,6 +18,7 @@ import com.vw.ide.client.devboardext.event.handler.SaveAllFilesEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SaveFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.SelectFileEventHandler;
 import com.vw.ide.client.devboardext.event.handler.ServerLogEventHandler;
+import com.vw.ide.client.devboardext.event.handler.StartProjectExecutionEventHandler;
 import com.vw.ide.client.devboardext.service.userstate.callbacks.UserStateGettingResultCallback;
 import com.vw.ide.client.devboardext.service.userstate.callbacks.custom.handler.UserStateHandler;
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
@@ -40,8 +41,10 @@ import com.vw.ide.client.event.uiflow.SaveAllFilesEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.event.uiflow.SelectFileEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
+import com.vw.ide.client.event.uiflow.StartProjectExecutionEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
+import com.vw.ide.client.service.remote.tracer.TracerServiceBroker;
 import com.vw.ide.client.service.remote.userstate.RemoteUserStateServiceBroker;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.ui.toppanel.TopPanel;
@@ -87,6 +90,7 @@ public class DevelopmentBoardPresenter extends Presenter {
 			put(ProjectMenuEvent.TYPE, new ProjectMenuEventHandler());
 			put(ServerLogEvent.TYPE, new ServerLogEventHandler());
 			put(SaveAllFilesEvent.TYPE, new SaveAllFilesEventHandler());
+			put(StartProjectExecutionEvent.TYPE, new StartProjectExecutionEventHandler());
 		}
 	};
 	
@@ -134,6 +138,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.addHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 		eventBus.addHandler(MoveFileEvent.TYPE, (MoveFileEventHandler)dispatcher.get(MoveFileEvent.TYPE));
 		eventBus.addHandler(SaveAllFilesEvent.TYPE, (SaveAllFilesEventHandler)dispatcher.get(SaveAllFilesEvent.TYPE));
+		eventBus.addHandler(StartProjectExecutionEvent.TYPE, (StartProjectExecutionEventHandler)dispatcher.get(StartProjectExecutionEvent.TYPE));
+		TracerServiceBroker.registerBackNotification();
 	}
 	
 	@Override
@@ -149,6 +155,8 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(ServerLogEvent.TYPE, (ServerLogHandler)dispatcher.get(ServerLogEvent.TYPE));
 		eventBus.removeHandler(MoveFileEvent.TYPE, (MoveFileEventHandler)dispatcher.get(MoveFileEvent.TYPE));
 		eventBus.removeHandler(SaveAllFilesEvent.TYPE, (SaveAllFilesEventHandler)dispatcher.get(SaveAllFilesEvent.TYPE));
+		eventBus.removeHandler(StartProjectExecutionEvent.TYPE, (StartProjectExecutionEventHandler)dispatcher.get(StartProjectExecutionEvent.TYPE));
+		TracerServiceBroker.unregisterBackNotification();
 	}
 	
 	public TopPanel getTopPanel() {

@@ -29,7 +29,7 @@ import com.vw.ide.client.dialog.VwmlDialogExt;
  *
  */
 public class FileOpenDialog extends VwmlDialogExt {
-
+	
 	private static class FileInfo {
 		private File f;
 		private String content;
@@ -104,8 +104,13 @@ public class FileOpenDialog extends VwmlDialogExt {
 	@UiField FieldLabel editLabelField;
 	@UiField FileUploadExt fileField;
 	
-	
-	
+	public FileOpenDialog() {
+		setPredefinedButtons(PredefinedButton.OK,PredefinedButton.CANCEL);
+		super.setWidget(uiBinder.createAndBindUi(this));
+		reader.addErrorHandler(new FailureUponLoad(this));
+		reader.addLoadEndHandler(new SuccessFulFileLoaded(this));
+	}
+
 	public String getParentPath() {
 		return parentPath;
 	}
@@ -122,18 +127,10 @@ public class FileOpenDialog extends VwmlDialogExt {
 		this.projectId = projectId;
 	}
 	
-	public FileOpenDialog() {
-		setPredefinedButtons(PredefinedButton.OK,PredefinedButton.CANCEL);
-		super.setWidget(uiBinder.createAndBindUi(this));
-		reader.addErrorHandler(new FailureUponLoad(this));
-		reader.addLoadEndHandler(new SuccessFulFileLoaded(this));
-	}
-
-	
 	public void setEditLabelText(String labelText) {
 		editLabelField.setText(labelText);
 	}
-	
+
 	public String getValue() {
 		return "";
 	}	
@@ -158,7 +155,7 @@ public class FileOpenDialog extends VwmlDialogExt {
 		      }
 		      else {
 		    	  try {
-		    		  startReadFile();
+	    			  startReadFile();
 		    	  }
 		    	  catch(Exception e) {
 			    	  AlertMessageBox alertMessageBox = new AlertMessageBox("File", e.getLocalizedMessage());
@@ -196,7 +193,7 @@ public class FileOpenDialog extends VwmlDialogExt {
 	}
 	
 	private void startReadFile()  {
-		  reader.readAsText(uploadedFiles.get(0).getFile());
+		reader.readAsText(uploadedFiles.get(0).getFile());
 	}
 	
 }

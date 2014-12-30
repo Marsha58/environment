@@ -10,6 +10,8 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.ClosingEvent;
+import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,6 +35,7 @@ import com.vw.ide.client.devboardext.operation.block.RenameOperationBlock;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
+import com.vw.ide.client.service.remote.tracer.TracerServiceBroker;
 import com.vw.ide.client.ui.editorpanel.EditorPanel;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
@@ -46,6 +49,17 @@ import com.vw.ide.shared.servlet.userstate.UserStateInfo;
 
 public class DevelopmentBoard extends ResizeComposite implements IsWidget, PresenterViewerLink {
 
+	private static class DevelopmentBoardCloseHandler implements ClosingHandler {
+
+		public DevelopmentBoardCloseHandler() {
+		}
+
+		@Override
+		public void onWindowClosing(ClosingEvent event) {
+			TracerServiceBroker.unregisterBackNotification();
+		}
+	}
+	
 	private static DevelopmentBoardUiBinder uiBinder = GWT.create(DevelopmentBoardUiBinder.class);
 
 	@UiField
@@ -142,6 +156,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 			northData.setSize(94);
 		}		
 		initWidget(uiBinder.createAndBindUi(this));
+		Window.addWindowClosingHandler(new DevelopmentBoardCloseHandler());
 	}
 
 	public DevelopmentBoard(String firstName) {

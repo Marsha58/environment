@@ -40,7 +40,7 @@ public class CommandProcessorServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public CommandProcessorResult compileProject(String userName, ProjectDescription projectDescription) {
+	public CommandProcessorResult buildProject(String userName, ProjectDescription projectDescription) {
 		pushMessageToTracer(userName, "Compilation of started");
 		return null;
 	}
@@ -52,7 +52,7 @@ public class CommandProcessorServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public CommandProcessorResult compileAndExportProjectToExecBin(String userName, ProjectDescription projectDescription) {
+	public CommandProcessorResult buildAndExportProjectToExecBin(String userName, ProjectDescription projectDescription) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -68,7 +68,7 @@
 
 -->
 
-
+	<servlet class="com.vw.ide.server.servlet.tracer.TracerServiceImpl" path="/tracer"/>
 	<!-- Specify the app entry point class. -->
 	<entry-point class='com.vw.ide.client.Vwide' />
 

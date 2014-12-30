@@ -11,9 +11,13 @@ import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRem
 import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRenameFileResultCallback;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
 import com.vw.ide.client.projects.FilesTypesEnum;
+import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.utils.Utils;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
+import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerService;
+import com.vw.ide.shared.servlet.projectmanager.RequestProjectImportResult;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
 /**
@@ -151,6 +155,53 @@ public class DevelopmentBoardDialogHandlers {
 		}		
 	}
 
+	public static class ImportProjectDialogHideHandler implements DialogHideHandler {
+		
+		protected static class ImportProjectCallback extends ResultCallback<RequestProjectImportResult> {
+
+			public ImportProjectCallback() {
+				
+			}
+			
+			@Override
+			public void handle(RequestProjectImportResult result) {
+				if (result.getListOfExpectedFiles().size() == 0) {
+					ProjectManagerServiceBroker.requestForImportProject(
+							result.getProjectDescription(),
+							FlowController.getLoggedAsUser(),
+							null,
+							RemoteProjectManagerService.IMPORT_PHASE_END,
+							new ImportProjectCallback());
+				}
+			}
+		}
+		
+		private FileOpenDialog box;
+		private DevelopmentBoardPresenter owner;
+		
+		public ImportProjectDialogHideHandler(FileOpenDialog box, DevelopmentBoardPresenter owner) {
+			this.owner = owner;
+			this.box = box;
+		}
+		
+		@Override
+		public void onDialogHide(DialogHideEvent event) {
+			if (box.getLoadedFiles() > 0) {
+				importProject(box.getFileName(0), box.getContent(0));
+			}
+		}
+
+		private void importProject(String mainProjectFileName, String content) {
+			FileItemInfo fileInfo = new FileItemInfo(mainProjectFileName, "", false);
+			fileInfo.setContent(content);
+			ProjectManagerServiceBroker.requestForImportProject(null,
+																FlowController.getLoggedAsUser(),
+																fileInfo,
+																RemoteProjectManagerService.IMPORT_PHASE_START,
+																new ImportProjectCallback());
+		}
+	}
+	
 	public static class RenameFileDialogHideHandler implements DialogHideHandler {
 
 		private static class SaveFileDialogHideHandler implements DialogHideHandler {

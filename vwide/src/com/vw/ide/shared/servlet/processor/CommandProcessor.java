@@ -18,7 +18,7 @@ public interface CommandProcessor extends RemoteService {
 	 * @param projectDescription
 	 * @return
 	 */
-	public CommandProcessorResult compileProject(String userName, ProjectDescription projectDescription);
+	public CommandProcessorResult buildProject(String userName, ProjectDescription projectDescription);
 	
 	/**
 	 * Runs compiled project
@@ -34,5 +34,5 @@ public interface CommandProcessor extends RemoteService {
 	 * @param projectDescription
 	 * @return
 	 */
-	public CommandProcessorResult compileAndExportProjectToExecBin(String userName, ProjectDescription projectDescription);
+	public CommandProcessorResult buildAndExportProjectToExecBin(String userName, ProjectDescription projectDescription);
 }

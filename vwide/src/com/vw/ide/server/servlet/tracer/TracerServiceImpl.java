@@ -67,7 +67,7 @@ public class TracerServiceImpl extends RemoteServiceServlet implements RemoteTra
 		}
 		
 		public TracerData<?> pop() {
-			return cq.peek();
+			return cq.poll();
 		}
 		
 		@Override
@@ -85,7 +85,9 @@ public class TracerServiceImpl extends RemoteServiceServlet implements RemoteTra
 						}
 					}
 				}
-				process(d);
+				else {
+					process(d);
+				}
 			}
 			cq.clear();
 			if (logger.isInfoEnabled()) {
@@ -193,9 +195,11 @@ public class TracerServiceImpl extends RemoteServiceServlet implements RemoteTra
 	        if (traceClients.putIfAbsent(userName, cometSession) != null) {
 	        	logger.error("User '" + userName + "' has already been registered on trace service");
 	        }
-	        Servant s = new Servant(userName, this);
-	        servants.put(userName, s);
-	        s.start();
+	        else {
+		        Servant s = new Servant(userName, this);
+		        servants.put(userName, s);
+		        s.start();
+	        }
         }
         else {
         	r.setRetCode(TracerRegisterResult.GENERAL_FAIL);

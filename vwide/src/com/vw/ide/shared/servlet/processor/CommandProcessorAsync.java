@@ -10,7 +10,7 @@ public interface CommandProcessorAsync {
 	 * @param projectDescription
 	 * @return
 	 */
-	public void compileProject(String userName, ProjectDescription projectDescription, AsyncCallback<CommandProcessorResult> callback);
+	public void buildProject(String userName, ProjectDescription projectDescription, AsyncCallback<CommandProcessorResult> callback);
 	
 	/**
 	 * Runs compiled project
@@ -26,5 +26,5 @@ public interface CommandProcessorAsync {
 	 * @param projectDescription
 	 * @return
 	 */
-	public void compileAndExportProjectToExecBin(String userName, ProjectDescription projectDescription, AsyncCallback<CommandProcessorResult> callback);
+	public void buildAndExportProjectToExecBin(String userName, ProjectDescription projectDescription, AsyncCallback<CommandProcessorResult> callback);
 }

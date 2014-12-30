@@ -24,6 +24,7 @@ public class ProjectPanelContextMenu extends Menu{
 	private MenuItem editProject;
 	private MenuItem delProject;
 	private MenuItem newFolder;
+	private MenuItem startExecutionProject;
 	public Presenter presenter;
 	
 	public SelectionHandler<Item> selectionHandler = new SelectionHandler<Item>() {
@@ -34,7 +35,6 @@ public class ProjectPanelContextMenu extends Menu{
 				if (menu.presenter != null) {
 					menu.presenter.fireEvent(new ProjectMenuEvent(event.getSelectedItem().getItemId())); 
 				}
-				
 			}
 		}
 	};  
@@ -78,7 +78,6 @@ public class ProjectPanelContextMenu extends Menu{
 		importProject.setText("Import project");
 		importProject.setIcon(Resources.IMAGES.new_wiz_en());
 		importProject.addSelectionHandler(selectionHandler);
-		importProject.disable();
 		this.add(importProject);
 
 		this.add(new SeparatorMenuItem());
@@ -92,7 +91,7 @@ public class ProjectPanelContextMenu extends Menu{
 		this.add(editProject);
 
 		this.add(new SeparatorMenuItem());
-		
+
 		newProject = new MenuItem();
 		newProject.setItemId(OperationTypes.NEW_PROJECT.getName());
 		newProject.setText("New project");
@@ -106,6 +105,15 @@ public class ProjectPanelContextMenu extends Menu{
 		delProject.setIcon(Resources.IMAGES.delete_edit_en());
 		delProject.addSelectionHandler(selectionHandler);
 		this.add(delProject);
+
+		this.add(new SeparatorMenuItem());
+
+		startExecutionProject = new MenuItem();
+		startExecutionProject.setItemId(OperationTypes.START_EXECUTION_PROJECT.getName());
+		startExecutionProject.setText("Start execution project");
+		startExecutionProject.setIcon(Resources.IMAGES.exec_en());
+		startExecutionProject.addSelectionHandler(selectionHandler);
+		this.add(startExecutionProject);
 
 		this.add(new SeparatorMenuItem());
 		
@@ -129,6 +137,7 @@ public class ProjectPanelContextMenu extends Menu{
 	  Boolean isNewFolderEnabled = false;
 	  Boolean isRenameFileEnabled = false;
 	  Boolean isEditProjectEnabled = false;
+	  Boolean isStartExecutionProject = false;
 	  
 	  if (projectItemInfo != null) {
 		  if (projectItemInfo.isMarkAsUserRoot()) {
@@ -137,6 +146,7 @@ public class ProjectPanelContextMenu extends Menu{
 		  }
 		  else
 		  if (projectItemInfo.isMarkAsProject()) {
+			  isStartExecutionProject = true;
 			  isNewFileEnabled = true;	
 			  isDelProjectEnabled = true;
 			  isImportFileEnabled = true;
@@ -171,10 +181,10 @@ public class ProjectPanelContextMenu extends Menu{
 	  importFile.setEnabled(isImportFileEnabled);
 	  renameFile.setEnabled(isRenameFileEnabled);
 	  editProject.setEnabled(isEditProjectEnabled);
+	  startExecutionProject.setEnabled(isStartExecutionProject);
 	}
 	
 	public void associatePresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
 }
