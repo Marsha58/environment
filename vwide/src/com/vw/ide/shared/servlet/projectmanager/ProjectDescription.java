@@ -159,6 +159,37 @@ public class ProjectDescription implements Serializable {
 		this.id = id;
 	}
 
+	public void wellForm() {
+		final String unknown = "<unknown>";
+		if (id == null) {
+			id = new Integer(0x1234);
+		}
+		if (userName == null) {
+			userName = unknown;
+		}
+		if (projectName == null) {
+			projectName = unknown;
+		}
+		if (projectPath == null) {
+			projectPath = unknown;
+		}
+		if (packageName == null) {
+			packageName = unknown;
+		}
+		if (javaSrcPath == null) {
+			javaSrcPath = unknown;
+		}
+		if (author == null) {
+			author = unknown;
+		}
+		if (descr == null) {
+			descr = unknown;
+		}
+		if (mainModuleName == null) {
+			mainModuleName = unknown;
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return "ProjectDescription [userName=" + userName + ", projectName="

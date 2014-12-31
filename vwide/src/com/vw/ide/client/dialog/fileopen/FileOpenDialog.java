@@ -87,12 +87,18 @@ public class FileOpenDialog extends VwmlDialogExt {
 		}
 	}
 	
+	public static enum ReadMode {
+		TEXT,
+		BINARY
+	};
+	
 	private static FileOpenDialogUiBinder uiBinder = GWT.create(FileOpenDialogUiBinder.class);
 	private FileReader reader = new FileReader();
 	private List<FileInfo> uploadedFiles = new ArrayList<FileInfo>();
 	private int loadCounter = 0;
 	private String parentPath;
 	private Long projectId;
+	private ReadMode mode = ReadMode.TEXT;
 	
 	public static interface ResultCallback {
 		public void setResult(String result);
@@ -135,6 +141,14 @@ public class FileOpenDialog extends VwmlDialogExt {
 		return "";
 	}	
 	
+	public ReadMode getMode() {
+		return mode;
+	}
+
+	public void setMode(ReadMode mode) {
+		this.mode = mode;
+	}
+
 	@UiHandler("fileField")
 	public void uploadFile(ChangeEvent event) {
 		FileList fl = fileField.getFiles();
@@ -155,7 +169,12 @@ public class FileOpenDialog extends VwmlDialogExt {
 		      }
 		      else {
 		    	  try {
-	    			  startReadFile();
+		    		  if (mode == ReadMode.TEXT) {
+		    			  startReadTextFile();
+		    		  }
+		    		  else {
+		    			  startReadBinFile();
+		    		  }
 		    	  }
 		    	  catch(Exception e) {
 			    	  AlertMessageBox alertMessageBox = new AlertMessageBox("File", e.getLocalizedMessage());
@@ -192,8 +211,12 @@ public class FileOpenDialog extends VwmlDialogExt {
 		}
 	}
 	
-	private void startReadFile()  {
+	private void startReadTextFile()  {
 		reader.readAsText(uploadedFiles.get(0).getFile());
+	}
+
+	private void startReadBinFile()  {
+		reader.readAsBinaryString(uploadedFiles.get(0).getFile());
 	}
 	
 }

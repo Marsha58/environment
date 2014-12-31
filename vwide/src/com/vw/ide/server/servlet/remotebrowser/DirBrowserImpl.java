@@ -203,6 +203,35 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 		return res;
 	}
 
+	public RequestDirOperationResult createBinFile(String user, String path, String fileName, byte[] content) {
+		RequestDirOperationResult res = new RequestDirOperationResult();
+		res.setOperation("file creating");
+		res.setRetCode(RequestDirOperationResult.GENERAL_OK);
+		String sFullPath = path + "/" + fileName; 
+		try {
+			
+			File parentPath = new File(path);
+			if (!parentPath.exists()) {
+				parentPath.mkdirs();
+			}
+			File fNewFile = new File(sFullPath);
+			if (!fNewFile.exists()) {
+				fNewFile.createNewFile();
+				FileOutputStream fos = new FileOutputStream(fNewFile);
+				if (content != null) {
+					fos.write(content);
+				} 
+				fos.flush();
+				fos.close();
+			}
+		}
+		catch(Exception ex) {
+			res.setResult(ex.getMessage());
+			res.setRetCode(RequestDirOperationResult.GENERAL_FAIL);
+		}		
+		return res;
+	}
+	
 	public RequestSerializationOperationResult serializeObjectToJson(String user, String fileName, String path, Object content) {
 		RequestSerializationOperationResult res = new RequestSerializationOperationResult();
 		res.setOperation("file serialization json");

@@ -1,13 +1,23 @@
 package com.vw.ide.server.servlet.projectmanager;
 
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.client.projects.FilesTypesEnum;
+import com.vw.ide.client.utils.Utils;
 import com.vw.ide.server.servlet.IService;
+import com.vw.ide.server.servlet.ServiceUtils;
 import com.vw.ide.server.servlet.locator.ServiceLocator;
 import com.vw.ide.server.servlet.projectmanager.sink.ImportProjectCompilationSink;
 import com.vw.ide.server.servlet.remotebrowser.DirBrowserImpl;
@@ -146,26 +156,30 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 	}
 
 	@Override
-	public RequestProjectImportResult importProject(ProjectDescription projDescr, String userName, FileItemInfo vwmlProjFile, Integer phase) {
-		RequestProjectImportResult r = null;
-		if (phase == IMPORT_PHASE_START) {
-			r = importProjectStartPhase(userName, vwmlProjFile);
+	public RequestProjectImportResult importProject(String userName, FileItemInfo vwmlProjArchive) {
+		RequestProjectImportResult res = new RequestProjectImportResult();
+		res.setOperation("importing project");
+		res.setRetCode(RequestProjectDeletionResult.GENERAL_OK);
+		DirBrowserImpl browser = (DirBrowserImpl)ServiceLocator.instance().locate(DirBrowserImpl.ID);
+		if (browser == null) {
+			res.setRetCode(RequestProjectDeletionResult.GENERAL_FAIL);
+			res.setResult("Remote browser service wasn't found");
+			return res;
 		}
-		else
-		if (phase == IMPORT_PHASE_PROGRESS) {
-			r = importProjectProgressPhase(projDescr, userName, vwmlProjFile);
+		try {
+			res = importProjectImpl(userName, res, Base64.decodeBase64(vwmlProjArchive.getContent()), browser.constructUserHomePath(userName));
+		} catch (Exception e) {
+			res.setRetCode(RequestProjectImportResult.GENERAL_FAIL);
+			res.setResult(e.getLocalizedMessage());
+			if (res.getDescription() != null) {
+				try {
+					removeProjectLayout(browser, res.getDescription());
+				} catch (Exception ex) {
+					res.setResult(ex.getLocalizedMessage());
+				}
+			}
 		}
-		else
-		if (phase == IMPORT_PHASE_END) {
-			r = importProjectEndPhase(projDescr, userName);
-		}
-		else {
-			r = new RequestProjectImportResult();
-			r.setRetCode(RequestProjectImportResult.GENERAL_FAIL);
-			r.setOperation("import project");
-			r.setResult("invalid phase '" + phase + "'");
-		}
-		return r;
+		return res;
 	}
 	
 	@Override
@@ -476,6 +490,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 				throw new Exception(r.getResult());
 			}
 		}
+		if (description.getProjectPath() != null) {
+			browser.removeDir(description.getUserName(), null, description.getProjectPath());
+		}
 	}
 	
 	private void generateMainProjectFile(DirBrowserImpl browser, ProjectDescription description) throws Exception {
@@ -506,6 +523,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			logger.info("User '" + description.getUserName() + "'" + "; project '" + description.getProjectName() + "';" + " description file '" + projectDescriptionFile + "'");
 		}
 		description.setProjectDescriptionFile(new FileItemInfo(projectDescriptionFile, getProjectOperationalDir(description), false));
+		description.wellForm();
 		RequestSerializationOperationResult res = browser.serializeObjectToJson(description.getUserName(),
 																				projectDescriptionFile,
 																				getProjectOperationalDir(description),
@@ -623,96 +641,89 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		}
 	}
 	
-	private RequestProjectImportResult importProjectStartPhase(String userName, FileItemInfo vwmlProjFile) {
-		RequestProjectImportResult r = new RequestProjectImportResult();
-		r.setOperation("importing project (start)");
-		r.setRetCode(RequestProjectImportResult.GENERAL_OK);
-		UserStateInfo usi = getUserStateInfo(userName, r);
-		if (usi == null) {
-			return r;
-		}
-		ImportProjectCompilationSink sink = new ImportProjectCompilationSink();
-		VWML vwml = new VWML();
-		vwml.setCompilationSink(sink);
-		vwml.setChunkVwmlCode(vwmlProjFile.getContent());
+	private RequestProjectImportResult importProjectImpl(String userName, RequestProjectImportResult res, byte[] archive, String toPath) throws Exception {
+		List<FileItemInfo> vwmlProjFiles = new ArrayList<FileItemInfo>();
+		ZipInputStream zis = null;
 		try {
-			vwml.handleArgs(s_vwmlCompilerDefaultSettings);
-			// analyzes sink and prepare response for the next phase
-			// 1. create project
+			boolean foundProjFile = false;
+			DirBrowserImpl browser = (DirBrowserImpl)ServiceLocator.instance().locate(DirBrowserImpl.ID);
+			if (browser == null) {
+				res.setRetCode(RequestProjectImportResult.GENERAL_FAIL);
+				res.setResult("Remote browser service wasn't found");
+				return res;
+			}
+			zis = new ZipInputStream(new ByteArrayInputStream(archive));
+			ZipEntry ze = zis.getNextEntry();
 			ProjectDescription d = new ProjectDescription();
-			d.setAuthor(sink.getAuthor());
-			d.setDescr(sink.getDescription());
-			d.setMainProjectFile(vwmlProjFile);
-			d.getProjectFiles().add(vwmlProjFile);
-			d.setMainModuleName(sink.getModuleName());
-			d.setPackageName(sink.getModulePackage());
-			d.setJavaSrcPath(sink.getFileLocation());
 			d.setUserName(userName);
-			RequestProjectCreationResult res = createProject(d);
-			if (res.getRetCode() == RequestProjectCreationResult.GENERAL_OK) {
-				// 2. add includes for farther processing... (next phase)
-				r.setListOfExpectedFiles(sink.getIncludes());
-				r.setProjectDescription(d);
+			while(ze != null && res.getRetCode() == RequestProjectImportResult.GENERAL_OK) {
+				String fileName = Utils.extractJustFileName(ze.getName());
+				String relPath = Utils.extractJustPath(ze.getName());
+				String absPath = toPath + "/" + ze.getName();
+				byte[] buffer = ServiceUtils.readFile(zis);
+				//String content = out.toString();
+				if (FileItemInfo.recognizeFileType(ze.getName()) == FilesTypesEnum.VWML && buffer != null) {
+					String content = new String(buffer);
+					FileItemInfo fi = new FileItemInfo(fileName, toPath + "/" + relPath, false);
+					fi.setRelPath(relPath);
+					fi.setContent(content);
+					ImportProjectCompilationSink sink = new ImportProjectCompilationSink();
+					VWML vwml = new VWML();
+					vwml.setCompilationSink(sink);
+					vwml.setChunkVwmlCode(content);
+					vwml.handleArgs(s_vwmlCompilerDefaultSettings);
+					if (sink.getProjectName() != null) { // main vwml project file detected
+						d.setAuthor(sink.getAuthor());
+						d.setDescr(sink.getDescription());
+						FileItemInfo fiMainFile = new FileItemInfo(fi.getName(), fi.getAbsolutePath(), false);
+						fiMainFile.setRelPath(relPath);
+						d.setMainProjectFile(fiMainFile);
+						d.setMainModuleName(sink.getModuleName());
+						d.setPackageName(sink.getModulePackage());
+						d.setJavaSrcPath(sink.getFileLocation());
+						d.setProjectName(sink.getProjectName());
+						d.setProjectPath(toPath);
+						d.setId(new Random().nextInt());
+						res.setDescription(d);
+					}
+					vwmlProjFiles.add(fi);
+				}
+				else {
+					RequestResult r = null;
+					if (buffer != null) {
+						r = browser.createBinFile(userName, toPath + "/" + relPath, fileName, buffer);
+					}
+					else {
+						r = browser.createAbsoluteDir(userName, absPath);
+					}
+					if (r.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
+						res.setResult(r.getResult());
+						res.setRetCode(r.getRetCode());
+					}
+				}
+				if (FileItemInfo.recognizeFileType(ze.getName()) == FilesTypesEnum.VWML_PROJ) {
+					foundProjFile = true;
+				}
+				ze = zis.getNextEntry();
 			}
-			else {
-				r.setRetCode(res.getRetCode());
-				r.setResult(res.getResult());
+			if (!foundProjFile && vwmlProjFiles.size() != 0) {
+				generateProjectDescriptionFile(browser, d);
+			}
+			for(FileItemInfo fi : vwmlProjFiles) {
+				fi.setProjectId(d.getId().longValue());
+				RequestProjectAddFileResult addFileResult = addFileToProject(d, fi);
+				if (addFileResult.getRetCode() == RequestProjectAddFileResult.GENERAL_FAIL) {
+					res.setRetCode(addFileResult.getRetCode());
+					res.setResult(addFileResult.getResult());
+					break;
+				}
 			}
 		}
-		catch(Exception e) {
-			r.setResult(e.getLocalizedMessage());
-			r.setRetCode(RequestProjectImportResult.GENERAL_FAIL);
-		}
-		return r;
-	}
-	
-	private RequestProjectImportResult importProjectProgressPhase(ProjectDescription projDescr, String userName, FileItemInfo vwmlProjFile) {
-		RequestProjectImportResult r = new RequestProjectImportResult();
-		r.setOperation("importing project (progress)");
-		r.setRetCode(RequestProjectImportResult.GENERAL_OK);
-		UserStateInfo usi = getUserStateInfo(userName, r);
-		if (usi == null) {
-			return r;
-		}
-		ImportProjectCompilationSink sink = new ImportProjectCompilationSink();
-		VWML vwml = new VWML();
-		vwml.setCompilationSink(sink);
-		vwml.setChunkVwmlCode(vwmlProjFile.getContent());
-		try {
-			vwml.handleArgs(s_vwmlCompilerDefaultSettings);
-			// analyzes sink and prepare response for the next phase
-			// 1. add file to proj
-			RequestProjectAddFileResult res = addFileToProject(projDescr, vwmlProjFile);			
-			if (res.getRetCode() == RequestProjectCreationResult.GENERAL_OK) {
-				// 2. add includes for farther processing... (next phase)
-				r.setListOfExpectedFiles(sink.getIncludes());
-				r.setProjectDescription(projDescr);
-			}
-			else {
-				r.setRetCode(res.getRetCode());
-				r.setResult(res.getResult());
+		finally {
+			if (zis != null) {
+				zis.close();
 			}
 		}
-		catch(Exception e) {
-			r.setResult(e.getLocalizedMessage());
-			r.setRetCode(RequestProjectImportResult.GENERAL_FAIL);
-		}
-		return r;
-	}
-
-	private RequestProjectImportResult importProjectEndPhase(ProjectDescription projDescr, String userName) {
-		RequestProjectImportResult r = new RequestProjectImportResult();
-		r.setOperation("importing project (end)");
-		r.setRetCode(RequestProjectImportResult.GENERAL_OK);
-		UserStateInfo usi = getUserStateInfo(userName, r);
-		if (usi == null) {
-			return r;
-		}
-		RequestProjectUpdateResult res = updateProject(projDescr);
-		if (res.getRetCode() != RequestProjectCreationResult.GENERAL_OK) {
-			r.setRetCode(res.getRetCode());
-			r.setResult(res.getResult());
-		}
-		return r;
+		return res;
 	}
 }

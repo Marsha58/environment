@@ -76,15 +76,13 @@ public class ProjectManagerServiceBroker {
 	 * @param phase
 	 * @param callback
 	 */
-	public static void requestForImportProject(ProjectDescription projectDescription, String userName, FileItemInfo vwmlProjFile, Integer phase, ResultCallback<RequestProjectImportResult> resultCallback) {
+	public static void requestForImportProject(String userName, FileItemInfo vwmlProjFile, ResultCallback<RequestProjectImportResult> resultCallback) {
 		RemoteProjectManagerServiceAsync service = ProjectManagerService.instance().getServiceImpl();
 		if (service != null) {
 			ServiceCallbackForProjectImport cbk = ProjectManagerService.instance().buildCallbackForProjectImport();
 			cbk.setProcessedResult(new Result<RequestProjectImportResult>(resultCallback));
-			service.importProject(projectDescription,
-								  userName,
+			service.importProject(userName,
 								  vwmlProjFile,
-								  phase,
 								  cbk);
 		}
 	}

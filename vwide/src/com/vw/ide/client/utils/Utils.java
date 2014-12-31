@@ -134,7 +134,7 @@ public class Utils {
 				return input;
 			} else {
 				for (int i = 0; i < arrPath.length - 2; i++) {
-					output += arrPath[i] + "\\";
+					output += arrPath[i] + "/";
 				}
 				output += arrPath[arrPath.length - 2];
 			}

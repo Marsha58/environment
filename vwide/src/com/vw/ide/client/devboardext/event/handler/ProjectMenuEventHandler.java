@@ -110,6 +110,7 @@ public class ProjectMenuEventHandler extends Presenter.PresenterEventHandler imp
 
 	private void doImportProject(DevelopmentBoardPresenter presenter) {
 		final FileOpenDialog box = new FileOpenDialog();
+		box.setMode(FileOpenDialog.ReadMode.BINARY);
 		box.setEditLabelText("Select project to import (main VWML project file)");
 		box.setParentPath("/");
 		box.addDialogHideHandler(new DevelopmentBoardDialogHandlers.ImportProjectDialogHideHandler(box, presenter));

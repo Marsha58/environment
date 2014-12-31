@@ -165,14 +165,6 @@ public class DevelopmentBoardDialogHandlers {
 			
 			@Override
 			public void handle(RequestProjectImportResult result) {
-				if (result.getListOfExpectedFiles().size() == 0) {
-					ProjectManagerServiceBroker.requestForImportProject(
-							result.getProjectDescription(),
-							FlowController.getLoggedAsUser(),
-							null,
-							RemoteProjectManagerService.IMPORT_PHASE_END,
-							new ImportProjectCallback());
-				}
 			}
 		}
 		
@@ -193,13 +185,16 @@ public class DevelopmentBoardDialogHandlers {
 
 		private void importProject(String mainProjectFileName, String content) {
 			FileItemInfo fileInfo = new FileItemInfo(mainProjectFileName, "", false);
+			content = btoa(content);
 			fileInfo.setContent(content);
-			ProjectManagerServiceBroker.requestForImportProject(null,
-																FlowController.getLoggedAsUser(),
+			ProjectManagerServiceBroker.requestForImportProject(FlowController.getLoggedAsUser(),
 																fileInfo,
-																RemoteProjectManagerService.IMPORT_PHASE_START,
 																new ImportProjectCallback());
 		}
+		
+		native String btoa(String content) /*-{
+			return btoa(content);
+		}-*/;
 	}
 	
 	public static class RenameFileDialogHideHandler implements DialogHideHandler {
