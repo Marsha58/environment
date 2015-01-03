@@ -144,7 +144,13 @@ public class DirBrowserImpl extends RemoteServiceServlet implements RemoteDirect
 
 	public RequestDirOperationResult removeDir(String user, String parent, String dir) {
 		RequestDirOperationResult res = new RequestDirOperationResult();
-		String fullPath = parent + "/" + dir;
+		String fullPath = null;
+		if (parent == null) {
+			fullPath = dir;
+		}
+		else {
+			fullPath = parent + "/" + dir;
+		}
 		res.setPath(fullPath);
 		res.setRetCode(0);
 		res.setOperation("remove directory");

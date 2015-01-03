@@ -10,13 +10,16 @@ import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectDel
 import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRemoveFileResultCallback;
 import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRenameFileResultCallback;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
+import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
+import com.vw.ide.client.presenters.Presenter;
+import com.vw.ide.client.presenters.automata.EventProcessingAutomata;
+import com.vw.ide.client.presenters.automata.EventProcessingAutomata.State;
 import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
-import com.vw.ide.shared.servlet.projectmanager.RemoteProjectManagerService;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectImportResult;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 
@@ -29,6 +32,74 @@ public class DevelopmentBoardDialogHandlers {
 	
 	public static class DeletedProjectDialogHideHandler implements DialogHideHandler {
 
+		// reaction upon closing editors tab
+		public static class DeleteProjectTabClosedTransition extends EventProcessingAutomata.Transition {
+
+			@Override
+			public void handle(EventProcessingAutomata automata) {
+				DeleteProjectActivationAutomata dpAutomata = (DeleteProjectActivationAutomata)automata;
+				if (dpAutomata.decEditorsTabsToBeClosed() == 0) {
+					// actual activating of project deletion process
+					ProjectManagerServiceBroker.requestForDeletingProject(
+												dpAutomata.getDescription(),
+												new ProjectDeletionResultCallback(dpAutomata.getOwner(), dpAutomata.getSelectedProjectItemInfo()));
+					Presenter.PresenterEventHandler handler = dpAutomata.getOwner().getEventHandlerByType(EditorTabClosedEvent.TYPE);
+					// resets the actual project deletion automata
+					if (handler != null) {
+						handler.setEmbeddedAutomata(null);
+					}
+				}
+			}
+		}
+		
+		// used in order to activate actual project deletion phase
+		public static class DeleteProjectActivationAutomata extends EventProcessingAutomata {
+			private ProjectDescription description;
+			private ProjectItemInfo selectedProjectItemInfo;
+			private DevelopmentBoardPresenter owner;
+			private int numOfEditorsTabsToBeClosed;
+
+			public int getNumOfEditorsTabsToBeClosed() {
+				return numOfEditorsTabsToBeClosed;
+			}
+
+			public void setNumOfEditorsTabsToBeClosed(int numOfEditorsTabsToBeClosed) {
+				this.numOfEditorsTabsToBeClosed = numOfEditorsTabsToBeClosed;
+			}
+
+			
+			public ProjectDescription getDescription() {
+				return description;
+			}
+
+			public void setDescription(ProjectDescription description) {
+				this.description = description;
+			}
+
+			public ProjectItemInfo getSelectedProjectItemInfo() {
+				return selectedProjectItemInfo;
+			}
+
+			public void setSelectedProjectItemInfo(ProjectItemInfo selectedProjectItemInfo) {
+				this.selectedProjectItemInfo = selectedProjectItemInfo;
+			}
+
+			public DevelopmentBoardPresenter getOwner() {
+				return owner;
+			}
+
+			public void setOwner(DevelopmentBoardPresenter owner) {
+				this.owner = owner;
+			}
+
+			public int decEditorsTabsToBeClosed() {
+				if (numOfEditorsTabsToBeClosed == 0) {
+					return numOfEditorsTabsToBeClosed;
+				}
+				return --numOfEditorsTabsToBeClosed;
+			}
+		}
+		
 		private DevelopmentBoardPresenter owner;
 		
 		public DeletedProjectDialogHideHandler(DevelopmentBoardPresenter owner) {
@@ -37,12 +108,32 @@ public class DevelopmentBoardDialogHandlers {
 		
 		@Override
 		public void onDialogHide(DialogHideEvent event) {
+			final int WAIT_FOR_CLOSING_TAB = 0x01;
 			String s = event.getHideButton().name();
 
 			if (s.equalsIgnoreCase("YES")) {
-				ProjectManagerServiceBroker.requestForDeletingProject(
-										  owner.getSelectedItemInTheProjectTree().getProjectDescription(),
-										  new ProjectDeletionResultCallback(owner, owner.getSelectedItemInTheProjectTree()));
+				int openedFiles = owner.getView().getNumberOfOpendedFilesOfSpecificProject(owner.getSelectedItemInTheProjectTree().getProjectDescription());
+				if (openedFiles != 0) {
+					Presenter.PresenterEventHandler handler = owner.getEventHandlerByType(EditorTabClosedEvent.TYPE);
+					// the actual project deletion is activated when all tabs will be closed
+					if (handler != null) {
+						State initialState = new State(WAIT_FOR_CLOSING_TAB);
+						DeleteProjectActivationAutomata dpa = new DeleteProjectActivationAutomata();
+						dpa.setDescription(owner.getSelectedItemInTheProjectTree().getProjectDescription());
+						dpa.setOwner(owner);
+						dpa.setSelectedProjectItemInfo(owner.getSelectedItemInTheProjectTree());
+						dpa.setCurrentState(initialState);
+						dpa.setNumOfEditorsTabsToBeClosed(openedFiles);
+						dpa.add(initialState, EditorTabClosedEvent.TYPE, new DeleteProjectTabClosedTransition());
+						handler.setEmbeddedAutomata(dpa);
+					}
+					owner.getView().closeEditorsForSpecificProject(owner.getSelectedItemInTheProjectTree().getProjectDescription());
+				}
+				else {
+					ProjectManagerServiceBroker.requestForDeletingProject(
+											  owner.getSelectedItemInTheProjectTree().getProjectDescription(),
+											  new ProjectDeletionResultCallback(owner, owner.getSelectedItemInTheProjectTree()));
+				}
 			}
 		}
 	};
@@ -159,12 +250,17 @@ public class DevelopmentBoardDialogHandlers {
 		
 		protected static class ImportProjectCallback extends ResultCallback<RequestProjectImportResult> {
 
-			public ImportProjectCallback() {
-				
+			private DevelopmentBoardPresenter owner;
+			
+			public ImportProjectCallback(DevelopmentBoardPresenter owner) {
+				this.owner = owner;
 			}
 			
 			@Override
 			public void handle(RequestProjectImportResult result) {
+				if (result != null && result.getRetCode() == RequestProjectImportResult.GENERAL_OK) {
+					owner.getView().getProjectPanel().addProject(null, result.getDescription());
+				}
 			}
 		}
 		
@@ -189,7 +285,7 @@ public class DevelopmentBoardDialogHandlers {
 			fileInfo.setContent(content);
 			ProjectManagerServiceBroker.requestForImportProject(FlowController.getLoggedAsUser(),
 																fileInfo,
-																new ImportProjectCallback());
+																new ImportProjectCallback(owner));
 		}
 		
 		native String btoa(String content) /*-{

@@ -4,6 +4,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.vw.ide.client.event.handler.DefaultController2PresenterEventDelegator;
+import com.vw.ide.client.presenters.automata.EventProcessingAutomata;
 
 /**
  * Root class for all presenters (per logged user)
@@ -15,6 +16,7 @@ public abstract class Presenter {
 	public static abstract class PresenterEventHandler {
 		
 		private Presenter presenter;
+		private EventProcessingAutomata embeddedAutomata;
 
 		public Presenter getPresenter() {
 			return presenter;
@@ -22,6 +24,14 @@ public abstract class Presenter {
 
 		public void setPresenter(Presenter presenter) {
 			this.presenter = presenter;
+		}
+
+		public EventProcessingAutomata getEmbeddedAutomata() {
+			return embeddedAutomata;
+		}
+
+		public void setEmbeddedAutomata(EventProcessingAutomata embeddedAutomata) {
+			this.embeddedAutomata = embeddedAutomata;
 		}
 
 		public abstract void handler(Presenter presenter, GwtEvent<?> event);
@@ -59,6 +69,13 @@ public abstract class Presenter {
 	 * @param eventBus
 	 */
 	public abstract void unregisterOnEventBus(HandlerManager eventBus);
+
+	/**
+	 * Returns event handler by event's type
+	 * @param type
+	 * @return
+	 */
+	public abstract PresenterEventHandler getEventHandlerByType(com.google.gwt.event.shared.GwtEvent.Type<?> type);
 	
 	public DefaultController2PresenterEventDelegator getEventDelegator() {
 		return eventDelegator;

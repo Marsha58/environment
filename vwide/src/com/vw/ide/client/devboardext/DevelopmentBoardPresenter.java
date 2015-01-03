@@ -158,6 +158,11 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(StartProjectExecutionEvent.TYPE, (StartProjectExecutionEventHandler)dispatcher.get(StartProjectExecutionEvent.TYPE));
 		TracerServiceBroker.unregisterBackNotification();
 	}
+
+	@Override
+	public PresenterEventHandler getEventHandlerByType(com.google.gwt.event.shared.GwtEvent.Type<?> type) {
+		return dispatcher.get(type);
+	}
 	
 	public TopPanel getTopPanel() {
 		return ((DevelopmentBoard) view).topPanel;

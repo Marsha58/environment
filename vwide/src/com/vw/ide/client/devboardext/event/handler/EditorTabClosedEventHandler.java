@@ -35,6 +35,17 @@ public class EditorTabClosedEventHandler extends Presenter.PresenterEventHandler
 			RemoteUserStateServiceBroker.requestForUpdateUserState(FlowController.getLoggedAsUser(),
 																	userState,
 																	new UserStateUpdatingResultCallback(presenter));
+			// runs automata upon finishing of processing EditorTabClosedEvent
+			// installed when project is deleted (waits for closing all opened tabs)
+			Presenter.PresenterEventHandler handler = presenter.getEventHandlerByType(EditorTabClosedEvent.TYPE);
+			if (handler != null && handler.getEmbeddedAutomata() != null) {
+				try {
+					// automata is installed before 'project deletion' operation is activated
+					handler.getEmbeddedAutomata().handle(EditorTabClosedEvent.TYPE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	

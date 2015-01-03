@@ -12,13 +12,15 @@ public class DeleteOperationBlock {
 	}
 	
 	public void deleteProjectItem(ProjectItemInfo itemInfo) {
-		devBoard.getProjectPanel().deleteItemOnTreeBranchView(itemInfo);
-		devBoard.getTopPanel().delItemFromScrollMenu(itemInfo);
-		devBoard.getEditorPanel().getTabPanel().remove(itemInfo.getFileSheet());
+		if (!itemInfo.isMarkAsProject()) {
+			devBoard.getTopPanel().delItemFromScrollMenu(itemInfo);
+			devBoard.getEditorPanel().getTabPanel().remove(itemInfo.getFileSheet());
+		}
 		if (devBoard.getEditorPanel().getTabPanel().getWidgetCount() == 0) {
 			devBoard.setTextForEditorContentPanel(null);
 			devBoard.getProjectPanel().selectParentOf(itemInfo);
 		}
+		devBoard.getProjectPanel().deleteItemOnTreeBranchView(itemInfo);
 	}
 	
 	public void deleteProjectItemFromViewOnly(ProjectItemInfo itemInfo) {

@@ -26,6 +26,7 @@ import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
+import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
 import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.vw.ide.client.FlowController;
 import com.vw.ide.client.devboardext.operation.block.AddOperationBlock;
@@ -33,6 +34,7 @@ import com.vw.ide.client.devboardext.operation.block.DeleteOperationBlock;
 import com.vw.ide.client.devboardext.operation.block.MoveOperationBlock;
 import com.vw.ide.client.devboardext.operation.block.RenameOperationBlock;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
+import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.service.remote.tracer.TracerServiceBroker;
@@ -261,6 +263,28 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 			FileSheet curFileSheet = (FileSheet)editor.getTabPanel().getWidget(i);
 			curFileSheet.getAceEditor().setTheme(event.getEvent().getSelectedItem());
 		}
+	}
+	
+	public void closeEditorsForSpecificProject(ProjectDescription projectDescription) {
+		for (int i = 0; i < editor.getTabPanel().getWidgetCount(); i++) {
+			FileSheet curFileSheet = (FileSheet)editor.getTabPanel().getWidget(i);
+			if (curFileSheet.getItemInfo() != null && curFileSheet.getItemInfo().getProjectDescription() == projectDescription) {
+				editor.getTabPanel().remove(curFileSheet);
+				presenter.fireEvent(new EditorTabClosedEvent(new BeforeCloseEvent<Widget>(curFileSheet)));
+				i--;
+			}
+		}
+	}
+	
+	public int getNumberOfOpendedFilesOfSpecificProject(ProjectDescription projectDescription) {
+		int n = 0;
+		for (int i = 0; i < editor.getTabPanel().getWidgetCount(); i++) {
+			FileSheet curFileSheet = (FileSheet)editor.getTabPanel().getWidget(i);
+			if (curFileSheet.getItemInfo() != null && curFileSheet.getItemInfo().getProjectDescription() == projectDescription) {
+				n++;
+			}
+		}
+		return n;
 	}
 	
 	public void restoreView(UserStateInfo userState) {

@@ -476,10 +476,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 
 	private void removeProjectLayout(DirBrowserImpl browser, ProjectDescription description) throws Exception {
 		String dirs[] = {
-				description.getJavaSrcPath(),
-				getProjectOperationalDir(description),
 				getProjectOperationalDir(description) + "/interpreter",
-				getProjectOperationalDir(description) + "/addons"
+				getProjectOperationalDir(description) + "/addons",
+				getProjectOperationalDir(description),
 		};
 		for(String dir : dirs) {
 			if (logger.isInfoEnabled()) {
@@ -490,6 +489,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 				throw new Exception(r.getResult());
 			}
 		}
+		browser.removeDir(description.getUserName(), null, description.getJavaSrcPath());
 		if (description.getProjectPath() != null) {
 			browser.removeDir(description.getUserName(), null, description.getProjectPath());
 		}

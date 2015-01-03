@@ -1,6 +1,7 @@
 package com.vw.ide.client.ui.windowspanel;
 
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.vw.ide.client.presenters.Presenter;
@@ -39,13 +40,14 @@ public class WindowsPanelPresenter extends Presenter {
 
 	@Override
 	public void registerOnEventBus(HandlerManager eventBus) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void unregisterOnEventBus(HandlerManager eventBus) {
-		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public PresenterEventHandler getEventHandlerByType(Type<?> type) {
+		return null;
 	}
 }

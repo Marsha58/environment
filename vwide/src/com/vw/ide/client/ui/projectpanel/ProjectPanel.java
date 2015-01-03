@@ -431,6 +431,17 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		return saveAllEnabled;
 	}
 
+	public void addProject(ProjectItemInfo root, ProjectDescription projectDescription) {
+		if (root == null) {
+			root = store.findModelWithKey(FileItemInfo.generateKeyFrom(presenter.getLoggedAsUser(), presenter.getLoggedAsUser()));
+			root.setMarkAsUserRoot(true);
+		}
+		ProjectItemInfo projectRoot = makeProjectRoot(projectDescription, projectDescription.getMainModuleName());
+		projectRoot.setMarkAsProject(true);
+		store.add(root, projectRoot);
+		buildProjectTreeBranchView(projectRoot);
+	}
+	
 	protected void prepare() {
 		buildContextMenu();
 		StoreSortInfo<ProjectItemInfo> ssi = new StoreSortInfo<ProjectItemInfo>(new ProjectItemInfo(), SortDir.DESC);

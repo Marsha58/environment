@@ -18,6 +18,7 @@ import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
+import com.vw.ide.client.presenters.Presenter.PresenterEventHandler;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.security.SecurityServiceBroker;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;
@@ -182,6 +183,11 @@ public class LoginGxtPresenter extends Presenter {
 		eventBus.removeHandler(LoggedInEvent.TYPE, (LoggedInEventHandler)dispatcher.get(LoggedInEvent.TYPE));
 		// Logout event
 		eventBus.removeHandler(LogoutEvent.TYPE, (LogoutEventHandler)dispatcher.get(LogoutEvent.TYPE));
+	}
+
+	@Override
+	public PresenterEventHandler getEventHandlerByType(com.google.gwt.event.shared.GwtEvent.Type<?> type) {
+		return dispatcher.get(type);
 	}
 	
 	protected void onSuccessLogin(String userName) {
