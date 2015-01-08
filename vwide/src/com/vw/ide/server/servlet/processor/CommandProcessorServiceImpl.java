@@ -11,6 +11,8 @@ import com.vw.ide.server.servlet.ServiceUtils;
 import com.vw.ide.server.servlet.locator.ServiceLocator;
 import com.vw.ide.shared.servlet.processor.CommandProcessor;
 import com.vw.ide.shared.servlet.processor.CommandProcessorResult;
+import com.vw.ide.shared.servlet.processor.command.sandr.SearchAndReplaceCommandHandler;
+import com.vw.ide.shared.servlet.processor.dto.sandr.SearchAndReplaceBundle;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.tracer.TracerMessage;
 
@@ -57,6 +59,23 @@ public class CommandProcessorServiceImpl extends RemoteServiceServlet implements
 		return null;
 	}
 
+	@Override
+	public CommandProcessorResult performSearchAndReplace(String userName, SearchAndReplaceBundle searchAndReplaceBundle) {
+		CommandProcessorResult r = null;
+		if (logger.isInfoEnabled()) {
+			logger.info("User '" + userName + "' requests search and replace action on '" + searchAndReplaceBundle + "'");
+		}
+		try {
+			r = SearchAndReplaceCommandHandler.instance(searchAndReplaceBundle).handle();
+		} catch (Exception e) {
+			r = new CommandProcessorResult();
+			r.setOperation("search_and_replace");
+			r.setResult(e.getMessage());
+			r.setRetCode(CommandProcessorResult.GENERAL_FAIL);
+		}
+		return null;
+	}
+	
 	protected void pushMessageToTracer(String userName, String message) {
 		ServiceUtils.pushDataToTracer(userName, new TracerMessage(message));
 	}

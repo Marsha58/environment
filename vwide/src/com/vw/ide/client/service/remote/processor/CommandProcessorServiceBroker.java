@@ -5,6 +5,7 @@ import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.processor.CommandProcessorService.ServiceCallbackForCommandProcessor;
 import com.vw.ide.shared.servlet.processor.CommandProcessorAsync;
 import com.vw.ide.shared.servlet.processor.CommandProcessorResult;
+import com.vw.ide.shared.servlet.processor.dto.sandr.SearchAndReplaceBundle;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 
 /**
@@ -56,6 +57,21 @@ public class CommandProcessorServiceBroker {
 			ServiceCallbackForCommandProcessor cbk = CommandProcessorService.instance().buildCallbackForCommandProcessor();
 			cbk.setProcessedResult(new Result<CommandProcessorResult>(resultCallback));
 			service.buildAndExportProjectToExecBin(userName, projectDescription, cbk);
+		}		
+	}
+	
+	/**
+	 * Executes search and replace action upon selected project. All info is passed inside the bundle
+	 * @param userName
+	 * @param bundle
+	 * @param resultCallback
+	 */
+	public static void performSearchAndReplace(String userName, SearchAndReplaceBundle bundle, ResultCallback<CommandProcessorResult> resultCallback) {
+		CommandProcessorAsync service = CommandProcessorService.instance().getServiceImpl();
+		if (service != null) {
+			ServiceCallbackForCommandProcessor cbk = CommandProcessorService.instance().buildCallbackForCommandProcessor();
+			cbk.setProcessedResult(new Result<CommandProcessorResult>(resultCallback));
+			service.performSearchAndReplace(userName, bundle, cbk);
 		}		
 	}
 }

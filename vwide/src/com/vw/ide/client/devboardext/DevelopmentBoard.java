@@ -38,13 +38,13 @@ import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
 import com.vw.ide.client.service.remote.tracer.TracerServiceBroker;
+import com.vw.ide.client.ui.consolespanel.ConsolesPanelView;
 import com.vw.ide.client.ui.editorpanel.EditorPanel;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.ui.toppanel.TopPanel;
 import com.vw.ide.client.ui.toppanel.TopPanel.Theme;
-import com.vw.ide.client.ui.windowspanel.WindowsPanelView;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.userstate.UserStateInfo;
@@ -91,7 +91,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	@UiField
 	EditorPanel editor;
 	@UiField
-	WindowsPanelView windows;
+	ConsolesPanelView consoles;
 
 	private Presenter presenter = null;
 	private RenameOperationBlock renameOperationBlock = new RenameOperationBlock(this);
@@ -316,7 +316,6 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	}
 	
 	public void appendLog(String log) {
-		windows.appendLog(log);		
 	}
 
 	public List<FileItemInfo> getUpdatedListOfFiles(ProjectDescription projectDescription) {
@@ -330,7 +329,7 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 	protected void associatePresenterWithSubpanels(Presenter presenter) {
 		topPanel.associatePresenter(presenter);
 		editor.associatePresenter(presenter);
-		windows.associatePresenter(presenter);
+		consoles.associatePresenter(presenter);
 		projectPanel.associatePresenter(presenter);
 	}
 }

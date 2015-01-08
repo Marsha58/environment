@@ -18,6 +18,7 @@ import com.vw.ide.client.service.VwIdeClientService;
 import com.vw.ide.client.service.factory.ServicesStubFactory;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.RequestResult;
+import com.vw.ide.shared.servlet.processor.command.sandr.SearchAndReplaceMessage;
 import com.vw.ide.shared.servlet.tracer.RemoteTracerAsync;
 import com.vw.ide.shared.servlet.tracer.TracerMessage;
 import com.vw.ide.shared.servlet.tracer.TracerRegisterResult;
@@ -25,7 +26,7 @@ import com.vw.ide.shared.servlet.tracer.TracerUnregisterResult;
 
 public class TracerService implements BusConnectivity, VwIdeClientService {
 
-	@SerialTypes( { TracerMessage.class })
+	@SerialTypes( { TracerMessage.class, SearchAndReplaceMessage.class })
     public static abstract class TracerServiceCometSerializer extends CometSerializer {
     }
 	
@@ -66,14 +67,20 @@ public class TracerService implements BusConnectivity, VwIdeClientService {
 		public void onMessage(List<? extends Serializable> messages) {
 			if (messages != null) {
 				for(Serializable message : messages) {
-					TracerMessage data = (TracerMessage)message;
-					RequestResult rr = new RequestResult();
-					rr.setOperationType(OperationTypes.LOG_OPERATION);
-					rr.setRetCode(0);
-					rr.setOperation("log");
-					rr.setResult(data.getData());
-					owner.fireEvent(new ServerLogEvent(rr));
-					System.out.println("Got tracer message '" + data.getData() + "'");
+					if (message instanceof TracerMessage) {
+						TracerMessage data = (TracerMessage)message;
+						RequestResult rr = new RequestResult();
+						rr.setOperationType(OperationTypes.LOG_OPERATION);
+						rr.setRetCode(0);
+						rr.setOperation("log");
+						rr.setResult(data.getData());
+						owner.fireEvent(new ServerLogEvent(rr));
+						System.out.println("Got tracer message '" + data.getData() + "'");
+					}
+					if (message instanceof SearchAndReplaceMessage) {
+						SearchAndReplaceMessage data = (SearchAndReplaceMessage)message;
+						System.out.println("Got search&replace message '" + data.getData() + "'");
+					}
 				}
 			}
 		}

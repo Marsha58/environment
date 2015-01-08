@@ -1,6 +1,7 @@
 package com.vw.ide.shared.servlet.processor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.vw.ide.shared.servlet.processor.dto.sandr.SearchAndReplaceBundle;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 
 public interface CommandProcessorAsync {
@@ -27,4 +28,13 @@ public interface CommandProcessorAsync {
 	 * @return
 	 */
 	public void buildAndExportProjectToExecBin(String userName, ProjectDescription projectDescription, AsyncCallback<CommandProcessorResult> callback);
+
+	/**
+	 * Performs search and replace action
+	 * @param userName
+	 * @param searchAndReplaceBundle
+	 * @return
+	 */
+	public void performSearchAndReplace(String userName, SearchAndReplaceBundle searchAndReplaceBundle, AsyncCallback<CommandProcessorResult> callback);
+	
 }

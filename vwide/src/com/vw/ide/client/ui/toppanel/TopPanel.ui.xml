@@ -185,8 +185,8 @@
 					<button:TextButton icon="{images.terminate_obj_en}" ui:field="bnTerminateExecution"
 						itemId="idTerminateExecution" toolTip="Terminate" />
 					<toolbar:SeparatorToolItem />
-					<button:TextButton icon="{images.search_en}"
-						toolTip="Search" />
+					<button:TextButton icon="{images.search_en}" ui:field="bnSearchText"
+						itemId="idSearchText" toolTip="Search" />
 					<toolbar:SeparatorToolItem />
 					<toolbar:FillToolItem />
 				</toolbar:ToolBar>

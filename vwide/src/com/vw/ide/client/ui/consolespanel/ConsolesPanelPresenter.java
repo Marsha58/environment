@@ -1,4 +1,4 @@
-package com.vw.ide.client.ui.windowspanel;
+package com.vw.ide.client.ui.consolespanel;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.GwtEvent.Type;
@@ -12,12 +12,12 @@ import com.vw.ide.client.presenters.PresenterViewerLink;
  * @author omelnyk
  *
  */
-public class WindowsPanelPresenter extends Presenter {
+public class ConsolesPanelPresenter extends Presenter {
 
 	private final HandlerManager eventBus;
 	private final PresenterViewerLink view;
 
-	public WindowsPanelPresenter(HandlerManager eventBus, PresenterViewerLink view) {
+	public ConsolesPanelPresenter(HandlerManager eventBus, PresenterViewerLink view) {
 		this.eventBus = eventBus;
 		this.view = view;
 		if (view != null) {

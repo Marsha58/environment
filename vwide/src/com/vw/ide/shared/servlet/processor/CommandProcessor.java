@@ -2,6 +2,7 @@ package com.vw.ide.shared.servlet.processor;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.vw.ide.shared.servlet.processor.dto.sandr.SearchAndReplaceBundle;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 
 /**
@@ -35,4 +36,12 @@ public interface CommandProcessor extends RemoteService {
 	 * @return
 	 */
 	public CommandProcessorResult buildAndExportProjectToExecBin(String userName, ProjectDescription projectDescription);
+
+	/**
+	 * Performs search and replace action
+	 * @param userName
+	 * @param searchAndReplaceBundle
+	 * @return
+	 */
+	public CommandProcessorResult performSearchAndReplace(String userName, SearchAndReplaceBundle searchAndReplaceBundle);
 }

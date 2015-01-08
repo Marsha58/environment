@@ -442,6 +442,14 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		buildProjectTreeBranchView(projectRoot);
 	}
 	
+	public List<ProjectItemInfo> getProjects() {
+		List<ProjectItemInfo> r = store.getRootItems();
+		if (r != null && r.size() != 0) {
+			return store.getChildren(r.get(0));
+		}
+		return new ArrayList<ProjectItemInfo>();
+	}
+	
 	protected void prepare() {
 		buildContextMenu();
 		StoreSortInfo<ProjectItemInfo> ssi = new StoreSortInfo<ProjectItemInfo>(new ProjectItemInfo(), SortDir.DESC);

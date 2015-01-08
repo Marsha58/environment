@@ -15,7 +15,7 @@ import com.sencha.gxt.widget.core.client.Dialog;
 
 //public class VwmlDialogExt extends MessageBox {
 
-public class VwmlDialogExt extends Dialog{
+public class VwmlDialogExt extends Dialog {
 
 
 	private String loggedAsUser;

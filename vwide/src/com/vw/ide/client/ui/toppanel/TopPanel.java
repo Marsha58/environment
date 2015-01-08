@@ -55,6 +55,7 @@ import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.ProjectMenuEvent;
 import com.vw.ide.client.event.uiflow.SaveAllFilesEvent;
 import com.vw.ide.client.event.uiflow.SaveFileEvent;
+import com.vw.ide.client.event.uiflow.SearchTextEvent;
 import com.vw.ide.client.event.uiflow.StartProjectExecutionEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
@@ -87,6 +88,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 	@UiField TextButton bnContinueExecution;
 	@UiField TextButton bnSuspendExecution;
 	@UiField TextButton bnTerminateExecution;
+	@UiField TextButton bnSearchText;
 	@UiField SimpleContainer comboAceEditorPlaceCont;
 	@UiField SimpleContainer userNamePlaceCont;
 	@UiField SimpleContainer comboPlaceCont;
@@ -244,7 +246,7 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 	    }
 	}
 
-	@UiHandler({"userLogout", "bnNewVwmlProjField", "bnSaveFileField", "bnSaveAllField", "bnStartExecution"})
+	@UiHandler({"userLogout", "bnNewVwmlProjField", "bnSaveFileField", "bnSaveAllField", "bnStartExecution", "bnSearchText"})
 	public void onToolBarrButtonClick(SelectEvent event) {
 	    Info.display("Click", ((TextButton) event.getSource()).getText() + " clicked");
 	    String sItemId = ((TextButton)event.getSource()).getItemId(); 
@@ -268,6 +270,9 @@ public class TopPanel extends Composite implements PresenterViewerLink {
 			if (selectedProjectItem != null) {
 				presenter.fireEvent(new StartProjectExecutionEvent(selectedProjectItem.getProjectDescription()));
 			}
+			break;
+		case "idSearchText":
+			presenter.fireEvent(new SearchTextEvent());
 			break;
 		default:
 			break;
