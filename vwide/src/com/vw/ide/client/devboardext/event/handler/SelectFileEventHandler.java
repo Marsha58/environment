@@ -49,6 +49,12 @@ public class SelectFileEventHandler extends Presenter.PresenterEventHandler impl
 													FlowController.getLoggedAsUser(),
 													userState,
 													new UserStateUpdatingResultCallback(presenter));
+					if (projectItemInfo.getLastLine() != -1 && projectItemInfo.getLastPos() != -1) {
+						projectItemInfo.getFileSheet().setCursorPosition(projectItemInfo.getLastLine(),
+																		 projectItemInfo.getLastPos());
+						projectItemInfo.setLastLine(-1);
+						projectItemInfo.setLastPos(-1);
+					}
 				}
 			}
 		}

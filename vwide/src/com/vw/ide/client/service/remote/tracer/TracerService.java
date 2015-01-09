@@ -11,6 +11,7 @@ import net.zschech.gwt.comet.client.SerialTypes;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
+import com.vw.ide.client.event.uiflow.SearchAndReplaceResultEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.BusConnectivity;
 import com.vw.ide.client.service.ServiceCallback;
@@ -79,6 +80,7 @@ public class TracerService implements BusConnectivity, VwIdeClientService {
 					}
 					if (message instanceof SearchAndReplaceMessage) {
 						SearchAndReplaceMessage data = (SearchAndReplaceMessage)message;
+						owner.fireEvent(new SearchAndReplaceResultEvent(data.getData()));
 						System.out.println("Got search&replace message '" + data.getData() + "'");
 					}
 				}

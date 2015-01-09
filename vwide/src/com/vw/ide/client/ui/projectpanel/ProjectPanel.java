@@ -87,6 +87,8 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		private ProjectDescription projectDescription;
 		private FileItemInfo associatedData = new FileItemInfo();
 		private FileSheet fileSheet;
+		private int lastLine = -1;
+		private int lastPos = -1;
 		private boolean markAsProject = false;
 		private boolean alreadyOpened = false;
 		private boolean isEdited = false;
@@ -107,6 +109,8 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 			to.setMarkAsProject(markAsProject);
 			to.setMarkAsUserRoot(markAsUserRoot);
 			to.setProjectDescription(projectDescription);
+			to.setLastLine(lastLine);
+			to.setLastPos(lastPos);
 		}
 		
 		@Override
@@ -168,6 +172,22 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 
 		public void setMarkAsUserRoot(boolean markAsUserRoot) {
 			this.markAsUserRoot = markAsUserRoot;
+		}
+
+		public int getLastLine() {
+			return lastLine;
+		}
+
+		public void setLastLine(int lastLine) {
+			this.lastLine = lastLine;
+		}
+
+		public int getLastPos() {
+			return lastPos;
+		}
+
+		public void setLastPos(int lastPos) {
+			this.lastPos = lastPos;
 		}
 
 		@Override
@@ -411,6 +431,10 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 		}
 	}
 
+	public ProjectItemInfo getProjectItemByFileItemInfo(FileItemInfo fi) {
+		return store.findModelWithKey(fi.generateKey());
+	}
+	
 	public boolean isEdited(FileItemInfo fi) {
 		boolean r = false;
 		ProjectItemInfo p = store.findModelWithKey(fi.generateKey());

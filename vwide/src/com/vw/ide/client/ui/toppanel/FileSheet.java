@@ -140,6 +140,14 @@ public class FileSheet extends Composite {
 		this.itemInfo = itemInfo;
 	}
 
+	public void setCursorPosition(int line, int pos) {
+		aceEditor.gotoPos(line, pos, JavaScriptObject.createFunction());
+	}
+
+	public void markText(String text) {
+		aceEditor.markText(aceEditor.createSelectionObject(), text);
+	}
+	
 	public void constructEditor(String textFile, FilesTypesEnum fileType) {
 		aceEditor = new AceEditor();
 		aceEditor.setWidth("100%");
@@ -159,7 +167,6 @@ public class FileSheet extends Composite {
 								// setTheme/setMode/etc.
 		aceEditor.setTheme(((DevelopmentBoardPresenter) presenter).getTopPanel().comboATh.getCurrentValue());
 
-		
 		aceEditor.setText(textFile);
 		
 		

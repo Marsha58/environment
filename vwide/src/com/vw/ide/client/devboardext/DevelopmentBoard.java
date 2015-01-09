@@ -322,6 +322,10 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		return getProjectPanel().getActualListOfFiles(projectDescription);
 	}
 
+	public ConsolesPanelView getConsoles() {
+		return consoles;
+	}
+
 	protected void requestUserProjects() {
 		projectPanel.requestUserProjects(FlowController.getLoggedAsUser());
 	}

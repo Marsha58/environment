@@ -305,6 +305,32 @@ public class AceEditor extends Composite implements RequiresResize, HasText, Tak
 	}-*/;
 
 	/**
+	 * Go to given line and column
+	 *
+	 * @param line the line to go to
+	 * @param column the position on line
+	 */
+	public native void gotoPos(int line, int column, JavaScriptObject func) /*-{
+		var editor = this.@edu.ycp.cs.dh.acegwt.client.ace.AceEditor::editor;
+		editor.focus();
+		editor.scrollToLine(line, true, true, func);
+		editor.gotoLine(line, column, true);
+	}-*/;
+
+	
+	  /**
+	   * Returns a new object.
+	   */
+	public native JavaScriptObject createSelectionObject() /*-{
+	    return {backwards: false, wrap: false, caseSensitive: false, wholeWord: true, regExp: false};
+	}-*/;
+	
+	public native void markText(JavaScriptObject selection, String text) /*-{
+		var editor = this.@edu.ycp.cs.dh.acegwt.client.ace.AceEditor::editor;
+		editor.findAll(text, selection, true);
+	}-*/;
+
+	/**
 	 * Set whether or not the horizontal scrollbar is always visible.
 	 *
 	 * @param hScrollBarAlwaysVisible true if the horizontal scrollbar is always

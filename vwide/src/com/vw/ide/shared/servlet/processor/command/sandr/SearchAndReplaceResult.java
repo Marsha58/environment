@@ -13,6 +13,13 @@ public class SearchAndReplaceResult implements Serializable {
 	private FileItemInfo fileInfo;
 	private String search;
 	private String replace;
+
+	@SuppressWarnings("unused")
+	transient private String key;
+	@SuppressWarnings("unused")
+	transient private String file;
+	@SuppressWarnings("unused")
+	transient private String place;
 	
 	public SearchAndReplaceResult() {
 		super();
@@ -87,6 +94,18 @@ public class SearchAndReplaceResult implements Serializable {
 		this.fileInfo = fileInfo;
 	}
 
+	public String getKey() {
+		return "Found: " + getSearch() + "; project: [" + getProjectName() + "]; file: [" + getFileInfo().getAbsolutePath() + "/" + getFileInfo().getName() + "]; line: [" + getLine() + "]; position: [" + getPosition() + "]";
+	}
+	
+	public String getFile() {
+		return getFileInfo().getAbsolutePath() + "/" + getFileInfo().getName();
+	}
+	
+	public String getPlace() {
+		return getLine() + ":" + getPosition();
+	}
+	
 	@Override
 	public String toString() {
 		return "SearchAndReplaceResult [userName=" + userName + ", position="
