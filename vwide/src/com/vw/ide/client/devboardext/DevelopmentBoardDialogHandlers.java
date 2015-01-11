@@ -1,7 +1,9 @@
 package com.vw.ide.client.devboardext;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.box.PromptMessageBox;
+import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
 import com.vw.ide.client.FlowController;
@@ -11,6 +13,7 @@ import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRem
 import com.vw.ide.client.devboardext.service.projectmanager.callbacks.ProjectRenameFileResultCallback;
 import com.vw.ide.client.dialog.fileopen.FileOpenDialog;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
+import com.vw.ide.client.event.uiflow.SaveFileEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.automata.EventProcessingAutomata;
 import com.vw.ide.client.presenters.automata.EventProcessingAutomata.State;
@@ -18,6 +21,7 @@ import com.vw.ide.client.projects.FilesTypesEnum;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.projectmanager.ProjectManagerServiceBroker;
 import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
+import com.vw.ide.client.ui.toppanel.FileSheet;
 import com.vw.ide.client.utils.Utils;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.projectmanager.RequestProjectImportResult;
@@ -138,6 +142,33 @@ public class DevelopmentBoardDialogHandlers {
 		}
 	};
 
+	public static class CloseUnsavedFileDialogHideHandler implements DialogHideHandler {
+		private DevelopmentBoardPresenter owner;
+		private BeforeCloseEvent<Widget> sourceEvent;
+		
+		public CloseUnsavedFileDialogHideHandler(DevelopmentBoardPresenter owner, BeforeCloseEvent<Widget> sourceEvent) {
+			this.owner = owner;
+			this.sourceEvent = sourceEvent;
+		}
+		
+		@Override
+		public void onDialogHide(DialogHideEvent event) {
+			String s = event.getHideButton().name();
+			// save file (set flag on SaveFileEvent to immediately close tab after saving)
+			FileSheet f = (FileSheet)sourceEvent.getItem();
+			if (s.equalsIgnoreCase("YES")) {
+				SaveFileEvent se = new SaveFileEvent(f.getItemInfo());
+				se.setCloseAfterSave(true);
+				owner.fireEvent(se);
+			}
+			else {
+				f.getItemInfo().setEdited(false);
+				owner.getView().markFileAsEdited(f.getItemInfo(), false);
+				owner.getView().closeEditorForSpecificProject(f.getItemInfo());
+			}
+		}
+	}
+	
 	public static class DeleteFileDialogHideHandler implements DialogHideHandler {
 		private DevelopmentBoardPresenter owner;
 		

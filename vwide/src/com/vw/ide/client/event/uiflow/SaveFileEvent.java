@@ -12,6 +12,8 @@ import com.vw.ide.client.ui.projectpanel.ProjectPanel.ProjectItemInfo;
 public class SaveFileEvent extends GwtEvent<SaveFileHandler> {
 
 	private ProjectItemInfo saveProjectItemInfo;
+	private boolean closeAfterSave;
+	
 	public static Type<SaveFileHandler> TYPE = new Type<SaveFileHandler>();
 	
 	public SaveFileEvent(ProjectItemInfo saveProjectItemInfo) {
@@ -19,9 +21,16 @@ public class SaveFileEvent extends GwtEvent<SaveFileHandler> {
 		this.saveProjectItemInfo = saveProjectItemInfo;
 	}
 
-	
 	public ProjectItemInfo getSaveProjectItemInfo() {
 		return saveProjectItemInfo;
+	}
+
+	public boolean isCloseAfterSave() {
+		return closeAfterSave;
+	}
+
+	public void setCloseAfterSave(boolean closeAfterSave) {
+		this.closeAfterSave = closeAfterSave;
 	}
 
 	@Override

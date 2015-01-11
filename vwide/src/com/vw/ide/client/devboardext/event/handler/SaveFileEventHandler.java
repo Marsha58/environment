@@ -18,16 +18,21 @@ public class SaveFileEventHandler extends Presenter.PresenterEventHandler implem
 
 		private ProjectItemInfo itemInfo;
 		private DevelopmentBoardPresenter presenter;
+		private boolean closeAfterSave;
 		
-		public HandlerOnSaveFile(DevelopmentBoardPresenter presenter, ProjectItemInfo itemInfo) {
+		public HandlerOnSaveFile(DevelopmentBoardPresenter presenter, ProjectItemInfo itemInfo, boolean closeAfterSave) {
 			this.presenter = presenter;
 			this.itemInfo = itemInfo;
+			this.closeAfterSave = closeAfterSave;
 		}
 		
 		@Override
 		public void handle(RequestFileOperationResult result) {
 			itemInfo.setEdited(false);
 			presenter.getView().markFileAsEdited(itemInfo, false);
+			if (closeAfterSave) {
+				presenter.getView().closeEditorForSpecificProject(itemInfo);
+			}
 		}
 	}
 	
@@ -51,6 +56,6 @@ public class SaveFileEventHandler extends Presenter.PresenterEventHandler implem
 													null,
 													null,
 													toSave.getFileSheet().getAceEditor().getText(),
-													new BrowserAnyFileOperationResultCallback(presenter, new HandlerOnSaveFile(presenter, toSave)));
+													new BrowserAnyFileOperationResultCallback(presenter, new HandlerOnSaveFile(presenter, toSave, event.isCloseAfterSave())));
 	}	
 }

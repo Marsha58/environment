@@ -58,7 +58,6 @@ public class SelectFileEventHandler extends Presenter.PresenterEventHandler impl
 				}
 			}
 		}
-		
 	}
 	
 	private static class UpdateUserStateOnSelection implements UserStateHandler {

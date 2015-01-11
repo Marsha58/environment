@@ -9,6 +9,7 @@ import com.vw.ide.client.event.uiflow.SearchTextEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.processor.CommandProcessorServiceBroker;
+import com.vw.ide.client.ui.consolespanel.ConsolesPanelView;
 import com.vw.ide.shared.servlet.processor.CommandProcessorResult;
 import com.vw.ide.shared.servlet.processor.dto.sandr.SearchAndReplaceBundle;
 
@@ -30,6 +31,7 @@ public class SearchTextEventHandler extends Presenter.PresenterEventHandler impl
 				b.show();
 			}
 			else {
+				presenter.getView().getConsoles().scrollToTab(ConsolesPanelView.Tab.SEARCH);
 				CommandProcessorServiceBroker.performSearchAndReplace(presenter.getLoggedAsUser(),
 																	bundle,
 																	new SearchAndReplaceCallback());

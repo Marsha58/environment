@@ -10,7 +10,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.TabPanel;
+import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.event.BeforeCloseEvent;
+import com.vw.ide.client.devboardext.DevelopmentBoardDialogHandlers.CloseUnsavedFileDialogHideHandler;
 import com.vw.ide.client.devboardext.DevelopmentBoardPresenter;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.presenters.Presenter;
@@ -50,8 +52,17 @@ public class EditorPanel extends Composite {
 		tabPanel.addBeforeCloseHandler(new BeforeCloseEvent.BeforeCloseHandler<Widget> () {
 			@Override
 			public void onBeforeClose(BeforeCloseEvent<Widget> event) {
-				System.out.println("BeforeCloseEvent: " + event.toString());
-				presenter.fireEvent(new EditorTabClosedEvent(event));
+				FileSheet curFileSheet = (FileSheet)event.getItem();
+				if (curFileSheet.getItemInfo().isEdited()) {
+					event.setCancelled(true);
+					ConfirmMessageBox box = new ConfirmMessageBox("Save", "Would you like to save '" + curFileSheet.getItemInfo().getAssociatedData().getName() + "'");
+					box.addDialogHideHandler(new CloseUnsavedFileDialogHideHandler((DevelopmentBoardPresenter)presenter, event));
+					box.show();
+				}
+				else {
+					System.out.println("BeforeCloseEvent: " + event.toString());
+					presenter.fireEvent(new EditorTabClosedEvent(event));
+				}
 			}
 		});
 		

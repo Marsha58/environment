@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Composite;
+import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -33,6 +34,12 @@ import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 
 public class ConsolesPanelView extends Composite {
 
+	public static enum Tab {
+		INFO,
+		SEARCH,
+		COMMUNICATION
+	};
+	
 	private static final SearchResultTabProperties searchProps = GWT.create(SearchResultTabProperties.class);
 	
 	private static class SearchSelectionHandler implements SelectionHandler<SearchAndReplaceResult> {
@@ -68,6 +75,10 @@ public class ConsolesPanelView extends Composite {
 	}
 
 	private AceEditor logAceEditor;
+	
+	@UiField
+	TabPanel consolesTab;
+	
 	// all info messages are sent here
 	@UiField HTML infoConsole;
 	// 'text' out fringe
@@ -113,6 +124,12 @@ public class ConsolesPanelView extends Composite {
 		this.searchConsoleTab = searchConsoleTab;
 	}
 
+	public void scrollToTab(Tab tab) {
+		Widget w = consolesTab.getWidget(tab.ordinal());
+		consolesTab.setActiveWidget(w);
+		consolesTab.scrollToTab(w, true);
+	}
+
 	protected Presenter getAssociatedPresenter() {
 		return this.presenter;
 	}
@@ -154,8 +171,5 @@ public class ConsolesPanelView extends Composite {
 	   logAceEditor.setMode(AceEditorMode.TEXT);	
 	   MarginData layoutData = new MarginData(1, 1, 1, 1);
 	   incomingConsole.add(logAceEditor, layoutData); 
-   }
-   
-   public void appendLog(String logContent) {
-   }
+   }   
 }

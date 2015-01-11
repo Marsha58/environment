@@ -275,6 +275,17 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 			}
 		}
 	}
+
+	public void closeEditorForSpecificProject(ProjectItemInfo itemInfo) {
+		for (int i = 0; i < editor.getTabPanel().getWidgetCount(); i++) {
+			FileSheet curFileSheet = (FileSheet)editor.getTabPanel().getWidget(i);
+			if (curFileSheet.equals(itemInfo.getFileSheet())) {
+				editor.getTabPanel().remove(curFileSheet);
+				presenter.fireEvent(new EditorTabClosedEvent(new BeforeCloseEvent<Widget>(curFileSheet)));
+				break;
+			}
+		}
+	}
 	
 	public int getNumberOfOpendedFilesOfSpecificProject(ProjectDescription projectDescription) {
 		int n = 0;
