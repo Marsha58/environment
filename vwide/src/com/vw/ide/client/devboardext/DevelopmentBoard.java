@@ -326,9 +326,6 @@ public class DevelopmentBoard extends ResizeComposite implements IsWidget, Prese
 		return moveOperationBlock;
 	}
 	
-	public void appendLog(String log) {
-	}
-
 	public List<FileItemInfo> getUpdatedListOfFiles(ProjectDescription projectDescription) {
 		return getProjectPanel().getActualListOfFiles(projectDescription);
 	}

@@ -7,6 +7,8 @@ import java.io.Serializable;
 
 import com.vw.ide.server.servlet.locator.ServiceLocator;
 import com.vw.ide.server.servlet.tracer.TracerServiceImpl;
+import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
+import com.vw.ide.shared.servlet.remotebrowser.FileItemInfo;
 import com.vw.ide.shared.servlet.tracer.TracerData;
 
 /**
@@ -52,5 +54,19 @@ public class ServiceUtils {
 			result = bos.toByteArray();
 		}
 		return result;
-	}	
+	}
+	
+	public static String getProjectOperationalDir(ProjectDescription description) {
+		return description.getProjectPath() + "/" + description.getMainModuleName();
+	}
+
+	public static void correctFileItem(String projDir, FileItemInfo f) {
+		if (f.getRelPath() == null && f.getAbsolutePath() != null) {
+			String relPath = "";
+			if (!projDir.equals(f.getAbsolutePath())) {
+				relPath = f.getAbsolutePath().substring(projDir.length() + 1);
+			}
+			f.setRelPath(relPath);
+		}
+	}
 }

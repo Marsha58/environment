@@ -15,7 +15,6 @@ public class StartProjectExecutionEventHandler extends Presenter.PresenterEventH
 
 		@Override
 		public void handle(CommandProcessorResult result) {
-			// TODO Auto-generated method stub
 		}
 	}
 	
@@ -32,7 +31,7 @@ public class StartProjectExecutionEventHandler extends Presenter.PresenterEventH
 	}
 	
 	private void process(DevelopmentBoardPresenter presenter, StartProjectExecutionEvent event) {
-		System.out.println("Start execution");
+		presenter.getView().getTopPanel().enableStarExecution(false);
 		CommandProcessorServiceBroker.buildProject(presenter.getLoggedAsUser(),
 													 event.getProjectToProcess(),
 													 new CompileProjectCallback());

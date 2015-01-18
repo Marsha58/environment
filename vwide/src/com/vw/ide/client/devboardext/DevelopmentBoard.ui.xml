@@ -6,7 +6,7 @@
     xmlns:uitp='urn:import:com.vw.ide.client.ui.toppanel'
     xmlns:uiep='urn:import:com.vw.ide.client.ui.editorpanel'
     xmlns:uipp='urn:import:com.vw.ide.client.ui.projectpanel'
-    xmlns:uiwp='urn:import:com.vw.ide.client.ui.consolespanel'>
+    xmlns:uiwp='urn:import:com.vw.ide.client.ui.consolespanel' xmlns:b="urn:import:com.sencha.gxt.widget.core.client.button">
  
   <ui:style>
     .centerMargin {
@@ -43,9 +43,10 @@
           <gxt:ContentPanel />
         </container:east>
         <container:south layoutData="{southData}">
-          <gxt:ContentPanel headingText="Windows" resize="true">
+            <gxt:ContentPanel headingText="Consoles" resize="true">
+            	<b:TextButton></b:TextButton>
           		<uiwp:ConsolesPanelView ui:field='consoles' />
-          </gxt:ContentPanel>
+            </gxt:ContentPanel> 
         </container:south>
       </container:BorderLayoutContainer>
     </container:child>

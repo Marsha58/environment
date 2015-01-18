@@ -18,7 +18,6 @@ import com.vw.ide.client.event.uiflow.LoginEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.presenters.Presenter;
 import com.vw.ide.client.presenters.PresenterViewerLink;
-import com.vw.ide.client.presenters.Presenter.PresenterEventHandler;
 import com.vw.ide.client.service.remote.ResultCallback;
 import com.vw.ide.client.service.remote.security.SecurityServiceBroker;
 import com.vw.ide.shared.servlet.security.RequestLoginResult;

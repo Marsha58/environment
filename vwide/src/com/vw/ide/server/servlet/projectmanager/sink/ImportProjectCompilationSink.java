@@ -100,4 +100,8 @@ public class ImportProjectCompilationSink extends CompilationSink {
 	public List<FileItemInfo> getIncludes() {
 		return includes;
 	}
+	
+	public void delegateErrorCompilationMessage(OperationInfo opInfo) {
+		
+	}
 }

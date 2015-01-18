@@ -15,6 +15,10 @@ public class DeleteOperationBlock {
 		if (!itemInfo.isMarkAsProject()) {
 			devBoard.getTopPanel().delItemFromScrollMenu(itemInfo);
 			devBoard.getEditorPanel().getTabPanel().remove(itemInfo.getFileSheet());
+			devBoard.getConsoles().getSearchConsoleTab().removeByFileItemInfo(itemInfo.getAssociatedData());
+		}
+		else {
+			devBoard.getConsoles().getSearchConsoleTab().removeByProjectName(itemInfo.getProjectDescription().getProjectName());
 		}
 		if (devBoard.getEditorPanel().getTabPanel().getWidgetCount() == 0) {
 			devBoard.setTextForEditorContentPanel(null);

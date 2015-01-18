@@ -9,9 +9,12 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vw.ide.server.servlet.IService;
 import com.vw.ide.server.servlet.ServiceUtils;
 import com.vw.ide.server.servlet.locator.ServiceLocator;
+import com.vw.ide.server.servlet.processor.command.sandr.SearchAndReplaceCommandHandler;
+import com.vw.ide.server.servlet.processor.command.vwml.RunVWMLProjectCommandHandler;
+import com.vw.ide.server.vwml.log.router.VWMLProcessorLogRouterAppender;
+import com.vw.ide.server.vwml.log.router.stream.TracerLogOutStream;
 import com.vw.ide.shared.servlet.processor.CommandProcessor;
 import com.vw.ide.shared.servlet.processor.CommandProcessorResult;
-import com.vw.ide.shared.servlet.processor.command.sandr.SearchAndReplaceCommandHandler;
 import com.vw.ide.shared.servlet.processor.dto.sandr.SearchAndReplaceBundle;
 import com.vw.ide.shared.servlet.projectmanager.ProjectDescription;
 import com.vw.ide.shared.servlet.tracer.TracerMessage;
@@ -29,6 +32,7 @@ public class CommandProcessorServiceImpl extends RemoteServiceServlet implements
 		if (logger.isInfoEnabled()) {
 			logger.info("CommandProcessorServiceImpl started and initialized");
 		}
+		Logger.getRootLogger().addAppender(new VWMLProcessorLogRouterAppender(new TracerLogOutStream()));
 	}
 
 	@Override
@@ -43,8 +47,19 @@ public class CommandProcessorServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public CommandProcessorResult buildProject(String userName, ProjectDescription projectDescription) {
-		pushMessageToTracer(userName, "Compilation of started");
-		return null;
+		CommandProcessorResult r = null;
+		if (logger.isInfoEnabled()) {
+			logger.info("User '" + userName + "' runs project '" + projectDescription.getProjectName() + "'");
+		}
+		try {
+			r = RunVWMLProjectCommandHandler.instance(projectDescription).handle();
+		} catch (Exception e) {
+			r = new CommandProcessorResult();
+			r.setOperation("run_project");
+			r.setResult(e.getMessage());
+			r.setRetCode(CommandProcessorResult.GENERAL_FAIL);
+		}
+		return r;
 	}
 
 	@Override

@@ -73,9 +73,8 @@ public class ServerLogEventHandler extends Presenter.PresenterEventHandler imple
 	
 	protected void process(DevelopmentBoardPresenter presenter, ServerLogEvent event) {
 		RequestResult r = event.getRequestResult();
-		if (r != null && r.getOperation() != null && r.getResult() != null && r.getRetCode() != null) {
-			Log log = new Log(r.getOperation(), r.getResult(), r.getRetCode());
-			presenter.getView().appendLog(log.toString());
+		if (r != null && r.getResult() != null && r.getResult().length() != 0) {
+			presenter.getView().getConsoles().getInfoConsoleTab().addInfo(r.getResult());
 		}
 	}
 }

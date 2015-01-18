@@ -108,10 +108,6 @@ public class FileSheet extends Composite {
 		absPos.setText(String.valueOf(iAbsPos));
 	}	
 	
-	public void setDockLayoutPanel(String sHeight) {
-		dockLayoutPanel.setHeight(sHeight);
-	}	
-	
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
@@ -146,6 +142,10 @@ public class FileSheet extends Composite {
 
 	public void markText(String text) {
 		aceEditor.markText(aceEditor.createSelectionObject(), text);
+	}
+	
+	public void setText(String text) {
+		aceEditor.setText(text);
 	}
 	
 	public void constructEditor(String textFile, FilesTypesEnum fileType) {

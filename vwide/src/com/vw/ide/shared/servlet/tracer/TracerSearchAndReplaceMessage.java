@@ -1,15 +1,15 @@
-package com.vw.ide.shared.servlet.processor.command.sandr;
+package com.vw.ide.shared.servlet.tracer;
 
-import com.vw.ide.shared.servlet.tracer.TracerData;
+import com.vw.ide.shared.servlet.processor.dto.sandr.SearchAndReplaceResult;
 
 @SuppressWarnings("serial")
-public class SearchAndReplaceMessage extends TracerData<SearchAndReplaceResult> {
+public class TracerSearchAndReplaceMessage extends TracerData<SearchAndReplaceResult> {
 
-	public SearchAndReplaceMessage() {
+	public TracerSearchAndReplaceMessage() {
 		
 	}
 	
-	public SearchAndReplaceMessage(SearchAndReplaceResult r) {
+	public TracerSearchAndReplaceMessage(SearchAndReplaceResult r) {
 		super(r);
 	}
 }

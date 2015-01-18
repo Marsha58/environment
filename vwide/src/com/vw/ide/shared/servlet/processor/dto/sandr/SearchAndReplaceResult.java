@@ -1,4 +1,4 @@
-package com.vw.ide.shared.servlet.processor.command.sandr;
+package com.vw.ide.shared.servlet.processor.dto.sandr;
 
 import java.io.Serializable;
 
@@ -13,6 +13,8 @@ public class SearchAndReplaceResult implements Serializable {
 	private FileItemInfo fileInfo;
 	private String search;
 	private String replace;
+	// fileInfo is considered as result of replace operation
+	private Boolean fileAsReplaced;
 
 	@SuppressWarnings("unused")
 	transient private String key;
@@ -106,6 +108,14 @@ public class SearchAndReplaceResult implements Serializable {
 		return getLine() + ":" + getPosition();
 	}
 	
+	public boolean isFileAsReplaced() {
+		return (fileAsReplaced == null) ? false : fileAsReplaced;
+	}
+
+	public void setFileAsReplaced(Boolean fileAsReplaced) {
+		this.fileAsReplaced = fileAsReplaced;
+	}
+
 	@Override
 	public String toString() {
 		return "SearchAndReplaceResult [userName=" + userName + ", position="
@@ -113,6 +123,4 @@ public class SearchAndReplaceResult implements Serializable {
 				+ ", fileInfo=" + fileInfo + ", search=" + search
 				+ ", replace=" + replace + "]";
 	}
-	
-	
 }

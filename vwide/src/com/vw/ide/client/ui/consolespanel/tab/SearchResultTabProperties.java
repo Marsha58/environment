@@ -5,7 +5,7 @@ import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
-import com.vw.ide.shared.servlet.processor.command.sandr.SearchAndReplaceResult;
+import com.vw.ide.shared.servlet.processor.dto.sandr.SearchAndReplaceResult;
 
 /**
  * See http://www.sencha.com/examples/#ExamplePlace:basicsimplegrid(uibinder)

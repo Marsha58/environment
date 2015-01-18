@@ -66,7 +66,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 	"</dependency> ";
 	
 	public static final int ID = 1027;
-	
+
 	public ProjectManagerServiceImpl() {
 		super();
 		if (s_vwmlCompilerDefaultSettings == null) {
@@ -218,8 +218,8 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			res.setRetCode(r.getRetCode());
 			return res;
 		}
-		String projDir = getProjectOperationalDir(description);
-		correctFileItem(projDir, toAdd);
+		String projDir = ServiceUtils.getProjectOperationalDir(description);
+		ServiceUtils.correctFileItem(projDir, toAdd);
 		description.getProjectFiles().add(toAdd);
 		r = updateProject(description);
 		if (r.getRetCode() != RequestProjectUpdateResult.GENERAL_OK) {
@@ -261,7 +261,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		}
 		RequestSerializationOperationResult r = browser.serializeObjectToJson(description.getUserName(),
 																			  projectDescriptionFile,
-																			  getProjectOperationalDir(description),
+																			  ServiceUtils.getProjectOperationalDir(description),
 																			  description);
 		if (r.getRetCode() != RequestSerializationOperationResult.GENERAL_OK) {
 			res.setRetCode(r.getRetCode());
@@ -308,9 +308,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 				if (d.getProjectFiles().size() == 0) {
 					d.getProjectFiles().add(d.getMainProjectFile());
 				}
-				String projDir = getProjectOperationalDir(d);
+				String projDir = ServiceUtils.getProjectOperationalDir(d);
 				for(FileItemInfo f : d.getProjectFiles()) {
-					correctFileItem(projDir, f);
+					ServiceUtils.correctFileItem(projDir, f);
 				}
 				res.getAvailableProjects().add(d);
 			}
@@ -459,9 +459,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 	private void createProjectLayout(DirBrowserImpl browser, ProjectDescription description) throws Exception {
 		String dirs[] = {
 				description.getJavaSrcPath(),
-				getProjectOperationalDir(description),
-				getProjectOperationalDir(description) + "/interpreter",
-				getProjectOperationalDir(description) + "/addons"
+				ServiceUtils.getProjectOperationalDir(description),
+				ServiceUtils.getProjectOperationalDir(description) + "/interpreter",
+				ServiceUtils.getProjectOperationalDir(description) + "/addons"
 		};
 		for(String dir : dirs) {
 			if (logger.isInfoEnabled()) {
@@ -476,9 +476,9 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 
 	private void removeProjectLayout(DirBrowserImpl browser, ProjectDescription description) throws Exception {
 		String dirs[] = {
-				getProjectOperationalDir(description) + "/interpreter",
-				getProjectOperationalDir(description) + "/addons",
-				getProjectOperationalDir(description),
+				ServiceUtils.getProjectOperationalDir(description) + "/interpreter",
+				ServiceUtils.getProjectOperationalDir(description) + "/addons",
+				ServiceUtils.getProjectOperationalDir(description),
 		};
 		for(String dir : dirs) {
 			if (logger.isInfoEnabled()) {
@@ -502,14 +502,14 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		}
 		String content = generateContentOfMainProjectFile(description);
 		RequestDirOperationResult res = browser.createFile(	description.getUserName(),
-															getProjectOperationalDir(description),
+															ServiceUtils.getProjectOperationalDir(description),
 															sProjectMainFileName,
 															content);
 		if (res.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
 			throw new Exception(res.getResult());
 		}
 		
-		description.setMainProjectFile(new FileItemInfo(sProjectMainFileName, getProjectOperationalDir(description), false));
+		description.setMainProjectFile(new FileItemInfo(sProjectMainFileName, ServiceUtils.getProjectOperationalDir(description), false));
 		description.getProjectFiles().add(description.getMainProjectFile());
 		RequestProjectUpdateResult updateResult = updateProject(description);
 		if (updateResult.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
@@ -522,11 +522,11 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		if (logger.isInfoEnabled()) {
 			logger.info("User '" + description.getUserName() + "'" + "; project '" + description.getProjectName() + "';" + " description file '" + projectDescriptionFile + "'");
 		}
-		description.setProjectDescriptionFile(new FileItemInfo(projectDescriptionFile, getProjectOperationalDir(description), false));
+		description.setProjectDescriptionFile(new FileItemInfo(projectDescriptionFile, ServiceUtils.getProjectOperationalDir(description), false));
 		description.wellForm();
 		RequestSerializationOperationResult res = browser.serializeObjectToJson(description.getUserName(),
 																				projectDescriptionFile,
-																				getProjectOperationalDir(description),
+																				ServiceUtils.getProjectOperationalDir(description),
 																				description);
 		if (res.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
 			throw new Exception(res.getResult());
@@ -541,7 +541,7 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		}
 		content += "interpreter.ring.visitor=com.vw.lang.conflictring.visitor.VWMLConflictRingVisitor\r\n";
 		RequestDirOperationResult res = browser.createFile(description.getUserName(),
-															getProjectOperationalDir(description) + "/interpreter",
+															ServiceUtils.getProjectOperationalDir(description) + "/interpreter",
 															INTERPRETER_CONF_FILE,
 															content);
 		if (res.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
@@ -554,10 +554,6 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 		if (res.getRetCode() != RequestDirOperationResult.GENERAL_OK) {
 			throw new Exception(res.getResult());
 		}		
-	}
-	
-	private String getProjectOperationalDir(ProjectDescription description) {
-		return description.getProjectPath() + "/" + description.getMainModuleName();
 	}
 	
 	private String generateContentOfMainProjectFile(ProjectDescription description) {
@@ -629,16 +625,6 @@ public class ProjectManagerServiceImpl extends RemoteServiceServlet implements R
 			return null;
 		}
 		return userStateResult.getUserStateInfo();
-	}
-	
-	private void correctFileItem(String projDir, FileItemInfo f) {
-		if (f.getRelPath() == null && f.getAbsolutePath() != null) {
-			String relPath = "";
-			if (!projDir.equals(f.getAbsolutePath())) {
-				relPath = f.getAbsolutePath().substring(projDir.length() + 1);
-			}
-			f.setRelPath(relPath);
-		}
 	}
 	
 	private RequestProjectImportResult importProjectImpl(String userName, RequestProjectImportResult res, byte[] archive, String toPath) throws Exception {

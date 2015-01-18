@@ -11,6 +11,8 @@ import net.zschech.gwt.comet.client.SerialTypes;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
+import com.vw.ide.client.event.uiflow.CompilationErrorResultEvent;
+import com.vw.ide.client.event.uiflow.FinishProjectExecutionEvent;
 import com.vw.ide.client.event.uiflow.SearchAndReplaceResultEvent;
 import com.vw.ide.client.event.uiflow.ServerLogEvent;
 import com.vw.ide.client.service.BusConnectivity;
@@ -19,15 +21,17 @@ import com.vw.ide.client.service.VwIdeClientService;
 import com.vw.ide.client.service.factory.ServicesStubFactory;
 import com.vw.ide.shared.OperationTypes;
 import com.vw.ide.shared.servlet.RequestResult;
-import com.vw.ide.shared.servlet.processor.command.sandr.SearchAndReplaceMessage;
 import com.vw.ide.shared.servlet.tracer.RemoteTracerAsync;
+import com.vw.ide.shared.servlet.tracer.TracerBuildVwmlProjectFinishedMessage;
 import com.vw.ide.shared.servlet.tracer.TracerMessage;
 import com.vw.ide.shared.servlet.tracer.TracerRegisterResult;
+import com.vw.ide.shared.servlet.tracer.TracerSearchAndReplaceMessage;
 import com.vw.ide.shared.servlet.tracer.TracerUnregisterResult;
+import com.vw.ide.shared.servlet.tracer.TracerVwmlCompilationErrorMessage;
 
 public class TracerService implements BusConnectivity, VwIdeClientService {
 
-	@SerialTypes( { TracerMessage.class, SearchAndReplaceMessage.class })
+	@SerialTypes( { TracerMessage.class, TracerSearchAndReplaceMessage.class, TracerBuildVwmlProjectFinishedMessage.class, TracerVwmlCompilationErrorMessage.class })
     public static abstract class TracerServiceCometSerializer extends CometSerializer {
     }
 	
@@ -76,12 +80,23 @@ public class TracerService implements BusConnectivity, VwIdeClientService {
 						rr.setOperation("log");
 						rr.setResult(data.getData());
 						owner.fireEvent(new ServerLogEvent(rr));
-						System.out.println("Got tracer message '" + data.getData() + "'");
 					}
-					if (message instanceof SearchAndReplaceMessage) {
-						SearchAndReplaceMessage data = (SearchAndReplaceMessage)message;
+					else
+					if (message instanceof TracerSearchAndReplaceMessage) {
+						TracerSearchAndReplaceMessage data = (TracerSearchAndReplaceMessage)message;
 						owner.fireEvent(new SearchAndReplaceResultEvent(data.getData()));
-						System.out.println("Got search&replace message '" + data.getData() + "'");
+					}
+					else
+					if (message instanceof TracerBuildVwmlProjectFinishedMessage) {
+						FinishProjectExecutionEvent event = new FinishProjectExecutionEvent();
+						event.setData((TracerBuildVwmlProjectFinishedMessage)message);
+						owner.fireEvent(event);
+					}
+					else
+					if (message instanceof TracerVwmlCompilationErrorMessage) {
+						TracerVwmlCompilationErrorMessage data = (TracerVwmlCompilationErrorMessage)message;
+						CompilationErrorResultEvent event = new CompilationErrorResultEvent(data.getData());
+						owner.fireEvent(event);
 					}
 				}
 			}

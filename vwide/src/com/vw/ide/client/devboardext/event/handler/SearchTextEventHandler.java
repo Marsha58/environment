@@ -27,7 +27,7 @@ public class SearchTextEventHandler extends Presenter.PresenterEventHandler impl
 		public void process(SearchAndReplaceBundle bundle) {
 			// perform request
 			if (bundle.getSearch() == null || bundle.getSearch().length() == 0) {
-				AlertMessageBox b = new AlertMessageBox("Warning", "At least 'Replace' field must be filled");
+				AlertMessageBox b = new AlertMessageBox("Warning", "At least 'Search' field must be filled");
 				b.show();
 			}
 			else {
@@ -43,8 +43,6 @@ public class SearchTextEventHandler extends Presenter.PresenterEventHandler impl
 
 		@Override
 		public void handle(CommandProcessorResult result) {
-			// TODO Auto-generated method stub
-			
 		}
 		
 	}
@@ -62,12 +60,8 @@ public class SearchTextEventHandler extends Presenter.PresenterEventHandler impl
 	}
 
 	private void process(DevelopmentBoardPresenter presenter, SearchTextEvent event) {
-		SearchAndReplaceDialog d = new SearchAndReplaceDialog(presenter.getView(), new StartSearch(presenter));
-		if (d.init()) {
-			d.setModal(true);
-			d.show();
-		}
-		else {
+		SearchAndReplaceDialog d = new SearchAndReplaceDialog(presenter, new StartSearch(presenter));
+		if (!d.init()) {
 			AlertMessageBox b = new AlertMessageBox("Warning", "User '" + presenter.getLoggedAsUser() + "' doesn't have any active project");
 			b.show();
 		}

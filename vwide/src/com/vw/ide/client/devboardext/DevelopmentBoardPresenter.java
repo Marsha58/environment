@@ -8,8 +8,10 @@ import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.vw.ide.client.devboardext.event.handler.AceColorThemeChangedEventHandler;
+import com.vw.ide.client.devboardext.event.handler.CompilationErrorResultEventHandler;
 import com.vw.ide.client.devboardext.event.handler.EditorTabClosedEventHandler;
 import com.vw.ide.client.devboardext.event.handler.FileEditedEventHandler;
+import com.vw.ide.client.devboardext.event.handler.FinishProjectExecutionEventHandler;
 import com.vw.ide.client.devboardext.event.handler.GetDirContentEventHandler;
 import com.vw.ide.client.devboardext.event.handler.LogoutEventHandler;
 import com.vw.ide.client.devboardext.event.handler.MoveFileEventHandler;
@@ -26,6 +28,7 @@ import com.vw.ide.client.devboardext.service.userstate.callbacks.custom.handler.
 import com.vw.ide.client.event.handler.AceColorThemeChangedHandler;
 import com.vw.ide.client.event.handler.EditorTabClosedHandler;
 import com.vw.ide.client.event.handler.FileEditedHandler;
+import com.vw.ide.client.event.handler.FinishProjectExecutionHandler;
 import com.vw.ide.client.event.handler.GetDirContentHandler;
 import com.vw.ide.client.event.handler.LogoutHandler;
 import com.vw.ide.client.event.handler.ProjectMenuHandler;
@@ -33,8 +36,10 @@ import com.vw.ide.client.event.handler.SaveFileHandler;
 import com.vw.ide.client.event.handler.SelectFileHandler;
 import com.vw.ide.client.event.handler.ServerLogHandler;
 import com.vw.ide.client.event.uiflow.AceColorThemeChangedEvent;
+import com.vw.ide.client.event.uiflow.CompilationErrorResultEvent;
 import com.vw.ide.client.event.uiflow.EditorTabClosedEvent;
 import com.vw.ide.client.event.uiflow.FileEditedEvent;
+import com.vw.ide.client.event.uiflow.FinishProjectExecutionEvent;
 import com.vw.ide.client.event.uiflow.GetDirContentEvent;
 import com.vw.ide.client.event.uiflow.LogoutEvent;
 import com.vw.ide.client.event.uiflow.MoveFileEvent;
@@ -95,8 +100,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 			put(ServerLogEvent.TYPE, new ServerLogEventHandler());
 			put(SaveAllFilesEvent.TYPE, new SaveAllFilesEventHandler());
 			put(StartProjectExecutionEvent.TYPE, new StartProjectExecutionEventHandler());
+			put(FinishProjectExecutionEvent.TYPE, new FinishProjectExecutionEventHandler());
 			put(SearchTextEvent.TYPE, new SearchTextEventHandler());
 			put(SearchAndReplaceResultEvent.TYPE, new SearchAndReplaceResultEventHandler());
+			put(CompilationErrorResultEvent.TYPE, new CompilationErrorResultEventHandler());
 		}
 	};
 	
@@ -145,8 +152,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.addHandler(MoveFileEvent.TYPE, (MoveFileEventHandler)dispatcher.get(MoveFileEvent.TYPE));
 		eventBus.addHandler(SaveAllFilesEvent.TYPE, (SaveAllFilesEventHandler)dispatcher.get(SaveAllFilesEvent.TYPE));
 		eventBus.addHandler(StartProjectExecutionEvent.TYPE, (StartProjectExecutionEventHandler)dispatcher.get(StartProjectExecutionEvent.TYPE));
+		eventBus.addHandler(FinishProjectExecutionEvent.TYPE, (FinishProjectExecutionHandler)dispatcher.get(FinishProjectExecutionEvent.TYPE));
 		eventBus.addHandler(SearchTextEvent.TYPE, (SearchTextEventHandler)dispatcher.get(SearchTextEvent.TYPE));
 		eventBus.addHandler(SearchAndReplaceResultEvent.TYPE, (SearchAndReplaceResultEventHandler)dispatcher.get(SearchAndReplaceResultEvent.TYPE));
+		eventBus.addHandler(CompilationErrorResultEvent.TYPE, (CompilationErrorResultEventHandler)dispatcher.get(CompilationErrorResultEvent.TYPE));
 		TracerServiceBroker.registerBackNotification();
 	}
 	
@@ -164,8 +173,10 @@ public class DevelopmentBoardPresenter extends Presenter {
 		eventBus.removeHandler(MoveFileEvent.TYPE, (MoveFileEventHandler)dispatcher.get(MoveFileEvent.TYPE));
 		eventBus.removeHandler(SaveAllFilesEvent.TYPE, (SaveAllFilesEventHandler)dispatcher.get(SaveAllFilesEvent.TYPE));
 		eventBus.removeHandler(StartProjectExecutionEvent.TYPE, (StartProjectExecutionEventHandler)dispatcher.get(StartProjectExecutionEvent.TYPE));
+		eventBus.removeHandler(FinishProjectExecutionEvent.TYPE, (FinishProjectExecutionHandler)dispatcher.get(FinishProjectExecutionEvent.TYPE));
 		eventBus.removeHandler(SearchTextEvent.TYPE, (SearchTextEventHandler)dispatcher.get(SearchTextEvent.TYPE));
 		eventBus.removeHandler(SearchAndReplaceResultEvent.TYPE, (SearchAndReplaceResultEventHandler)dispatcher.get(SearchAndReplaceResultEvent.TYPE));
+		eventBus.removeHandler(CompilationErrorResultEvent.TYPE, (CompilationErrorResultEventHandler)dispatcher.get(CompilationErrorResultEvent.TYPE));
 		TracerServiceBroker.unregisterBackNotification();
 	}
 

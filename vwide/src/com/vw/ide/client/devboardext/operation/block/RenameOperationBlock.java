@@ -11,14 +11,14 @@ public class RenameOperationBlock {
 	
 	public static class RenameProjectItemCallback {
 		
-		private RenameOperationBlock renbameBlock;
+		private RenameOperationBlock renameBlock;
 		
-		public RenameProjectItemCallback(RenameOperationBlock renbameBlock) {
-			this.renbameBlock = renbameBlock;
+		public RenameProjectItemCallback(RenameOperationBlock renameBlock) {
+			this.renameBlock = renameBlock;
 		}
 		
 		public void rename(ProjectItemInfo oldItemInfo, ProjectItemInfo newItemInfo) {
-			renbameBlock.renameOpenedProjectItem(oldItemInfo, newItemInfo);
+			renameBlock.renameOpenedProjectItem(oldItemInfo, newItemInfo);
 		}
 	}
 	
@@ -46,5 +46,7 @@ public class RenameOperationBlock {
 				devBoard.setTextForEditorContentPanel(newItemInfo.getAssociatedData().getAbsolutePath() + "/" + newItemInfo.getAssociatedData().getName());
 			}
 		}
+		// last search should be updated also
+		devBoard.getConsoles().getSearchConsoleTab().renameByFileItemInfo(origItemInfo.getAssociatedData(), newItemInfo.getAssociatedData());
 	}
 }

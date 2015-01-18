@@ -11,6 +11,8 @@ public class UserStateInfo implements Serializable {
 	private ProjectDescription projectIdSelected;
 	private FileItemInfo fileIdSelected;
 	private Set<FileItemInfo> openedFiles = new HashSet<FileItemInfo>(); 
+	private Set<String> searchHistory = new HashSet<String>();
+	private Set<String> replaceHistory = new HashSet<String>();
 	
 	public UserStateInfo() {
 		super();
@@ -48,10 +50,51 @@ public class UserStateInfo implements Serializable {
 		return openedFiles.contains(openedFile);
 	}
 
+	public void addToSearchHistory(String item) {
+		searchHistory.add(item);
+	}
+
+	public void addToReplaceHistory(String item) {
+		replaceHistory.add(item);
+	}
+	
+	public void removeFromSearchHistory(String item) {
+		searchHistory.remove(item);
+	}
+
+	public void removeFromReplaceHistory(String item) {
+		replaceHistory.remove(item);
+	}
+	
+	public void clearSearchHistory() {
+		searchHistory.clear();
+	}
+
+	public void clearReplaceHistory() {
+		replaceHistory.clear();
+	}
+
+	public Set<String> getSearchHistory() {
+		return searchHistory;
+	}
+
+	public void setSearchHistory(Set<String> searchHistory) {
+		this.searchHistory = searchHistory;
+	}
+
+	public Set<String> getReplaceHistory() {
+		return replaceHistory;
+	}
+
+	public void setReplaceHistory(Set<String> replaceHistory) {
+		this.replaceHistory = replaceHistory;
+	}
+
 	@Override
 	public String toString() {
 		return "UserStateInfo [projectIdSelected=" + projectIdSelected
 				+ ", fileIdSelected=" + fileIdSelected + ", openedFiles="
-				+ openedFiles + "]";
+				+ openedFiles + ", searchHistory=" + searchHistory
+				+ ", replaceHistory=" + replaceHistory + "]";
 	}	
 }
