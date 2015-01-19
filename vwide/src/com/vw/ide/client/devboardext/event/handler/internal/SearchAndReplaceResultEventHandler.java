@@ -36,7 +36,6 @@ public class SearchAndReplaceResultEventHandler extends Presenter.PresenterEvent
 		if (event.getSearchResult().getReplace() != null && event.getSearchResult().getReplace().length() != 0) {
 			presenter.getView().getConsoles().getSearchConsoleTab().enableSelectMenuItem(SearchConsoleTab.applyReplace, true);
 		}
-		presenter.getView().getConsoles().getSearchConsoleTab().getSearchConsoleSelectionMode().select(event.getSearchResult(), true);
 		presenter.getView().getConsoles().getSearchConsoleTab().enableSelectMenuItem(SearchConsoleTab.clearAll, true);
 		presenter.getView().getConsoles().getSearchConsoleTab().enableSelectMenuItem(SearchConsoleTab.selectAll, true);
 		presenter.getView().getConsoles().getSearchConsoleTab().enableSelectMenuItem(SearchConsoleTab.unselectAll, true);

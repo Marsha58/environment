@@ -301,6 +301,8 @@ public class AceEditor extends Composite implements RequiresResize, HasText, Tak
 	 */
 	public native void gotoLine(int line) /*-{
 		var editor = this.@edu.ycp.cs.dh.acegwt.client.ace.AceEditor::editor;
+		editor.resize(true);
+		editor.scrollToLine(line, true, true, function () {});
 		editor.gotoLine(line);
 	}-*/;
 
@@ -310,13 +312,23 @@ public class AceEditor extends Composite implements RequiresResize, HasText, Tak
 	 * @param line the line to go to
 	 * @param column the position on line
 	 */
-	public native void gotoPos(int line, int column, JavaScriptObject func) /*-{
+	public native void gotoPos(int line, int column) /*-{
 		var editor = this.@edu.ycp.cs.dh.acegwt.client.ace.AceEditor::editor;
 		editor.focus();
-		editor.scrollToLine(line, true, true, func);
+		editor.resize(true);
+		editor.scrollToLine(line, true, true, function () {});
 		editor.gotoLine(line, column, true);
 	}-*/;
 
+
+	/**
+	 * Returns number of lines in current session
+	 *
+	 */
+	public native int getLines() /*-{
+		var editor = this.@edu.ycp.cs.dh.acegwt.client.ace.AceEditor::editor;
+		return editor.getSession().getLength();
+	}-*/;
 	
 	  /**
 	   * Returns a new object.

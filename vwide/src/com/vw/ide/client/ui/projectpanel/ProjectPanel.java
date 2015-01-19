@@ -333,7 +333,10 @@ public class ProjectPanel extends Composite implements IsWidget, PresenterViewer
 			readyItem.setProjectDescription(parent.getProjectDescription());
 			readyItem.setAssociatedData(fi);
 			String projFullPath = Utils.createFullProjectPath(parent.getProjectDescription());
-			String relPath = fi.getAbsolutePath().substring(projFullPath.length() + 1);
+			String relPath = "";
+			if (fi.getAbsolutePath().startsWith(projFullPath) && !fi.getAbsolutePath().equals(projFullPath)) {
+				relPath = fi.getAbsolutePath().substring(projFullPath.length() + 1);
+			}
 			fi.setRelPath(relPath);
 			store.add(p, readyItem);
 		}

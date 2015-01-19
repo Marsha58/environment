@@ -48,5 +48,6 @@ public class RenameOperationBlock {
 		}
 		// last search should be updated also
 		devBoard.getConsoles().getSearchConsoleTab().renameByFileItemInfo(origItemInfo.getAssociatedData(), newItemInfo.getAssociatedData());
+		devBoard.getConsoles().getCompilationErrorConsoleTab().renameByFileItemInfo(origItemInfo.getAssociatedData(), newItemInfo.getAssociatedData());
 	}
 }

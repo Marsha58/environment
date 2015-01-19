@@ -38,6 +38,8 @@ public class InfoConsoleTab extends ConsoleTab {
 			t = info;
 		}
 		control.setText(t);
+		int lines = control.getLines();
+		control.gotoLine(lines - 1);
 	}
 	
 	public void clearInfo() {

@@ -100,6 +100,9 @@ public class Servant {
 		public void stop() {
 			clear();
 			stopFlag.getAndSet(true);
+			synchronized(this) {
+				this.notifyAll();
+			}
 			synchronized(stopFlag) {
 				try {
 					stopFlag.wait();

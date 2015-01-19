@@ -1,5 +1,6 @@
 package com.vw.ide.server.servlet.projectmanager.sink;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,5 +104,17 @@ public class ImportProjectCompilationSink extends CompilationSink {
 	
 	public void delegateErrorCompilationMessage(OperationInfo opInfo) {
 		
+	}
+
+	@Override
+	public void delegateStartProcessExecution(String processName) {
+	}
+
+	@Override
+	public void delegateRuntimeStreams(String processName, InputStream is, InputStream es) {
+	}
+
+	@Override
+	public void delegateFinishProcessExecution(String processName) {
 	}
 }

@@ -137,7 +137,7 @@ public class FileSheet extends Composite {
 	}
 
 	public void setCursorPosition(int line, int pos) {
-		aceEditor.gotoPos(line, pos, JavaScriptObject.createFunction());
+		aceEditor.gotoPos(line, pos);
 	}
 
 	public void markText(String text) {
